@@ -20,5 +20,6 @@
 | Leigh Apotheker | lapothker@sfsu.edu | lapotheker |
 | Jonathan Tsang | jtsang1@sfsu.edu | jjotsang |
 | Yuhang Wei | ywei@sfsu.edu | JustinWei110 |
+| Megha Rai | mrai@sfsu.edu | Megharai-Prog| 
 
 ## NO code needs to be stored in the root of your repository. You may rename the application folder if you like to your team's application name. But all source code related to your team's application should be stored inside the application folder.
