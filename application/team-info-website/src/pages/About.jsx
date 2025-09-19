@@ -12,46 +12,46 @@ const TEAM = {
 
 const MEMBERS = [
   {
+    name: "Iliana Gallegos",
+    role: "Team-lead",
+    bio: "Coordinates the team, ensures milestones are met, and bridges communication between front-end and back-end.",
+    email: "igallegos@sfsu.edu",
+  },
+  {
     name: "Leigh Ann Apotheker",
     role: "Front-End lead",
-    bio: "Focus on Java/Spring Boot, MongoDB, and CI/CD pipelines.",
-    email: "https://github.com/CSC-648-SFSU/csc648-fa25-145-team04",
-    github: "https://github.com/CSC-648-SFSU/csc648-fa25-145-team04",
+    bio: "Guides the front-end team and oversees user interface development.",
+    email: "lapothker@sfsu.edu",
   },
   {
     name: "Megha Rai",
     role: "Front-End Dev",
-    bio: "React + Tailwind lover. Designs delightful, accessible UI.",
+    bio: "Works on front-end features and contributes to building user interfaces.",
     email: "mrai@sfsu.edu",
-    github: "https://github.com/CSC-648-SFSU/csc648-fa25-145-team04",
   },
   {
     name: "Roxana Alicia Del Toro",
     role: "Front-End Dev",
-    bio: "Schema design, REST/GraphQL, performance tuning.",
+    bio: "Supports front-end development and improves user experience.",
     email: "rxdt@sfsu.edu",
-    github: "https://github.com/CSC-648-SFSU/csc648-fa25-145-team04",
   },
   {
     name: "Darien C Sngoeun",
     role: "Back-End Lead",
-    bio: "Testing strategy, automation, and project documentation.",
+    bio: "Leads the back-end team and coordinates server-side development.",
     email: "dsngoeun@sfsu.edu",
-    github: "https://github.com/CSC-648-SFSU/csc648-fa25-145-team04",
   },
   {
     name: "Jonathan Tsang",
     role: "Back-End Dev",
-    bio: "Testing strategy, automation, and project documentation.",
+    bio: "Assists with back-end development and contributes to server logic.",
     email: "jtsang1@sfsu.edu",
-    github: "https://github.com/CSC-648-SFSU/csc648-fa25-145-team04",
   },
   {
     name: "Yuhang Wei",
     role: "GitHub Master",
-    bio: "Manage Github Flow.",
+    bio: "Manages the repository, branching workflow, and pull requests.",
     email: "ywei@sfsu.edu",
-    github: "https://github.com/CSC-648-SFSU/csc648-fa25-145-team04",
   },
 ];
 
@@ -76,9 +76,7 @@ export default function About() {
           <Item label="Team">{TEAM.name}</Item>
           <Item label="Term">{TEAM.term}</Item>
           <Item label="Location">{TEAM.location}</Item>
-          <Item label="Email"><a className="hover:underline" href={`mailto:${TEAM.email}`}>{TEAM.email}</a></Item>
-          <Item label="GitHub"><a className="hover:underline" href={TEAM.github} target="_blank">{TEAM.github}</a></Item>
-          <Item label="Website"><a className="hover:underline" href={TEAM.site} target="_blank">{TEAM.site}</a></Item>
+          <Item label="GitHub"><a className="hover:underline" href={TEAM.github} target="_blank">{TEAM.github}</a></Item>  
         </dl>
       </motion.div>
 
@@ -107,7 +105,6 @@ export default function About() {
               <p className="text-sm mt-3 text-slate-700">{m.bio}</p>
               <div className="mt-4 flex items-center gap-2 text-sm">
                 <LinkPill href={`mailto:${m.email}`} icon={<Mail className="h-4 w-4" />}>Email</LinkPill>
-                <LinkPill href={m.github} icon={<Github className="h-4 w-4" />}>GitHub</LinkPill>
               </div>
             </motion.article>
           ))}

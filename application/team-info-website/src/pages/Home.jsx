@@ -23,14 +23,9 @@ export default function Home() {
           <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight">{TEAM.name}</h1>
           <p className="mt-3 text-lg text-slate-600">{TEAM.tagline}</p>
           <div className="mt-5 flex flex-wrap gap-3">
-            <Badge icon={<GraduationCap className="h-4 w-4" />}>{TEAM.location}</Badge>
-            <Badge icon={<Users className="h-4 w-4" />}>Learning Group</Badge>
-            <Badge icon={<CalendarDays className="h-4 w-4" />}>{TEAM.term}</Badge>
-          </div>
-          <div className="mt-6 flex flex-wrap gap-3 text-sm">
-            <LinkPill href={`mailto:${TEAM.email}`} icon={<Mail className="h-4 w-4" />}>{TEAM.email}</LinkPill>
-            <LinkPill href={TEAM.github} icon={<Github className="h-4 w-4" />}>GitHub</LinkPill>
-            <LinkPill href={TEAM.site} icon={<Globe className="h-4 w-4" />}>Website</LinkPill>
+            <Badge icon={<GraduationCap className="h-6 w-6" />}>{TEAM.location}</Badge>
+            <Badge icon={<Users className="h-6 w-6" />}>Learning Group</Badge>
+            <Badge icon={<CalendarDays className="h-6 w-6" />}>{TEAM.term}</Badge>
           </div>
         </motion.div>
 
