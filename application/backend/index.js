@@ -5,12 +5,8 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Absolute path to the "public" folder next to this file
-const publicDir = path.join(__dirname, 'public');
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve everything in /public (index.html will auto-serve at "/")
-app.use(express.static(publicDir));
-
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(PORT, '127.0.0.1', () => {
+  console.log(`Server running on http://127.0.0.1:${PORT}`);
 });
