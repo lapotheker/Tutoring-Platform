@@ -1,0 +1,8 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Light custom tweaks */
+:root {
+  color-scheme: light;
+}
