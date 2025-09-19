@@ -1,6 +1,7 @@
 module.exports = {
   apps: [{
-    name: 'app',
+    name: 'backend',
+    cwd: "application/backend",
     script: './index.js'
   }],
   deploy: {
@@ -11,7 +12,7 @@ module.exports = {
       ref: 'origin/main',
       repo: 'git@github.com:CSC-648-SFSU/csc648-fa25-145-team04.git',
       path: '/home/ubuntu/csc648-fa25-145-team04',
-      'post-deploy': 'npm install && pm2 startOrRestart ecosystem.config.js'
+      'post-deploy': 'cd application/backend && npm ci --omit=dev && pm2 startOrRestart ecosystem.config.js --only backend',
     }
   }
 }
