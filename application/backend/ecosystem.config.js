@@ -22,7 +22,8 @@ module.exports = {
         // publish static files to Nginx root
         "rsync -ah --delete application/team-info-website/dist/ /var/www/team04-frontend/ && " +
         // restart api
-        "pm2 startOrRestart ecosystem.config.js --only backend && pm2 save"
+        "pm2 startOrRestart application/backend/ecosystem.config.js --only backend && pm2 save"
+
     }
   }
 }
