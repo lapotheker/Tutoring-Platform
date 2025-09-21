@@ -1,7 +1,7 @@
 module.exports = {
   apps: [{
     name: 'backend',
-    cwd: "application/backend",
+    cwd: ".",
     script: 'index.js',
     env: { NODE_ENV: "production", PORT: "3000" }
   }],
