@@ -1,7 +1,7 @@
 # Credentials (Team 04)
 
 ## 1. Server URL or IP
-- **Public DNS:** ec2-54-219-99-133.us-west-1.compute.amazonaws.com
+- **Public DNS:** ec2-54-193-205-119.us-west-1.compute.amazonaws.com
 ## 2. SSH username
 - **SSH user:** ubuntu
 ## 3. SSH key (file inside this folder)
@@ -9,7 +9,7 @@
 - **How to SSH (macOS/Linux/WSL/Git Bash):**
   ```bash
   chmod 400 credentials/team04-project.pem
-  ssh -i credentials/team04-project.pem ubuntu@ec2-54-219-99-133.us-west-1.compute.amazonaws.com
+  ssh -i credentials/team04-project.pem ubuntu@ec2-54-193-205-119.us-west-1.compute.amazonaws.com
 ## 4. Database URL/IP and port
 - **Host:** 127.0.0.1
 - **Port:** 3306
@@ -23,7 +23,7 @@
 - **App DB:** teamapp_db
 ## 8. How to connect
 - ### MySQL Workbench (Standard TCP/IP over SSH)
-  - **SSH Hostname:** ec2-54-219-99-133.us-west-1.compute.amazonaws.com
+  - **SSH Hostname:** ec2-54-193-205-119.us-west-1.compute.amazonaws.com
   - **SSH Username:** ubuntu
   - **SSH Key File:** credentials/team04-project.pem
   - **MySQL Hostname:** 127.0.0.1
