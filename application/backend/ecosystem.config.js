@@ -9,7 +9,7 @@ module.exports = {
     production: {
       user: 'ubuntu',
       host: 'ec2-54-193-205-119.us-west-1.compute.amazonaws.com',
-      key: 'credentials/team04-project.pem',
+      key: '~/.ssh/team04-project.pem',
       ref: 'origin/main',
       repo: 'git@github.com:CSC-648-SFSU/csc648-fa25-145-team04.git',
       path: '/home/ubuntu/csc648-fa25-145-team04',
