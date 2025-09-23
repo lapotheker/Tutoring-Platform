@@ -5,7 +5,6 @@ const MEMBER = {
   name: "Leigh Apotheker",
   role: "Front-End Lead",
   bio: "Guides the front-end team and oversees user interface development.",
-  email: "lapothker@sfsu.edu"
 };
 
 export default function LeighApotheker() {
@@ -48,9 +47,6 @@ export default function LeighApotheker() {
                 {MEMBER.bio}
               </p>
               <div className="mt-6">
-                <LinkButton href={`mailto:${MEMBER.email}`} icon={<Mail className="h-4 w-4" />}>
-                  Email Me
-                </LinkButton>
               </div>
             </div>
           </div>
