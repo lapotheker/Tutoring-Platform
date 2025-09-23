@@ -19,6 +19,7 @@ const MEMBERS = [
     email: "igallegos@sfsu.edu",
   },
   {
+    slug: "leigh-apotheker",
     name: "Leigh Apotheker",
     role: "Front-End lead",
     bio: "Guides the front-end team and oversees user interface development.",
@@ -104,7 +105,7 @@ export default function About() {
               </div>
               
               <div className="font-semibold leading-tight">
-                {m.slug === "yuhang-wei" || m.slug === "leigh-ann-apotheker" ? (
+                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" ? (
                   <Link to={`/member/${m.slug}`} className="text-blue-600 hover:underline">
                     {m.name}
                   </Link>
