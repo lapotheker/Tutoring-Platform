@@ -36,7 +36,7 @@ const MEMBERS = [
     email: "rxdt@sfsu.edu",
   },
   {
-    name: "Darien C Sngoeun",
+    name: "Darien Sngoeun",
     role: "Back-End Lead",
     bio: "Leads the back-end team and coordinates server-side development.",
     email: "dsngoeun@sfsu.edu",
