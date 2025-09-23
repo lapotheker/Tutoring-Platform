@@ -5,8 +5,7 @@ const MEMBER = {
   name: "Leigh Apotheker",
   role: "Front-End Lead",
   bio: "Guides the front-end team and oversees user interface development.",
-  email: "lapothker@sfsu.edu",
-  slug: "leigh-apotheker"
+  email: "lapothker@sfsu.edu"
 };
 
 export default function LeighApotheker() {
