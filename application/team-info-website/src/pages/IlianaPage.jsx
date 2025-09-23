@@ -14,8 +14,8 @@ export default function Iliana() {
             <h2 className="text-xl text-slate-500 font-medium mt-1">Team Lead</h2>
             <p className="text-slate-700 mt-4 max-w-prose">
               Hello, my name is <strong>Iliana Gallegos</strong>. I am the Team Lead. 
-              I coordinate the team, ensure milestones are met, and bridge communication 
-              between front-end and back-end.
+              I coordinate with the team, make sure milestones are met, and bridge communication 
+              between front-end and back-end to ensure the project goes smoothly.
             </p>
 
             {/* Contact Button */}
