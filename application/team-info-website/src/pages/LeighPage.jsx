@@ -2,15 +2,16 @@ import { motion } from "framer-motion";
 import { Mail, ArrowLeft } from "lucide-react";
 
 const MEMBER = {
-  name: "Leigh Apotheker",
+  name: "Leigh Ann Apotheker",
   role: "Front-End Lead",
-  bio: "Guides the front-end team and oversees user interface development.",
+  bio: "Guides the front-end team and oversees user interface development."
 };
 
 export default function LeighApotheker() {
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
+
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
@@ -35,7 +36,7 @@ export default function LeighApotheker() {
             <div className="h-32 w-32 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 text-white grid place-items-center font-bold text-4xl flex-shrink-0">
               LA
             </div>
-            
+
             <div className="flex-1">
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
                 {MEMBER.name}
@@ -46,8 +47,6 @@ export default function LeighApotheker() {
               <p className="text-slate-600 mt-4 leading-relaxed">
                 {MEMBER.bio}
               </p>
-              <div className="mt-6">
-              </div>
             </div>
           </div>
         </motion.div>
