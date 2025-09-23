@@ -13,6 +13,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/member/yuhang-wei" element={<YuhangPage />} />
+          <Route path="/member/leigh-apotheker" element={<LeighApotheker />} />
         </Routes>
       </main>
       <footer className="mt-10 border-t border-slate-200">
