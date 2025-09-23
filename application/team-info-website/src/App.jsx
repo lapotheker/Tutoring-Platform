@@ -5,6 +5,7 @@ import { Routes, Route } from "react-router-dom";
 import YuhangPage from "./pages/YuhangPage";
 import LeighPage from "./pages/LeighPage";
 import DarienPage from "./pages/DarienPage";
+import MeghaPage from "./pages/MeghaPage";
 
 export default function App() {
   return (
@@ -17,6 +18,7 @@ export default function App() {
           <Route path="/member/yuhang-wei" element={<YuhangPage />} />
           <Route path="/member/leigh-apotheker" element={<LeighPage />} />
           <Route path="/member/darien-sngoeun" element={<DarienPage />} />
+          <Route path="/member/megha-rai" element={<MeghaPage />} />
         </Routes>
       </main>
       <footer className="mt-10 border-t border-slate-200">
