@@ -38,6 +38,7 @@ const MEMBERS = [
     email: "rxdt@sfsu.edu",
   },
   {
+    slug: "darien-sngoeun",
     name: "Darien C Sngoeun",
     role: "Back-End Lead",
     bio: "Leads the back-end team and coordinates server-side development.",
@@ -105,7 +106,7 @@ export default function About() {
               </div>
               
               <div className="font-semibold leading-tight">
-                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" ? (
+                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" || m.slug === "darien-sngoeun" ? (
                   <Link to={`/member/${m.slug}`} className="text-blue-600 hover:underline">
                     {m.name}
                   </Link>
