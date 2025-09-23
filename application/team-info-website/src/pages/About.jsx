@@ -19,7 +19,7 @@ const MEMBERS = [
     email: "igallegos@sfsu.edu",
   },
   {
-    name: "Leigh Ann Apotheker",
+    name: "Leigh Apotheker",
     role: "Front-End lead",
     bio: "Guides the front-end team and oversees user interface development.",
     email: "lapothker@sfsu.edu",
@@ -99,17 +99,12 @@ export default function About() {
               transition={{ duration: 0.35 }}
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md"
             >
-              onClick={m.name === "Leigh Ann Apotheker" ? () => {
-              console.log("Clicked Leigh's card!");
-              alert("Navigation would happen here");
-              } : undefined}
-
               <div className="h-14 w-14 rounded-xl bg-slate-900 text-white grid place-items-center font-bold mb-3">
                 {m.name.split(" ").map(p => p[0]).join("")}
               </div>
               
               <div className="font-semibold leading-tight">
-                {m.slug === "yuhang-wei" ? (
+                {m.slug === "yuhang-wei" || m.slug === "leigh-ann-apotheker" ? (
                   <Link to={`/member/${m.slug}`} className="text-blue-600 hover:underline">
                     {m.name}
                   </Link>

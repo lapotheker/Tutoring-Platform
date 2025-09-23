@@ -2,10 +2,11 @@ import { motion } from "framer-motion";
 import { Mail, ArrowLeft } from "lucide-react";
 
 const MEMBER = {
-  name: "Leigh Ann Apotheker",
+  name: "Leigh Apotheker",
   role: "Front-End Lead",
   bio: "Guides the front-end team and oversees user interface development.",
   email: "lapothker@sfsu.edu",
+  slug: "leigh-apotheker"
 };
 
 export default function LeighApotheker() {
