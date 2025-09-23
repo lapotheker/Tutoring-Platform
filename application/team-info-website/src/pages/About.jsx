@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { Mail, Github, Globe } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const TEAM = {
   name: "CSC648 Section04 Team04",
@@ -31,12 +32,12 @@ const MEMBERS = [
   },
   {
     name: "Roxana Alicia Del Toro",
-    role: "Back-End Dev",
+    role: "Front-End Dev",
     bio: "Supports front-end development and improves user experience.",
     email: "rxdt@sfsu.edu",
   },
   {
-    name: "Darien Sngoeun",
+    name: "Darien C Sngoeun",
     role: "Back-End Lead",
     bio: "Leads the back-end team and coordinates server-side development.",
     email: "dsngoeun@sfsu.edu",
@@ -48,6 +49,7 @@ const MEMBERS = [
     email: "jtsang1@sfsu.edu",
   },
   {
+    slug: "yuhang-wei",
     name: "Yuhang Wei",
     role: "GitHub Master",
     bio: "Manages the repository, branching workflow, and pull requests.",
@@ -100,7 +102,15 @@ export default function About() {
               <div className="h-14 w-14 rounded-xl bg-slate-900 text-white grid place-items-center font-bold mb-3">
                 {m.name.split(" ").map(p => p[0]).join("")}
               </div>
-              <div className="font-semibold leading-tight">{m.name}</div>
+              <div className="font-semibold leading-tight">
+                {m.slug === "yuhang-wei" ? (
+                  <Link to={`/member/${m.slug}`} className="text-blue-600 hover:underline">
+                    {m.name}
+                  </Link>
+                ) : (
+                  m.name
+                )}
+              </div>
               <div className="text-sm text-slate-500">{m.role}</div>
               <p className="text-sm mt-3 text-slate-700">{m.bio}</p>
               <div className="mt-4 flex items-center gap-2 text-sm">
