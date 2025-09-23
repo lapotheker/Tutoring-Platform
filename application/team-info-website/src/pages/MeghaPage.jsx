@@ -14,7 +14,9 @@ export default function MeghaPage() {
           <h1 className="mt-6 text-3xl font-extrabold tracking-tight">
             Megha Rai
           </h1>
-          <h2 className="mt-1 text-slate-500 font-medium">Front-End Developer</h2>
+          <h2 className="mt-1 text-slate-500 font-medium">
+            Front-End Developer
+          </h2>
 
           <p className="mt-4 text-slate-700 leading-relaxed">
             Hi, I’m <strong>Megha Rai</strong>. I work on front-end features and
