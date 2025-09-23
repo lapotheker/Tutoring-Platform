@@ -31,7 +31,7 @@ const MEMBERS = [
   },
   {
     name: "Roxana Alicia Del Toro",
-    role: "Front-End Dev",
+    role: "Back-End Dev",
     bio: "Supports front-end development and improves user experience.",
     email: "rxdt@sfsu.edu",
   },
