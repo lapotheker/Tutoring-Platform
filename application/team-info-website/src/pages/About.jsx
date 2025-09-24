@@ -26,6 +26,7 @@ const MEMBERS = [
     email: "lapothker@sfsu.edu",
   },
   {
+    slug: "megha-rai", 
     name: "Megha Rai",
     role: "Front-End Dev",
     bio: "Works on front-end features and contributes to building user interfaces.",
