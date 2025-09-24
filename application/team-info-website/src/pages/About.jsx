@@ -107,7 +107,7 @@ export default function About() {
               </div>
               
               <div className="font-semibold leading-tight">
-                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" || m.slug === "darien-sngoeun" ? (
+                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" || m.slug === "darien-sngoeun" || m.slug ==="megha-rai" ?  (
                   <Link to={`/member/${m.slug}`} className="text-blue-600 hover:underline">
                     {m.name}
                   </Link>
