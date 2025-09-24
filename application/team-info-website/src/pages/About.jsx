@@ -34,12 +34,6 @@ const MEMBERS = [
     email: "mrai@sfsu.edu",
   },
   {
-    name: "Roxana Alicia Del Toro",
-    role: "Front-End Dev",
-    bio: "Supports front-end development and improves user experience.",
-    email: "rxdt@sfsu.edu",
-  },
-  {
     slug: "darien-sngoeun",
     name: "Darien C Sngoeun",
     role: "Back-End Lead",
@@ -58,6 +52,13 @@ const MEMBERS = [
     role: "GitHub Master",
     bio: "Manages the repository, branching workflow, and pull requests.",
     email: "ywei@sfsu.edu",
+  },
+  {
+    slug: "roxana-del-toro",
+    name: "Roxana del Toro",
+    role: "Back-End Dev",
+    bio: "Develops on the backend part of the stack and helps with infrastructure.",
+    email: "rxdt@sfsu.edu",
   },
 ];
 
@@ -108,7 +109,7 @@ export default function About() {
               </div>
               
               <div className="font-semibold leading-tight">
-                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" || m.slug === "darien-sngoeun" || m.slug ==="megha-rai" || m.slug === "iliana-morales" ?  (
+                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" || m.slug === "darien-sngoeun" || m.slug ==="megha-rai" || m.slug === "iliana-morales" || m.slug === "roxana-del-toro"?  (
                   <Link to={`/member/${m.slug}`} className="text-blue-600 hover:underline">
                     {m.name}
                   </Link>

@@ -6,7 +6,8 @@ import YuhangPage from "./pages/YuhangPage";
 import LeighPage from "./pages/LeighPage";
 import DarienPage from "./pages/DarienPage";
 import MeghaPage from "./pages/MeghaPage";
-import IlianaPage from "./pages/IlianaPage.jsx";  
+import IlianaPage from "./pages/IlianaPage.jsx";
+import RoxanaPage from "./pages/RoxanaPage.jsx";
 
 export default function App() {
   return (
@@ -21,6 +22,7 @@ export default function App() {
           <Route path="/member/darien-sngoeun" element={<DarienPage />} />
           <Route path="/member/megha-rai" element={<MeghaPage />} />
           <Route path="/member/iliana-morales" element={<IlianaPage />} />
+          <Route path="/member/roxana-del-toro" element={<RoxanaPage />} />
         </Routes>
       </main>
       <footer className="mt-10 border-t border-slate-200">
