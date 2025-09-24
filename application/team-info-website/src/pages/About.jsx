@@ -41,6 +41,7 @@ const MEMBERS = [
     email: "dsngoeun@sfsu.edu",
   },
   {
+    slug: "jonathan-tsang",
     name: "Jonathan Tsang",
     role: "Back-End Dev",
     bio: "Assists with back-end development and contributes to server logic.",
@@ -60,6 +61,7 @@ const MEMBERS = [
     bio: "Develops on the backend part of the stack and helps with infrastructure.",
     email: "rxdt@sfsu.edu",
   },
+  
 ];
 
 export default function About() {
@@ -109,7 +111,7 @@ export default function About() {
               </div>
               
               <div className="font-semibold leading-tight">
-                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" || m.slug === "darien-sngoeun" || m.slug ==="megha-rai" || m.slug === "iliana-morales" || m.slug === "roxana-del-toro"?  (
+                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" || m.slug === "darien-sngoeun" || m.slug ==="megha-rai" || m.slug === "iliana-morales" || m.slug === "roxana-del-toro" || m.slug === "jonathan-tsang"?  (
                   <Link to={`/member/${m.slug}`} className="text-blue-600 hover:underline">
                     {m.name}
                   </Link>
