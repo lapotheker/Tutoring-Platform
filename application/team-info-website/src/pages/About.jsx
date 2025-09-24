@@ -13,6 +13,7 @@ const TEAM = {
 
 const MEMBERS = [
   {
+    slug: "iliana-morales",
     name: "Iliana Gallegos",
     role: "Team-lead",
     bio: "Coordinates the team, ensures milestones are met, and bridges communication between front-end and back-end.",
@@ -107,7 +108,7 @@ export default function About() {
               </div>
               
               <div className="font-semibold leading-tight">
-                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" || m.slug === "darien-sngoeun" || m.slug ==="megha-rai" ?  (
+                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" || m.slug === "darien-sngoeun" || m.slug ==="megha-rai" || m.slug === "iliana-morales" ?  (
                   <Link to={`/member/${m.slug}`} className="text-blue-600 hover:underline">
                     {m.name}
                   </Link>
