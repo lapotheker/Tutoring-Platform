@@ -8,7 +8,8 @@ module.exports = {
   deploy: {
     production: {
       user: 'ubuntu',
-      host: 'ec2-54-193-205-119.us-west-1.compute.amazonaws.com',
+      host: '50.18.23.168',
+      ssh_options: 'StrictHostKeyChecking=no',
       key: '~/.ssh/team04-project.pem',
       ref: 'origin/main',
       repo: 'git@github.com:CSC-648-SFSU/csc648-fa25-145-team04.git',
