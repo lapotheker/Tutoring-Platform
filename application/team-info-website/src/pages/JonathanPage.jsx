@@ -1,6 +1,12 @@
+import { Link } from "react-router-dom";
+
 export default function JonathanPage() {
   return (
     <section className="max-w-2xl mx-auto p-6 border border-gray-300 rounded-2xl shadow-md bg-white">
+      
+      <Link to="/about" className="text-sm text-slate-500 hover:underline">
+        ← Back to About
+      </Link>
       <h1 className="text-3xl font-bold">Jonathan Tsang</h1>
 
       <p className="mt-4 text-slate-700 leading-relaxed">
