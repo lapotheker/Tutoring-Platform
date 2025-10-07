@@ -1,8 +1,14 @@
 import { Mail } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function MeghaPage() {
   return (
     <section className="max-w-lg mx-auto mt-8">
+      <Link 
+          to="/about" className="inline-block text-blue-600 hover:underline mb-4">
+          ← Back to About
+      </Link>
+
       <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-lg">
         <div className="flex flex-col items-center text-center">
           <img

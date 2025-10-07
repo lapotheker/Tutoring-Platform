@@ -1,6 +1,13 @@
+import { Link } from "react-router-dom";
+
 export default function RoxanaPage() {
     return (
         <section className="max-w-2xl mx-auto p-6">
+            <Link 
+                to="/about" className="inline-block text-blue-600 hover:underline mb-4">
+                ← Back to About
+            </Link>
+            
             <h1 className="text-3xl font-bold">Roxana del Toro</h1>
 
             <img
