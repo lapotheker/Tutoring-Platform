@@ -27,7 +27,7 @@ const MEMBERS = [
     email: "lapothker@sfsu.edu",
   },
   {
-    slug: "megha-rai", 
+    slug: "megha-rai",
     name: "Megha Rai",
     role: "Front-End Dev",
     bio: "Works on front-end features and contributes to building user interfaces.",
@@ -61,7 +61,6 @@ const MEMBERS = [
     bio: "Develops on the backend part of the stack and helps with infrastructure.",
     email: "rxdt@sfsu.edu",
   },
-  
 ];
 
 export default function About() {
@@ -76,8 +75,8 @@ export default function About() {
       >
         <h2 className="text-2xl md:text-3xl font-bold tracking-tight">About Us</h2>
         <p className="text-slate-600 mt-2">
-          We are a collaborative learning group at SFSU focused on full‑stack web development.
-          Our workflow emphasizes clear communication, short sprint cycles, and measurable deliverables.
+          We are a collaborative learning group at SFSU focused on full‑stack web development. Our
+          workflow emphasizes clear communication, short sprint cycles, and measurable deliverables.
           We meet weekly to plan, pair‑program, and review progress.
         </p>
 
@@ -85,7 +84,11 @@ export default function About() {
           <Item label="Team">{TEAM.name}</Item>
           <Item label="Term">{TEAM.term}</Item>
           <Item label="Location">{TEAM.location}</Item>
-          <Item label="GitHub"><a className="hover:underline" href={TEAM.github} target="_blank">{TEAM.github}</a></Item>  
+          <Item label="GitHub">
+            <a className="hover:underline" href={TEAM.github} target="_blank">
+              {TEAM.github}
+            </a>
+          </Item>
         </dl>
       </motion.div>
 
@@ -107,11 +110,20 @@ export default function About() {
               className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm hover:shadow-md"
             >
               <div className="h-14 w-14 rounded-xl bg-slate-900 text-white grid place-items-center font-bold mb-3">
-                {m.name.split(" ").map(p => p[0]).join("")}
+                {m.name
+                  .split(" ")
+                  .map((p) => p[0])
+                  .join("")}
               </div>
-              
+
               <div className="font-semibold leading-tight">
-                {m.slug === "yuhang-wei" || m.slug === "leigh-apotheker" || m.slug === "darien-sngoeun" || m.slug ==="megha-rai" || m.slug === "iliana-morales" || m.slug === "roxana-del-toro" || m.slug === "jonathan-tsang"?  (
+                {m.slug === "yuhang-wei" ||
+                m.slug === "leigh-apotheker" ||
+                m.slug === "darien-sngoeun" ||
+                m.slug === "megha-rai" ||
+                m.slug === "iliana-morales" ||
+                m.slug === "roxana-del-toro" ||
+                m.slug === "jonathan-tsang" ? (
                   <Link to={`/member/${m.slug}`} className="text-blue-600 hover:underline">
                     {m.name}
                   </Link>
@@ -122,7 +134,9 @@ export default function About() {
               <div className="text-sm text-slate-500">{m.role}</div>
               <p className="text-sm mt-3 text-slate-700">{m.bio}</p>
               <div className="mt-4 flex items-center gap-2 text-sm">
-                <LinkPill href={`mailto:${m.email}`} icon={<Mail className="h-4 w-4" />}>Email</LinkPill>
+                <LinkPill href={`mailto:${m.email}`} icon={<Mail className="h-4 w-4" />}>
+                  Email
+                </LinkPill>
               </div>
             </motion.article>
           ))}
@@ -143,7 +157,10 @@ function Item({ label, children }) {
 
 function LinkPill({ href, icon, children }) {
   return (
-    <a href={href} className="inline-flex items-center gap-1 rounded-full border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50">
+    <a
+      href={href}
+      className="inline-flex items-center gap-1 rounded-full border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50"
+    >
       {icon}
       <span>{children}</span>
     </a>

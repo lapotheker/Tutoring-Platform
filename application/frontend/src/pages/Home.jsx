@@ -65,7 +65,10 @@ function Badge({ icon, children }) {
 
 function LinkPill({ href, icon, children }) {
   return (
-    <a href={href} className="inline-flex items-center gap-1 rounded-full border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50">
+    <a
+      href={href}
+      className="inline-flex items-center gap-1 rounded-full border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50"
+    >
       {icon}
       <span>{children}</span>
     </a>

@@ -1,44 +1,41 @@
-import { Link, NavLink } from "react-router-dom";
+// src/components/Navbar.jsx
+import { NavLink } from "react-router-dom";
 
-// Navigation bar component displayed at the top of all pages
-export default function NavBar() {
-  // Define a reusable style for navigation links
-  const linkClass = isActive =>
-    `px-3 py-1 rounded-2xl transition ${
-      isActive ? "bg-uno-blue/40 underline" : "hover:bg-white/10"
-    }`;
-
+export default function Navbar() {
   return (
-    <header className="sticky top-0 z-40 bg-bg/80 backdrop-blur shadow-soft">
-      <div className="max-w-6xl mx-auto h-14 px-4 flex items-center justify-between">
-        {/* Left side — project logo and home link */}
-        <Link to="/" className="font-semibold text-lg tracking-wide">
-          SFSU Tutor
-        </Link>
-
-        {/* Right side — navigation links */}
-        <nav className="flex items-center gap-3 text-sm">
-          {/* Home page link */}
-          <NavLink to="/" className={({ isActive }) => linkClass(isActive)}>
-            Home
-          </NavLink>
-
-          {/* Search page link */}
-          <NavLink to="/search" className={({ isActive }) => linkClass(isActive)}>
-            Search
-          </NavLink>
-
-          {/* Login page link */}
-          <NavLink to="/login" className={({ isActive }) => linkClass(isActive)}>
-            Login
-          </NavLink>
-
-          {/* Sign-up page link */}
-          <NavLink to="/signup" className={({ isActive }) => linkClass(isActive)}>
-            Sign Up
-          </NavLink>
-        </nav>
-      </div>
+    <header className="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-slate-200">
+      <nav className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="h-9 w-9 rounded-2xl bg-slate-900 text-white grid place-items-center font-semibold">
+            04
+          </div>
+          <div>
+            <div className="font-semibold leading-tight">CSC648 Section04 Team04</div>
+            <div className="text-xs text-slate-500 -mt-0.5">Fall 2025</div>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 text-sm">
+          <Nav to="/">Home</Nav>
+          <Nav to="/about">About</Nav>
+          {/* NEW: Tutor */}
+          <Nav to="/tutor">Tutor</Nav>
+        </div>
+      </nav>
     </header>
+  );
+}
+
+function Nav({ to, children }) {
+  return (
+    <NavLink
+      to={to}
+      className={({ isActive }) =>
+        `px-3 py-1 rounded-full ${
+          isActive ? "bg-slate-200 text-slate-900" : "text-slate-600 hover:bg-slate-100"
+        }`
+      }
+    >
+      {children}
+    </NavLink>
   );
 }

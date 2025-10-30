@@ -6,7 +6,7 @@ export default function YuhangPage() {
       <Link to="/about" className="inline-block text-blue-600 hover:underline mb-4">
         ← Back to About
       </Link>
-      
+
       <h1 className="text-3xl font-bold">Yuhang Wei</h1>
 
       <img
@@ -16,16 +16,14 @@ export default function YuhangPage() {
       />
 
       <p className="mt-4 text-slate-700 leading-relaxed">
-        Hi, I’m <strong>Yuhang Wei</strong>, the GitHub Master of our team.  
-        I manage the repository, branching workflow, and pull requests.  
-        My role ensures smooth collaboration and version control across our project.
+        Hi, I’m <strong>Yuhang Wei</strong>, the GitHub Master of our team. I manage the repository,
+        branching workflow, and pull requests. My role ensures smooth collaboration and version
+        control across our project.
       </p>
 
       <p className="mt-4 text-slate-600">
-        📧 <a
-          href="mailto:ywei@sfsu.edu"
-          className="text-blue-600 hover:underline"
-        >
+        📧{" "}
+        <a href="mailto:ywei@sfsu.edu" className="text-blue-600 hover:underline">
           ywei@sfsu.edu
         </a>
       </p>

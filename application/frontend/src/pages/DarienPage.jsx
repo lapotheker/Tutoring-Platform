@@ -18,9 +18,9 @@ export default function Darien() {
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Darien Sngoeun</h1>
             <p className="text-slate-700 mt-4 max-w-prose">
-              Lorem ipsum dolor sit amet consectetur adipisicing elit. 
-              Tempora culpa laudantium rem eaque ea, itaque obcaecati esse nisi ipsa cum a illo, 
-              maiores excepturi quam? Minus ea enim deleniti magni?
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Tempora culpa laudantium rem
+              eaque ea, itaque obcaecati esse nisi ipsa cum a illo, maiores excepturi quam? Minus ea
+              enim deleniti magni?
             </p>
           </div>
         </div>

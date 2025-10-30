@@ -2,18 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Light custom tweaks */
 :root {
-  --radius: 18px;
-}
-html,
-body {
-  height: 100%;
-}
-body {
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-a {
-  text-decoration: none;
+  color-scheme: light;
 }

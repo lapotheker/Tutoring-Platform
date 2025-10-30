@@ -4,20 +4,19 @@ import { Mail, ArrowLeft } from "lucide-react";
 const MEMBER = {
   name: "Leigh Ann Apotheker",
   role: "Front-End Lead",
-  bio: "Guides the front-end team and oversees user interface development."
+  bio: "Guides the front-end team and oversees user interface development.",
 };
 
 export default function LeighApotheker() {
   return (
     <div className="min-h-screen bg-slate-50 py-8 px-4">
       <div className="max-w-4xl mx-auto space-y-6">
-
         <motion.div
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.3 }}
         >
-          <button 
+          <button
             onClick={() => window.history.back()}
             className="inline-flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
           >
@@ -41,17 +40,11 @@ export default function LeighApotheker() {
               <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-slate-900">
                 {MEMBER.name}
               </h1>
-              <p className="text-xl text-blue-600 font-medium mt-2">
-                {MEMBER.role}
-              </p>
-              <p className="text-slate-600 mt-4 leading-relaxed">
-                {MEMBER.bio}
-              </p>
+              <p className="text-xl text-blue-600 font-medium mt-2">{MEMBER.role}</p>
+              <p className="text-slate-600 mt-4 leading-relaxed">{MEMBER.bio}</p>
             </div>
           </div>
         </motion.div>
-
-
       </div>
     </div>
   );
@@ -59,7 +52,7 @@ export default function LeighApotheker() {
 
 function LinkButton({ href, icon, children }) {
   return (
-    <a 
+    <a
       href={href}
       className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 hover:border-slate-400 transition-all duration-200 font-medium"
     >
