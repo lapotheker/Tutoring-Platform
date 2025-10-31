@@ -1,10 +1,11 @@
+// src/pages/TutorDashboard.jsx
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function TutorDashboard() {
   const navigate = useNavigate();
 
-  // Read demo user (from Login.jsx). Fallback name: "Tutor".
+  // Load demo user from local or session storage
   const user = useMemo(() => {
     try {
       return JSON.parse(
@@ -15,14 +16,14 @@ export default function TutorDashboard() {
     }
   }, []);
 
+  // Extract name from email or use fallback
   const displayName = useMemo(() => {
     if (!user?.email) return "Tutor";
     const beforeAt = user.email.split("@")[0] || "Tutor";
-    // Try to make it look like a name (capitalize first letter)
     return beforeAt.charAt(0).toUpperCase() + beforeAt.slice(1);
   }, [user]);
 
-  // (Optional) If you want to force login before viewing dashboard, redirect:
+  // Optional redirect if user not logged in
   useEffect(() => {
     if (!user) {
       const next = encodeURIComponent("/tutor/dashboard");
@@ -79,7 +80,7 @@ export default function TutorDashboard() {
 
           <div className="mt-5">
             <button
-              onClick={() => navigate("/register?role=tutor")}
+              onClick={() => navigate("/tutor/profile-submitted")}
               className="rounded-md border px-5 py-2 font-semibold hover:bg-white"
             >
               CREATE PROFILE

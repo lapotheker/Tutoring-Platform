@@ -1,165 +1,198 @@
 // src/pages/RequestSession.jsx
 import { useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
-
-// Simple local data (same mock tutors as used in TutorSearch)
-const MOCK = [
-  {
-    id: 1,
-    name: "Alex Chen",
-    subjects: ["CSC 415", "Data Structures"],
-    rate: 30,
-    rating: 4.8,
-  },
-  {
-    id: 2,
-    name: "Maya Singh",
-    subjects: ["Math 227", "Linear Algebra"],
-    rate: 28,
-    rating: 4.6,
-  },
-  {
-    id: 3,
-    name: "Sofia Lopez",
-    subjects: ["ENG 214", "Academic Writing"],
-    rate: 25,
-    rating: 4.9,
-  },
-];
+import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
 
 export default function RequestSession() {
-  const { id } = useParams(); // Get tutor ID from URL (e.g., /tutor/request/1)
+  const { id } = useParams(); // /tutor/request/:id
   const navigate = useNavigate();
+  const { search } = useLocation(); // keep prior filters when going back
 
-  // Form state
+  // --- Form state ---
+  const [fromEmail, setFromEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [language, setLanguage] = useState("");
   const [message, setMessage] = useState("");
-  const [sent, setSent] = useState(false);
+  const [err, setErr] = useState("");
+  const [status, setStatus] = useState("idle"); // idle | sending | sent
 
-  // Check demo login status (Login.jsx stores demoUser in localStorage)
-  const user = useMemo(() => {
+  // Read demo login (set by Login.jsx) and prefill FROM with @sfsu.edu email
+  const demoUser = useMemo(() => {
     try {
-      const raw = localStorage.getItem("demoUser");
-      return raw ? JSON.parse(raw) : null;
+      return JSON.parse(
+        localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser") || "null"
+      );
     } catch {
       return null;
     }
   }, []);
 
-  // If user not logged in, redirect to login page
-  // and return here after login using ?next=...
+  // If not logged in (demo), redirect to login then return here via ?next=
   useEffect(() => {
-    if (!user) {
+    if (!demoUser) {
       const next = encodeURIComponent(`/tutor/request/${id}`);
       navigate(`/login?next=${next}`, { replace: true });
+    } else if (demoUser.email && !fromEmail) {
+      setFromEmail(demoUser.email);
     }
-  }, [user, id, navigate]);
+  }, [demoUser, id, navigate, fromEmail]);
 
-  // Find the selected tutor from the mock list
-  const tutor = useMemo(() => MOCK.find((t) => String(t.id) === String(id)), [id]);
-
-  // If tutor not found (invalid ID in URL)
-  if (!tutor) {
-    return (
-      <section className="space-y-6">
-        <div className="rounded-2xl border border-slate-200 bg-white p-6">
-          <h1 className="text-xl font-semibold">Tutor not found</h1>
-          <p className="text-slate-600 mt-2">
-            The tutor you are trying to contact does not exist.{" "}
-            <Link to="/tutor/search" className="text-blue-600 hover:underline">
-              Back to search
-            </Link>
-          </p>
-        </div>
-      </section>
-    );
+  // Basic validation to match the wireframe requirements
+  function validate() {
+    if (!fromEmail || !/^[^@\s]+@sfsu\.edu$/i.test(fromEmail)) {
+      return "FROM must be a valid @sfsu.edu email.";
+    }
+    if (!subject.trim()) return "SUBJECT is required.";
+    if (!message.trim()) return "MESSAGE is required.";
+    return "";
   }
 
-  // Handle form submission (demo only)
-  function onSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
-    if (!message.trim()) return;
-    setSent(true); // Mark as "sent" for success UI
+    setErr("");
+
+    const v = validate();
+    if (v) {
+      setErr(v);
+      return;
+    }
+
+    setStatus("sending");
+
+    try {
+      // Hook this up to your backend later:
+      // const base = import.meta.env.VITE_API_BASE_URL || "";
+      // const res = await fetch(`${base}/api/messages`, {
+      //   method: "POST",
+      //   headers: { "Content-Type": "application/json" },
+      //   body: JSON.stringify({
+      //     toTutorId: id,
+      //     fromEmail: fromEmail.trim(),
+      //     subject: subject.trim(),
+      //     languageRequest: language.trim(),
+      //     message: message.trim(),
+      //   }),
+      // });
+      // if (!res.ok) throw new Error("Failed to send message");
+
+      // Demo: simulate a short network delay
+      await new Promise((r) => setTimeout(r, 700));
+      setStatus("sent");
+
+      // After sending, go back to results (keeps original filters), or back to profile:
+      navigate({ pathname: "/results", search }, { replace: true });
+    } catch (e) {
+      setStatus("idle");
+      setErr(e?.message || "Something went wrong.");
+    }
   }
+
+  // Simple panel + form layout to mirror the wireframe
+  const input = "w-full max-w-xs rounded-md border px-3 py-2 text-sm";
+  const label = "text-sm font-semibold text-slate-700";
+  const panel = "rounded-2xl border border-slate-300 bg-white p-6 shadow-sm";
 
   return (
     <section className="space-y-6">
-      {/* Header section */}
-      <header className="rounded-2xl border border-slate-200 bg-white p-6">
-        <h1 className="text-2xl font-bold">Request a Session</h1>
-        <p className="text-slate-600 mt-2 text-sm">
-          One-way messaging (demo only): Students can send a single message to a tutor. Tutors
-          cannot reply inside the app.
-        </p>
-      </header>
+      <div className={panel}>
+        {/* Back to profile/results link (wireframe shows a simple back line) */}
+        <Link
+          to={{ pathname: `/tutors/${id}`, search }}
+          className="text-sm font-medium text-blue-600 hover:underline"
+        >
+          &lt; BACK TO PROFILE
+        </Link>
 
-      {/* Tutor summary card */}
-      <div className="rounded-2xl border border-slate-200 bg-white p-6">
-        <div className="font-semibold text-lg">{tutor.name}</div>
-        <div className="text-sm text-slate-600 mt-1">{tutor.subjects.join(", ")}</div>
-        <div className="text-sm mt-2">
-          Rate: ${tutor.rate}/hr · Rating: {tutor.rating}
-        </div>
-      </div>
+        <h1 className="mt-4 text-xl font-extrabold tracking-wide">Contact Form</h1>
 
-      {/* Show either success message or message form */}
-      {sent ? (
-        // Success confirmation
-        <div className="rounded-2xl border border-emerald-300 bg-emerald-50 text-emerald-900 p-6">
-          <div className="font-semibold">Request sent!</div>
-          <p className="text-sm mt-1">
-            Your message has been recorded for demo purposes. This is a one-way message—tutors
-            cannot reply inside the app.
-          </p>
-          <div className="mt-4 flex gap-2">
-            <Link
-              to="/tutor/search"
-              className="rounded-xl bg-slate-900 px-4 py-2 text-white text-sm hover:bg-black"
-            >
-              Back to Search
-            </Link>
-            <Link
-              to="/tutor"
-              className="rounded-xl bg-slate-100 px-4 py-2 text-slate-800 text-sm hover:bg-slate-200"
-            >
-              Tutor Home
-            </Link>
-          </div>
-        </div>
-      ) : (
-        // Request form
-        <form onSubmit={onSubmit} className="rounded-2xl border border-slate-200 bg-white p-6">
-          <label className="block">
-            <div className="text-sm text-slate-600 mb-1">Message (max 500 characters)</div>
-            <textarea
-              value={message}
-              onChange={(e) => setMessage(e.target.value.slice(0, 500))}
-              rows={5}
-              placeholder="Briefly describe your course/topic, preferred time, and goals…"
-              className="w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        {/* Form Block */}
+        <form onSubmit={onSubmit} className="mt-4 space-y-4">
+          {/* FROM */}
+          <div>
+            <div className={label}>FROM:</div>
+            <input
+              type="email"
+              value={fromEmail}
+              onChange={(e) => setFromEmail(e.target.value)}
+              placeholder="you@sfsu.edu"
+              className={input}
+              autoComplete="email"
               required
             />
-          </label>
-
-          <div className="mt-3 text-xs text-slate-500">
-            * Demo only — no real emails or payments are sent.
+            <p className="text-xs text-slate-500 mt-1">(Must use @sfsu.edu email)</p>
           </div>
 
-          <div className="mt-4 flex gap-2">
+          {/* SUBJECT */}
+          <div>
+            <div className={label}>SUBJECT:</div>
+            <input
+              type="text"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="e.g., CSC 648 tutoring request"
+              className={input}
+              required
+            />
+          </div>
+
+          {/* LANGUAGE REQUEST */}
+          <div>
+            <div className={label}>LANGUAGE REQUEST:</div>
+            <input
+              type="text"
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              placeholder="e.g., English, Spanish"
+              className={input}
+            />
+          </div>
+
+          {/* MESSAGE */}
+          <div>
+            <div className={label}>MESSAGE:</div>
+
+            {/* Example box (static, like the wireframe) */}
+            <div className="mt-2 rounded-md border border-slate-300 bg-slate-50 p-3 text-sm text-slate-700">
+              Example: "Hi Sarah, I'm taking CSC 648 this semester and need help with the team
+              project requirements. Are you available for tutoring sessions on Wednesdays?"
+            </div>
+
+            <textarea
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              rows={6}
+              className="mt-2 w-full rounded-md border px-3 py-2 text-sm"
+              placeholder="Write your message here…"
+              required
+            />
+          </div>
+
+          {/* Error message (if any) */}
+          {err && (
+            <div className="rounded-md border border-amber-300 bg-amber-50 px-3 py-2 text-sm text-amber-900">
+              {err}
+            </div>
+          )}
+
+          {/* Bottom action bar: SEND / CANCEL */}
+          <div className="mt-2 flex gap-3">
             <button
               type="submit"
-              className="rounded-xl bg-blue-600 px-4 py-2 text-white text-sm font-medium hover:bg-blue-700"
+              disabled={status === "sending"}
+              className="rounded-md border px-4 py-2 text-sm font-semibold hover:bg-slate-50 disabled:opacity-60"
             >
-              Send Request
+              {status === "sending" ? "SENDING…" : "SEND"}
             </button>
-            <Link
-              to="/tutor/search"
-              className="rounded-xl bg-slate-100 px-4 py-2 text-slate-800 text-sm hover:bg-slate-200"
+
+            <button
+              type="button"
+              onClick={() => navigate(-1)}
+              className="rounded-md border px-4 py-2 text-sm hover:bg-slate-50"
             >
-              Cancel
-            </Link>
+              CANCEL
+            </button>
           </div>
         </form>
-      )}
+      </div>
     </section>
   );
 }

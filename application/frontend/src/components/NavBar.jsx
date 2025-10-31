@@ -17,8 +17,6 @@ export default function Navbar() {
         <div className="flex items-center gap-2 text-sm">
           <Nav to="/">Home</Nav>
           <Nav to="/about">About</Nav>
-          {/* NEW: Tutor */}
-          <Nav to="/tutor">Tutor</Nav>
         </div>
       </nav>
     </header>
