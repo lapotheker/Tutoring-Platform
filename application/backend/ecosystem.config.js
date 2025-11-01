@@ -18,10 +18,10 @@ module.exports = {
         // install backend deps
         "npm ci --omit=dev --prefix application/backend && " +
         // build the Vite app
-        "npm ci --prefix application/team-info-website && " +
-        "npm run --prefix application/team-info-website build && " +
+        "npm ci --prefix application/frontend && " +
+        "npm run --prefix application/frontend build && " +
         // publish static files to Nginx root
-        "rsync -ah --delete application/team-info-website/dist/ /var/www/team04-frontend/ && " +
+        "rsync -ah --delete application/frontend/dist/ /var/www/team04-frontend/ && " +
         // restart api
         "pm2 startOrRestart application/backend/ecosystem.config.js --only backend && pm2 save"
 
