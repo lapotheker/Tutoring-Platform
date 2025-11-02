@@ -1,0 +1,12 @@
+{
+  "dependencies": {
+    "express": "^5.1.0"
+  },
+  "scripts": {
+    "restart": "pm2 startOrRestart ecosystem.config.js",
+    "deploy": "pm2 deploy ecosystem.config.js production"
+  },
+  "devDependencies": {
+    "pm2": "^6.0.11"
+  }
+}
