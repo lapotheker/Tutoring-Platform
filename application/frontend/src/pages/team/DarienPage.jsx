@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import avatar from "../assets/default-profile.jpg";
+import avatar from "../../assets/default-profile.jpg";
 
 export default function Darien() {
   return (

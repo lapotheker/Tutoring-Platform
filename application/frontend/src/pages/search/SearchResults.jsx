@@ -1,4 +1,4 @@
-// src/pages/SearchResults.jsx
+// src/pages/search/SearchResults.jsx
 import { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
 
@@ -28,14 +28,14 @@ export default function SearchResults() {
   const { search } = useLocation();
   const params = new URLSearchParams(search);
 
-  // ----- Read query params (mirrors Home/SearchFilters) -----
-  const q = params.get("q") || ""; // optional full-text query
+  // ----- Read query params -----
+  const q = params.get("q") || "";
   const subject = params.get("subject") || "";
   const course = params.get("course") || "";
   const rates = (params.get("rates") || "").split(",").filter(Boolean);
   const langs = (params.get("langs") || "").split(",").filter(Boolean);
 
-  // ----- Client-side filtering for demo -----
+  // ----- Filter demo data -----
   const filtered = useMemo(() => {
     return SAMPLE.filter((t) => {
       const text =
@@ -63,33 +63,24 @@ export default function SearchResults() {
     });
   }, [q, subject, course, rates, langs]);
 
-  // ----- Header labels -----
   const showingLabel = filtered.length ? `Showing 1–${filtered.length}` : "Showing 0";
   const searchTitle = course || q || subject || "All";
 
   return (
     <section className="space-y-6">
-      {/* ===== Header Bar (avatar + icons) ===== */}
-      <div className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
-        <div className="flex items-start justify-between">
-          <div className="h-12 w-12 rounded-full bg-slate-200 grid place-items-center text-slate-600 text-2xl">
-            👤
-          </div>
-          <div className="flex items-center gap-3 text-2xl">
-            <Link to="/inbox" title="Messages" className="hover:opacity-80">
-              ✉️
-            </Link>
-            <Link to="/" title="Home" className="hover:opacity-80">
-              🏠
-            </Link>
-          </div>
-        </div>
+      {/* ===== Header Bar ===== */}
+      <div className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm text-center relative">
+        {/* ← Back to Home */}
+        <Link
+          to="/"
+          className="absolute left-6 top-6 text-slate-600 text-sm font-medium hover:text-blue-600"
+        >
+          ← Back to Home
+        </Link>
 
-        <h1 className="mt-4 text-center text-xl md:text-2xl font-extrabold tracking-wide">
-          SFSU TUTORING PLATFORM
-        </h1>
+        <h1 className="text-xl md:text-2xl font-extrabold tracking-wide">SFSU TUTORING PLATFORM</h1>
 
-        {/* Centered search bar (read-only demo, shows current keyword/course) */}
+        {/* Centered search bar */}
         <div className="mt-4 flex justify-center">
           <div className="flex items-center gap-2 rounded-full border border-slate-300 pl-4 pr-2 py-2 w-full max-w-lg bg-white">
             <input
@@ -118,15 +109,7 @@ export default function SearchResults() {
       {/* ===== Results Header ===== */}
       <div className="max-w-4xl mx-auto">
         <div className="flex items-baseline justify-between">
-          <h2 className="text-lg md:text-xl font-extrabold">
-            Search Results – "{searchTitle}"{/* Keep existing filters when modifying */}
-            <Link
-              to={{ pathname: "/search", search }}
-              className="ml-3 text-sm font-medium text-blue-600 hover:underline"
-            >
-              [Modify Filters]
-            </Link>
-          </h2>
+          <h2 className="text-lg md:text-xl font-extrabold">Search Results – "{searchTitle}"</h2>
           <div className="text-sm text-slate-600">{showingLabel}</div>
         </div>
 
@@ -140,13 +123,11 @@ export default function SearchResults() {
                 </div>
 
                 <div className="flex-1">
-                  {/* Top row: name + rate */}
                   <div className="flex items-start justify-between">
                     <h3 className="font-extrabold tracking-wide">{t.name.toUpperCase()}</h3>
                     <div className="font-semibold">${t.rate}/hour</div>
                   </div>
 
-                  {/* Tutor facts */}
                   <div className="text-sm">
                     <div>{t.title}</div>
                     <div>Courses: {t.courses.join(", ")}</div>
@@ -154,10 +135,9 @@ export default function SearchResults() {
                     <div>Availability Summary: {t.availability}</div>
                   </div>
 
-                  {/* Actions: View Profile + Contact (carry current filters + tutor name) */}
                   <div className="mt-3 flex gap-2">
                     <Link
-                      to={`/tutors/${t.id}${search}`} // keep current search params for "Back to Results"
+                      to={`/tutors/${t.id}${search}`}
                       className="inline-block rounded border px-4 py-1 text-sm font-medium hover:bg-slate-50"
                     >
                       VIEW PROFILE
@@ -166,7 +146,6 @@ export default function SearchResults() {
                     <Link
                       to={{
                         pathname: `/tutor/request/${t.id}`,
-                        // include tutor name (?to=) and preserve all existing filters
                         search: `?to=${encodeURIComponent(t.name)}${
                           search ? `&${search.slice(1)}` : ""
                         }`,
@@ -181,14 +160,10 @@ export default function SearchResults() {
             </article>
           ))}
 
-          {/* Empty state with a friendly link back to filters (preserving current params) */}
+          {/* Empty state */}
           {filtered.length === 0 && (
-            <div className="text-slate-600">
-              No results found. Try modifying your filters on{" "}
-              <Link to={{ pathname: "/search", search }} className="text-blue-600 hover:underline">
-                Search Filters
-              </Link>
-              .
+            <div className="text-slate-600 text-center">
+              No results found. Try adjusting your filters.
             </div>
           )}
         </div>
