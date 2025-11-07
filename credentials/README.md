@@ -18,7 +18,8 @@
 ## 6. Database passwords
 - **class_cto:** CTO_TEMP_PASSWORD
 ## 7. Database name
-- **App DB:** teamapp_db
+- **Develop/Testing DB:** teamapp_db
+- **Main/Production DB:** main_db
 ## 8. How to connect
 - ### MySQL Workbench (Standard TCP/IP over SSH)
   - **SSH Hostname:** ec2-50-18-23-168.us-west-1.compute.amazonaws.com
@@ -29,6 +30,7 @@
   - **Username:** class_cto 
   - **Password:** see section 6
   - **Default Schema:** teamapp_db
+
 
 
 
