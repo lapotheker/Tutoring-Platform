@@ -1,5 +1,5 @@
 // src/App.jsx
-import Navbar from "./components/Navbar.jsx";
+import Navbar from "./components/NavBar.jsx";
 import BannerNotice from "./components/BannerNotice.jsx";
 import { Routes, Route } from "react-router-dom";
 
