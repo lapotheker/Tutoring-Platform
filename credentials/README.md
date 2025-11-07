@@ -14,11 +14,9 @@
 - **Host:** 127.0.0.1
 - **Port:** 3306
 ## 5. Database username
-- **Grading (full privileges):** class_cto
-- **App user (least privilege):** teamapp
+- **MySQL user (full privileges):** class_cto
 ## 6. Database passwords
 - **class_cto:** CTO_TEMP_PASSWORD
-- **teamapp:** APP_STRONG_PASSWORD
 ## 7. Database name
 - **App DB:** teamapp_db
 ## 8. How to connect
@@ -31,4 +29,5 @@
   - **Username:** class_cto (or teamapp)
   - **Password:** see section 6
   - **Default Schema:** teamapp_db
+
 
