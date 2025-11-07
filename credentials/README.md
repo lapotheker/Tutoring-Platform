@@ -26,8 +26,9 @@
   - **SSH Key File:** credentials/team04-project.pem
   - **MySQL Hostname:** 127.0.0.1
   - **MySQL Server Port:** 3306
-  - **Username:** class_cto (or teamapp)
+  - **Username:** class_cto 
   - **Password:** see section 6
   - **Default Schema:** teamapp_db
+
 
 
