@@ -1,15 +1,21 @@
-// src/pages/public/Home.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import { dataAPI } from "../../services/api";
 
 export default function Home() {
   const navigate = useNavigate();
 
-  // Basic search inputs
-  const [query, setQuery] = useState("");
+  // Separate search inputs
+  const [tutorName, setTutorName] = useState("");
+  const [courseCode, setCourseCode] = useState("");
   const [subjectQuery, setSubjectQuery] = useState("");
   const [language, setLanguage] = useState("");
+
+  // Dropdown data from API
+  const [courses, setCourses] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [languages, setLanguages] = useState([]);
 
   // Advanced filters
   const [showAdvanced, setShowAdvanced] = useState(false);
@@ -25,6 +31,26 @@ export default function Home() {
   });
   const [daytimes, setDaytimes] = useState({ Morning: false, Afternoon: false, Evening: false });
 
+  // Load dropdown data from API
+  useEffect(() => {
+    async function loadDropdowns() {
+      try {
+        const [coursesRes, subjectsRes, languagesRes] = await Promise.all([
+          dataAPI.getCourses(),
+          dataAPI.getSubjects(),
+          dataAPI.getLanguages(),
+        ]);
+
+        if (coursesRes.success) setCourses(coursesRes.data);
+        if (subjectsRes.success) setSubjects(subjectsRes.data);
+        if (languagesRes.success) setLanguages(languagesRes.data);
+      } catch (error) {
+        console.error("Failed to load dropdown data:", error);
+      }
+    }
+    loadDropdowns();
+  }, []);
+
   function toggle(setter, key) {
     setter((prev) => ({ ...prev, [key]: !prev[key] }));
   }
@@ -35,27 +61,47 @@ export default function Home() {
     setDaytimes({ Morning: false, Afternoon: false, Evening: false });
   }
 
-  function handleSearch(e) {
-    e.preventDefault();
+  function performSearch() {
     const params = new URLSearchParams();
-    if (query) params.set("query", query.trim());
-    if (subjectQuery) params.set("subject", subjectQuery.trim());
-    if (language) params.set("language", language.trim());
 
-    const chosenRates = [
-      rates.under20 ? "$0-20" : null,
-      rates.between21_40 ? "$21-40" : null,
-      rates.over41 ? "$41+" : null,
-    ].filter(Boolean);
-    if (chosenRates.length) params.set("rates", chosenRates.join(","));
+    // Add each field separately
+    if (tutorName.trim()) params.set("search", tutorName.trim());
+    if (courseCode.trim()) params.set("course", courseCode.trim());
+    if (subjectQuery.trim()) params.set("subject", subjectQuery.trim());
+    if (language) params.set("language", language);
 
+    // Hourly rate filters - convert to min/max
+    const rateRanges = [];
+    if (rates.under20) rateRanges.push({ min: 0, max: 20 });
+    if (rates.between21_40) rateRanges.push({ min: 21, max: 40 });
+    if (rates.over41) rateRanges.push({ min: 41, max: 999 });
+
+    if (rateRanges.length > 0) {
+      const minRate = Math.min(...rateRanges.map((r) => r.min));
+      const maxRate = Math.max(...rateRanges.map((r) => r.max));
+      params.set("minRate", minRate.toString());
+      params.set("maxRate", maxRate.toString());
+    }
+
+    // Days filter
     const chosenDays = Object.keys(days).filter((k) => days[k]);
     if (chosenDays.length) params.set("days", chosenDays.join(","));
 
+    // Times filter
     const chosenTimes = Object.keys(daytimes).filter((k) => daytimes[k]);
     if (chosenTimes.length) params.set("times", chosenTimes.join(","));
 
     navigate(`/results?${params.toString()}`);
+  }
+
+  function handleSearch(e) {
+    e.preventDefault();
+    performSearch();
+  }
+
+  function handleApplyFilters(e) {
+    e.preventDefault();
+    performSearch();
   }
 
   return (
@@ -66,108 +112,128 @@ export default function Home() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="text-2xl md:text-3xl font-extrabold tracking-wide"
+          className="text-3xl md:text-4xl font-extrabold tracking-wide"
         >
-          SFSU TUTORING PLATFORM
+          Find Your Perfect Tutor
         </motion.h1>
 
-        <motion.p className="mt-4 text-base md:text-lg">Find Your Perfect Tutor</motion.p>
-        <motion.p className="text-base md:text-lg">Connect with SFSU students and faculty</motion.p>
+        <motion.p className="mt-3 text-base md:text-lg text-slate-600">
+          Connect with verified SFSU students and faculty
+        </motion.p>
 
-        {/* Find a Tutor */}
-        <div className="mt-8 text-left mx-auto max-w-5xl">
-          <h3 className="text-xl md:text-2xl font-bold tracking-tight text-center">Find a Tutor</h3>
-          <p className="text-slate-600 mt-1 text-center">
-            Enter your criteria and view results instantly.
-          </p>
+        {/* Search Section */}
+        <div className="mt-8 text-left mx-auto max-w-4xl">
+          {/* Compact search form */}
+          <form onSubmit={handleSearch} className="mt-6">
+            {/* Single row with all basic fields */}
+            <div className="grid grid-cols-1 md:grid-cols-[2fr_1.5fr_1.5fr_1fr_auto] gap-2 items-end">
+              {/* Tutor Name */}
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Tutor Name</label>
+                <input
+                  type="text"
+                  value={tutorName}
+                  onChange={(e) => setTutorName(e.target.value)}
+                  placeholder="e.g., John Smith"
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
 
-          {/* Input row */}
-          <form
-            onSubmit={handleSearch}
-            className="mt-4 grid gap-3 md:grid-cols-[2fr_1.5fr_1fr_auto] items-center"
-          >
-            {/* Name/Course */}
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Tutor name or course (e.g., CSC 648)"
-              className="w-full border rounded-xl px-3 py-2 text-sm"
-            />
+              {/* Course Code */}
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Course</label>
+                <input
+                  type="text"
+                  value={courseCode}
+                  onChange={(e) => setCourseCode(e.target.value)}
+                  placeholder="e.g., CSC 648"
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
 
-            {/* Subject */}
-            <input
-              type="text"
-              value={subjectQuery}
-              onChange={(e) => setSubjectQuery(e.target.value)}
-              placeholder="Subject (e.g., Software Engineering)"
-              className="w-full border rounded-xl px-3 py-2 text-sm"
-            />
+              {/* Subject */}
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Subject</label>
+                <input
+                  type="text"
+                  value={subjectQuery}
+                  onChange={(e) => setSubjectQuery(e.target.value)}
+                  placeholder="e.g., Software Eng"
+                  className="w-full border rounded-lg px-3 py-2 text-sm"
+                />
+              </div>
 
-            {/* Language dropdown */}
-            <select
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              className="w-full border rounded-xl px-3 py-2 text-sm bg-white"
-            >
-              <option value="">Language</option>
-              <option value="English">English</option>
-              <option value="Spanish">Spanish</option>
-              <option value="Chinese">Chinese</option>
-              <option value="Japanese">Japanese</option>
-              <option value="Korean">Korean</option>
-            </select>
+              {/* Language */}
+              <div>
+                <label className="block text-xs font-medium text-slate-700 mb-1">Language</label>
+                <select
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value)}
+                  className="w-full border rounded-lg px-3 py-2 text-sm bg-white"
+                >
+                  <option value="">Any</option>
+                  {languages.map((lang) => (
+                    <option key={lang.language_id} value={lang.language_name}>
+                      {lang.language_name}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-            {/* Search button */}
-            <button
-              type="submit"
-              className="rounded-xl bg-blue-600 px-5 py-2 text-white font-medium shadow hover:bg-blue-700 transition md:self-stretch"
-            >
-              Search
-            </button>
+              {/* Search button */}
+              <button
+                type="submit"
+                className="rounded-lg bg-blue-600 px-6 py-2 text-white font-medium text-sm shadow hover:bg-blue-700 transition whitespace-nowrap"
+              >
+                Search
+              </button>
+            </div>
           </form>
 
           {/* Advanced filters toggle */}
-          <div className="mt-3">
+          <div className="mt-3 text-center">
             <button
               type="button"
               onClick={() => setShowAdvanced((v) => !v)}
-              className="text-sm text-slate-600 hover:underline"
+              className="text-sm text-blue-600 hover:underline"
             >
-              {showAdvanced ? "Hide advanced filters" : "Advanced filters"}
+              {showAdvanced ? "− Hide filters" : "+ Advanced filters"}
             </button>
           </div>
 
           {/* Advanced filters expanded panel */}
           {showAdvanced && (
-            <div className="mt-4 rounded-2xl border border-slate-200 p-5">
-              <h4 className="font-semibold text-slate-800 mb-3">Advanced Filters</h4>
+            <div className="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4">
+              <h4 className="font-semibold text-slate-800 mb-3 text-sm">Advanced Filters</h4>
 
               {/* Hourly Rate */}
-              <div className="mt-2">
-                <div className="font-semibold text-sm">Hourly Rate:</div>
-                <div className="mt-2 flex flex-wrap gap-4 text-sm">
-                  <label className="inline-flex items-center gap-2">
+              <div className="mb-4">
+                <div className="font-medium text-xs text-slate-700 mb-2">Hourly Rate:</div>
+                <div className="flex flex-wrap gap-3 text-sm">
+                  <label className="inline-flex items-center gap-1.5 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={rates.under20}
                       onChange={() => toggle(setRates, "under20")}
+                      className="rounded"
                     />
                     <span>$0–20</span>
                   </label>
-                  <label className="inline-flex items-center gap-2">
+                  <label className="inline-flex items-center gap-1.5 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={rates.between21_40}
                       onChange={() => toggle(setRates, "between21_40")}
+                      className="rounded"
                     />
                     <span>$21–40</span>
                   </label>
-                  <label className="inline-flex items-center gap-2">
+                  <label className="inline-flex items-center gap-1.5 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={rates.over41}
                       onChange={() => toggle(setRates, "over41")}
+                      className="rounded"
                     />
                     <span>$41+</span>
                   </label>
@@ -175,16 +241,17 @@ export default function Home() {
               </div>
 
               {/* Availability */}
-              <div className="mt-4 grid gap-4 md:grid-cols-2">
+              <div className="grid gap-4 md:grid-cols-2">
                 <div>
-                  <div className="font-semibold text-sm">Availability (Days):</div>
-                  <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2 text-sm">
+                  <div className="font-medium text-xs text-slate-700 mb-2">Days:</div>
+                  <div className="grid grid-cols-4 gap-2 text-sm">
                     {Object.keys(days).map((d) => (
-                      <label key={d} className="inline-flex items-center gap-2">
+                      <label key={d} className="inline-flex items-center gap-1.5 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={days[d]}
                           onChange={() => toggle(setDays, d)}
+                          className="rounded"
                         />
                         <span>{d}</span>
                       </label>
@@ -193,16 +260,17 @@ export default function Home() {
                 </div>
 
                 <div>
-                  <div className="font-semibold text-sm">Availability (Times):</div>
-                  <div className="mt-2 flex flex-wrap gap-4 text-sm">
+                  <div className="font-medium text-xs text-slate-700 mb-2">Times:</div>
+                  <div className="flex flex-wrap gap-3 text-sm">
                     {Object.keys(daytimes).map((t) => (
-                      <label key={t} className="inline-flex items-center gap-2">
+                      <label key={t} className="inline-flex items-center gap-1.5 cursor-pointer">
                         <input
                           type="checkbox"
                           checked={daytimes[t]}
                           onChange={() => toggle(setDaytimes, t)}
+                          className="rounded"
                         />
-                        <span>{t}s</span>
+                        <span>{t}</span>
                       </label>
                     ))}
                   </div>
@@ -210,20 +278,20 @@ export default function Home() {
               </div>
 
               {/* Clear / Apply buttons */}
-              <div className="mt-4 flex gap-3">
+              <div className="mt-4 flex gap-2 justify-end">
                 <button
                   type="button"
                   onClick={clearAdvanced}
-                  className="rounded-lg border px-4 py-2 text-sm hover:bg-slate-50"
+                  className="rounded-lg border border-slate-300 bg-white px-4 py-1.5 text-sm hover:bg-slate-100"
                 >
-                  CLEAR
+                  Clear
                 </button>
                 <button
-                  type="submit"
-                  onClick={handleSearch}
-                  className="rounded-lg border px-4 py-2 text-sm font-semibold hover:bg-slate-50"
+                  type="button"
+                  onClick={handleApplyFilters}
+                  className="rounded-lg bg-blue-600 text-white px-4 py-1.5 text-sm font-medium hover:bg-blue-700"
                 >
-                  APPLY FILTERS
+                  Apply
                 </button>
               </div>
             </div>
