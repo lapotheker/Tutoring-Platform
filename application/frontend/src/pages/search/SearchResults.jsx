@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { tutorAPI } from "../../services/api";
 
 export default function SearchResults() {
   const { search } = useLocation();
+  const navigate = useNavigate();
   const params = new URLSearchParams(search);
 
-  // State
+  // States
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Read query params
+  // Read query parameters
   const searchText = params.get("search") || "";
   const subject = params.get("subject") || "";
   const course = params.get("course") || "";
@@ -21,7 +22,13 @@ export default function SearchResults() {
   const days = params.get("days") || "";
   const times = params.get("times") || "";
 
-  // Fetch tutors from API
+  // Controlled input for the top search bar
+  const [q, setQ] = useState(searchText || course);
+  useEffect(() => {
+    setQ(searchText || course);
+  }, [searchText, course]);
+
+  // Fetch tutors from API whenever filters change
   useEffect(() => {
     async function fetchTutors() {
       setLoading(true);
@@ -60,6 +67,22 @@ export default function SearchResults() {
   const showingLabel = tutors.length ? `Showing 1–${tutors.length}` : "Showing 0";
   const searchTitle = course || searchText || subject || "All";
 
+  // Update the URL with the new search value
+  function submitHeaderSearch() {
+    const p = new URLSearchParams(search);
+    const value = q.trim();
+
+    if (value) {
+      p.set("search", value);
+    } else {
+      p.delete("search");
+    }
+    // Uncomment this line if you want to clear "course" param when searching
+    // p.delete("course");
+
+    navigate(`/results?${p.toString()}`);
+  }
+
   return (
     <section className="space-y-6">
       {/* ===== Header Bar ===== */}
@@ -77,12 +100,21 @@ export default function SearchResults() {
           <div className="flex items-center gap-2 rounded-full border border-slate-300 pl-4 pr-2 py-2 w-full max-w-lg bg-white">
             <input
               type="text"
-              defaultValue={searchText || course}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") submitHeaderSearch();
+              }}
               placeholder="Search by keyword or course"
               className="flex-1 outline-none text-sm"
-              readOnly
             />
-            <div className="grid place-items-center h-9 w-9 rounded-full bg-slate-900 text-white">
+            <button
+              type="button"
+              onClick={submitHeaderSearch}
+              className="grid place-items-center h-9 w-9 rounded-full bg-slate-900 text-white"
+              aria-label="Search"
+              title="Search"
+            >
               <svg
                 viewBox="0 0 24 24"
                 fill="none"
@@ -93,7 +125,7 @@ export default function SearchResults() {
                 <circle cx="11" cy="11" r="7" />
                 <line x1="21" y1="21" x2="16.65" y2="16.65" />
               </svg>
-            </div>
+            </button>
           </div>
         </div>
       </div>
@@ -105,13 +137,13 @@ export default function SearchResults() {
           <div className="text-sm text-slate-600">{showingLabel}</div>
         </div>
 
-        {/* ===== Loading State ===== */}
+        {/* Loading State */}
         {loading && <div className="mt-8 text-center text-slate-600">Loading tutors...</div>}
 
-        {/* ===== Error State ===== */}
+        {/* Error State */}
         {error && <div className="mt-8 text-center text-red-600">{error}</div>}
 
-        {/* ===== Result Cards ===== */}
+        {/* Result Cards */}
         {!loading && !error && (
           <div className="mt-4 space-y-5">
             {tutors.map((t) => (
@@ -173,7 +205,7 @@ export default function SearchResults() {
               </article>
             ))}
 
-            {/* Empty state */}
+            {/* Empty State */}
             {tutors.length === 0 && (
               <div className="text-slate-600 text-center">
                 No results found. Try adjusting your filters.
