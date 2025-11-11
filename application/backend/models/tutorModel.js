@@ -35,31 +35,42 @@ const tutorModel = {
 
     const params = [];
 
-    // Add course filter
+    // Filter by course code
     if (filters.course && filters.course.trim()) {
       query += ` AND cn.code LIKE ?`;
       params.push(`%${filters.course}%`);
     }
 
-    // Add subject tag filter
+    // Filter by subject tag
     if (filters.subject && filters.subject.trim()) {
       query += ` AND st.tag_name LIKE ?`;
       params.push(`%${filters.subject}%`);
     }
 
-    // Add language filter
+    // Filter by language
     if (filters.language && filters.language.trim()) {
       query += ` AND l.language_name LIKE ?`;
       params.push(`%${filters.language}%`);
     }
 
-    // Add free text search (searches display name and availability summary)
+    // Free text search across multiple fields
     if (filters.search && filters.search.trim()) {
-      query += ` AND (tp.display_name LIKE ? OR tp.availability_summary LIKE ?)`;
-      params.push(`%${filters.search}%`, `%${filters.search}%`);
+      const like = `%${filters.search}%`;
+      query += `
+        AND (
+          tp.display_name LIKE ?
+          OR u.full_name LIKE ?
+          OR cn.code LIKE ?
+          OR cn.title LIKE ?
+          OR st.tag_name LIKE ?
+          OR l.language_name LIKE ?
+          OR tp.availability_summary LIKE ?
+        )
+      `;
+      params.push(like, like, like, like, like, like, like);
     }
 
-    // Add hourly rate filter
+    // Filter by hourly rate range
     if (filters.minRate && filters.minRate !== "") {
       const minRate = Number(filters.minRate);
       if (!isNaN(minRate)) {
@@ -75,31 +86,34 @@ const tutorModel = {
       }
     }
 
-    // Add days filter (searches in availability_summary)
+    // Filter by days (matches within availability summary)
     if (filters.days && filters.days.trim()) {
       const days = filters.days.split(",").filter((d) => d.trim());
       if (days.length > 0) {
-        const dayConditions = days
-          .map(() => `tp.availability_summary LIKE ?`)
-          .join(" OR ");
+        const dayConditions = days.map(() => `tp.availability_summary LIKE ?`).join(" OR ");
         query += ` AND (${dayConditions})`;
         days.forEach((day) => params.push(`%${day.trim()}%`));
       }
     }
 
-    // Add times filter (searches in availability_summary)
+    // Filter by times (matches within availability summary)
     if (filters.times && filters.times.trim()) {
       const times = filters.times.split(",").filter((t) => t.trim());
       if (times.length > 0) {
-        const timeConditions = times
-          .map(() => `tp.availability_summary LIKE ?`)
-          .join(" OR ");
+        const timeConditions = times.map(() => `tp.availability_summary LIKE ?`).join(" OR ");
         query += ` AND (${timeConditions})`;
         times.forEach((time) => params.push(`%${time.trim()}%`));
       }
     }
 
-    query += ` GROUP BY tp.tutor_profile_id, tp.display_name, tp.hourly_rate, tp.availability_summary, tp.approval_status, tp.visibility, u.full_name, u.sfsu_email ORDER BY tp.display_name ASC`;
+    // Group results and sort alphabetically
+    query += `
+      GROUP BY 
+        tp.tutor_profile_id, tp.display_name, tp.hourly_rate, 
+        tp.availability_summary, tp.approval_status, tp.visibility, 
+        u.full_name, u.sfsu_email
+      ORDER BY tp.display_name ASC
+    `;
 
     const [rows] = await pool.execute(query, params);
     return rows;
@@ -135,7 +149,10 @@ const tutorModel = {
       WHERE tp.tutor_profile_id = ?
         AND tp.approval_status = 'Approved'
         AND tp.visibility = 'Public'
-      GROUP BY tp.tutor_profile_id, tp.display_name, tp.hourly_rate, tp.availability_summary, tp.approval_status, tp.visibility, u.full_name, u.sfsu_email
+      GROUP BY 
+        tp.tutor_profile_id, tp.display_name, tp.hourly_rate, 
+        tp.availability_summary, tp.approval_status, tp.visibility, 
+        u.full_name, u.sfsu_email
     `;
 
     const [rows] = await pool.execute(query, [tutorId]);
