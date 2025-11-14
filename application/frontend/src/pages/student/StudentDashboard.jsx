@@ -1,24 +1,33 @@
-import { useState, useEffect, useMemo } from 'react';
-import { motion } from 'framer-motion';
-import { MessageSquare, User, Clock, AlertCircle, CheckCircle, XCircle, Search, Home } from 'lucide-react';
+import { useState, useEffect, useMemo } from "react";
+import { motion } from "framer-motion";
+import {
+  MessageSquare,
+  User,
+  Clock,
+  AlertCircle,
+  CheckCircle,
+  XCircle,
+  Search,
+  Home,
+} from "lucide-react";
 
 export default function StudentDashboard() {
   // Get active tab from URL hash (default to 'home')
   const [activeTab, setActiveTab] = useState(() => {
-    const hash = window.location.hash.replace('#', '');
-    return hash || 'home';
+    const hash = window.location.hash.replace("#", "");
+    return hash || "home";
   });
-  
+
   // User state
   const [user, setUser] = useState(null);
-  
+
   // Search state
   const [query, setQuery] = useState("");
-  
+
   // Messages state
   const [messages, setMessages] = useState([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
-  const [messageFilter, setMessageFilter] = useState('all');
+  const [messageFilter, setMessageFilter] = useState("all");
 
   // Load user from storage
   useEffect(() => {
@@ -34,7 +43,7 @@ export default function StudentDashboard() {
 
   // Load messages when messages tab is active
   useEffect(() => {
-    if (activeTab === 'messages') {
+    if (activeTab === "messages") {
       loadMessages();
     }
   }, [activeTab]);
@@ -52,7 +61,7 @@ export default function StudentDashboard() {
       //   credentials: 'include'
       // });
       // const data = await response.json();
-      
+
       // Mock data
       const mockMessages = [
         {
@@ -83,10 +92,10 @@ export default function StudentDashboard() {
           message_content: "I need help with a Python assignment",
         },
       ];
-      
+
       setMessages(mockMessages);
     } catch (error) {
-      console.error('Failed to fetch messages:', error);
+      console.error("Failed to fetch messages:", error);
       setMessages([]);
     } finally {
       setMessagesLoading(false);
@@ -116,11 +125,11 @@ export default function StudentDashboard() {
 
   const getStatusIcon = (status) => {
     switch (status) {
-      case 'Sent':
+      case "Sent":
         return <CheckCircle className="w-5 h-5 text-green-600" />;
-      case 'Reported':
+      case "Reported":
         return <AlertCircle className="w-5 h-5 text-yellow-600" />;
-      case 'Removed':
+      case "Removed":
         return <XCircle className="w-5 h-5 text-red-600" />;
       default:
         return <MessageSquare className="w-5 h-5 text-slate-600" />;
@@ -129,14 +138,14 @@ export default function StudentDashboard() {
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'Sent':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'Reported':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'Removed':
-        return 'bg-red-100 text-red-800 border-red-200';
+      case "Sent":
+        return "bg-green-100 text-green-800 border-green-200";
+      case "Reported":
+        return "bg-yellow-100 text-yellow-800 border-yellow-200";
+      case "Removed":
+        return "bg-red-100 text-red-800 border-red-200";
       default:
-        return 'bg-slate-100 text-slate-800 border-slate-200';
+        return "bg-slate-100 text-slate-800 border-slate-200";
     }
   };
 
@@ -151,11 +160,11 @@ export default function StudentDashboard() {
     if (diffMins < 60) return `${diffMins} minutes ago`;
     if (diffHours < 24) return `${diffHours} hours ago`;
     if (diffDays < 7) return `${diffDays} days ago`;
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return date.toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" });
   };
 
-  const filteredMessages = messages.filter(msg => {
-    if (messageFilter === 'all') return true;
+  const filteredMessages = messages.filter((msg) => {
+    if (messageFilter === "all") return true;
     return msg.message_status.toLowerCase() === messageFilter;
   });
 
@@ -184,12 +193,13 @@ export default function StudentDashboard() {
         {/* Tab Navigation */}
         <div className="flex border-b border-slate-200">
           <button
-            onClick={() => switchTab('home')}
+            onClick={() => switchTab("home")}
             className={`
               flex-1 px-6 py-3 text-sm font-medium transition-colors
-              ${activeTab === 'home'
-                ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ${
+                activeTab === "home"
+                  ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
               }
             `}
           >
@@ -199,12 +209,13 @@ export default function StudentDashboard() {
             </div>
           </button>
           <button
-            onClick={() => switchTab('messages')}
+            onClick={() => switchTab("messages")}
             className={`
               flex-1 px-6 py-3 text-sm font-medium transition-colors relative
-              ${activeTab === 'messages'
-                ? 'border-b-2 border-blue-600 text-blue-600 bg-blue-50'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+              ${
+                activeTab === "messages"
+                  ? "border-b-2 border-blue-600 text-blue-600 bg-blue-50"
+                  : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
               }
             `}
           >
@@ -228,12 +239,12 @@ export default function StudentDashboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.2 }}
       >
-        {activeTab === 'home' && (
+        {activeTab === "home" && (
           <div className="space-y-6">
             {/* Search Section */}
             <div className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
               <h2 className="text-xl md:text-2xl font-bold text-center mb-4">Find A Tutor</h2>
-              
+
               <form onSubmit={onSearch} className="flex items-center justify-center">
                 <div className="flex items-center gap-2 rounded-full border border-slate-300 pl-4 pr-2 py-2 w-full max-w-lg bg-white">
                   <input
@@ -266,7 +277,7 @@ export default function StudentDashboard() {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <button
-                onClick={() => switchTab('messages')}
+                onClick={() => switchTab("messages")}
                 className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm hover:shadow-md transition-shadow text-left"
               >
                 <div className="flex items-center gap-4">
@@ -274,7 +285,7 @@ export default function StudentDashboard() {
                   <div>
                     <h3 className="font-semibold text-lg">My Messages</h3>
                     <p className="text-sm text-slate-600">
-                      {messages.length} message{messages.length !== 1 ? 's' : ''}
+                      {messages.length} message{messages.length !== 1 ? "s" : ""}
                     </p>
                   </div>
                 </div>
@@ -307,32 +318,47 @@ export default function StudentDashboard() {
           </div>
         )}
 
-        {activeTab === 'messages' && (
+        {activeTab === "messages" && (
           <div className="space-y-4">
             {/* Message Filters */}
             <div className="bg-white rounded-xl border border-slate-200 p-2 shadow-sm">
               <div className="flex gap-2 overflow-x-auto">
                 {[
-                  { key: 'all', label: 'All Messages', count: messages.length },
-                  { key: 'sent', label: 'Sent', count: messages.filter(m => m.message_status === 'Sent').length },
-                  { key: 'reported', label: 'Reported', count: messages.filter(m => m.message_status === 'Reported').length },
-                  { key: 'removed', label: 'Removed', count: messages.filter(m => m.message_status === 'Removed').length },
-                ].map(tab => (
+                  { key: "all", label: "All Messages", count: messages.length },
+                  {
+                    key: "sent",
+                    label: "Sent",
+                    count: messages.filter((m) => m.message_status === "Sent").length,
+                  },
+                  {
+                    key: "reported",
+                    label: "Reported",
+                    count: messages.filter((m) => m.message_status === "Reported").length,
+                  },
+                  {
+                    key: "removed",
+                    label: "Removed",
+                    count: messages.filter((m) => m.message_status === "Removed").length,
+                  },
+                ].map((tab) => (
                   <button
                     key={tab.key}
                     onClick={() => setMessageFilter(tab.key)}
                     className={`
                       px-4 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap
-                      ${messageFilter === tab.key
-                        ? 'bg-blue-600 text-white shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-100'
+                      ${
+                        messageFilter === tab.key
+                          ? "bg-blue-600 text-white shadow-sm"
+                          : "text-slate-600 hover:bg-slate-100"
                       }
                     `}
                   >
                     {tab.label}
-                    <span className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
-                      messageFilter === tab.key ? 'bg-blue-500' : 'bg-slate-200'
-                    }`}>
+                    <span
+                      className={`ml-2 px-2 py-0.5 rounded-full text-xs ${
+                        messageFilter === tab.key ? "bg-blue-500" : "bg-slate-200"
+                      }`}
+                    >
                       {tab.count}
                     </span>
                   </button>
@@ -353,13 +379,12 @@ export default function StudentDashboard() {
                 <MessageSquare className="w-12 h-12 text-slate-300 mx-auto mb-3" />
                 <h3 className="text-lg font-semibold text-slate-700 mb-1">No messages found</h3>
                 <p className="text-sm text-slate-500 mb-4">
-                  {messageFilter === 'all' 
+                  {messageFilter === "all"
                     ? "You haven't sent any messages yet. Start by searching for a tutor!"
-                    : `No ${messageFilter} messages to display.`
-                  }
+                    : `No ${messageFilter} messages to display.`}
                 </p>
                 <button
-                  onClick={() => switchTab('home')}
+                  onClick={() => switchTab("home")}
                   className="inline-block px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
                 >
                   Find a Tutor
@@ -419,14 +444,16 @@ export default function StudentDashboard() {
 
                       {/* Status Badge */}
                       <div className="flex flex-col items-end gap-2">
-                        <div className={`
+                        <div
+                          className={`
                           inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border
                           ${getStatusColor(msg.message_status)}
-                        `}>
+                        `}
+                        >
                           {getStatusIcon(msg.message_status)}
                           <span>{msg.message_status}</span>
                         </div>
-                        
+
                         {/* Action Button */}
                         <a
                           href={`/tutors/${msg.tutor_profile_id}`}
@@ -451,13 +478,13 @@ export default function StudentDashboard() {
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-green-600">
-                      {messages.filter(m => m.message_status === 'Sent').length}
+                      {messages.filter((m) => m.message_status === "Sent").length}
                     </div>
                     <div className="text-xs text-slate-600">Active</div>
                   </div>
                   <div>
                     <div className="text-2xl font-bold text-yellow-600">
-                      {messages.filter(m => m.message_status === 'Reported').length}
+                      {messages.filter((m) => m.message_status === "Reported").length}
                     </div>
                     <div className="text-xs text-slate-600">Reported</div>
                   </div>

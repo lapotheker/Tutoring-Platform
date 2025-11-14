@@ -23,6 +23,8 @@ import TutorDashboardApproved from "./pages/tutor/TutorDashboardApproved.jsx";
 import TutorPolicy from "./pages/tutor/TutorPolicy.jsx";
 import TutorProfile from "./pages/tutor/TutorProfile.jsx";
 import TutorProfileSubmitted from "./pages/tutor/TutorProfileSubmitted.jsx";
+import Posting from "./pages/tutor/Posting.jsx";
+import AdminDashboard from "./pages/tutor/AdminDashboard";
 
 // Team member pages
 import DarienPage from "./pages/team/DarienPage.jsx";
@@ -44,7 +46,7 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterPage />} />
-          
+
           {/* Student and Tutor Modules */}
           <Route path="/dashboard" element={<StudentDashboard />} />
           <Route path="/tutor/policy" element={<TutorPolicy />} />
@@ -55,7 +57,9 @@ export default function App() {
           <Route path="/tutor/dashboard" element={<TutorDashboard />} />
           <Route path="/tutor/profile-submitted" element={<TutorProfileSubmitted />} />
           <Route path="/tutor/dashboard-approved" element={<TutorDashboardApproved />} />
-          
+          <Route path="/tutor/posting" element={<Posting />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+
           {/* Team member pages */}
           <Route path="/member/yuhang-wei" element={<YuhangPage />} />
           <Route path="/member/leigh-apotheker" element={<LeighPage />} />

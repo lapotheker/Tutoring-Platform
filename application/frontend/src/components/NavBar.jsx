@@ -14,10 +14,7 @@ export default function Navbar() {
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Logo/Brand */}
-          <Link
-            to="/"
-            className="text-xl font-bold text-slate-900 hover:text-blue-600 transition"
-          >
+          <Link to="/" className="text-xl font-bold text-slate-900 hover:text-blue-600 transition">
             SFSU Tutoring
           </Link>
 
@@ -26,9 +23,7 @@ export default function Navbar() {
             <Link
               to="/"
               className={`text-sm font-medium transition ${
-                isActive("/")
-                  ? "text-blue-600"
-                  : "text-slate-600 hover:text-slate-900"
+                isActive("/") ? "text-blue-600" : "text-slate-600 hover:text-slate-900"
               }`}
             >
               Home
@@ -36,9 +31,7 @@ export default function Navbar() {
             <Link
               to="/about"
               className={`text-sm font-medium transition ${
-                isActive("/about")
-                  ? "text-blue-600"
-                  : "text-slate-600 hover:text-slate-900"
+                isActive("/about") ? "text-blue-600" : "text-slate-600 hover:text-slate-900"
               }`}
             >
               About
@@ -59,23 +52,22 @@ export default function Navbar() {
               <MessageSquare className="w-4 h-4" />
               <span>Student Dashboard</span>
             </Link>
-            
+
             {/* Tutor Dashboard */}
             <Link
-            to="/tutor/dashboard"
-            className={`
+              to="/tutor/dashboard"
+              className={`
               inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
                ${
                  isActive("/tutor/dashboard")
-                  ? "bg-green-600 text-white shadow-sm"
-                  : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
-                }
+                   ? "bg-green-600 text-white shadow-sm"
+                   : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+               }
               `}
-             >
-                   <span className="font-bold text-lg">🎓</span>
-                   <span>Tutor Dashboard</span>
+            >
+              <span className="font-bold text-lg">🎓</span>
+              <span>Tutor Dashboard</span>
             </Link>
-            
           </div>
         </div>
       </div>

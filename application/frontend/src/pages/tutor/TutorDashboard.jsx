@@ -1,8 +1,7 @@
+// src/pages/tutor/TutorDashboard.jsx
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
-// false = demo user allowed
-// true  = redirect to login if no user found
 const ENFORCE_LOGIN = false;
 
 export default function TutorDashboard() {
@@ -11,18 +10,17 @@ export default function TutorDashboard() {
   // Load saved user or use demo user (when login is not enforced)
   const user = useMemo(() => {
     try {
-      const stored =
-        localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser");
-
-      if (!stored && !ENFORCE_LOGIN) {
-        return { email: "demo_tutor@sfsu.edu" };
+      const stored = localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser");
+      if (!stored) {
+        return {
+          email: "demo_tutor@sfsu.edu",
+        };
       }
-      if (!stored) return null;
-
       return JSON.parse(stored);
     } catch {
-      if (!ENFORCE_LOGIN) return { email: "demo_tutor@sfsu.edu" };
-      return null;
+      return {
+        email: "demo_tutor@sfsu.edu",
+      };
     }
   }, []);
 
@@ -33,12 +31,10 @@ export default function TutorDashboard() {
     return beforeAt.charAt(0).toUpperCase() + beforeAt.slice(1);
   }, [user]);
 
-  // Redirect only when login is required
   useEffect(() => {
     if (ENFORCE_LOGIN && !user) {
-      navigate(`/login?next=${encodeURIComponent("/tutor/dashboard")}`, {
-        replace: true,
-      });
+      const next = encodeURIComponent("/tutor/dashboard");
+      navigate(`/login?next=${next}`, { replace: true });
     }
   }, [user, navigate]);
 
@@ -83,9 +79,7 @@ export default function TutorDashboard() {
             Create your profile to start offering tutoring services.
           </p>
           <p className="mt-1 text-slate-800">
-            <span className="underline underline-offset-2">
-              Your profile will be reviewed.
-            </span>{" "}
+            <span className="underline underline-offset-2">Your profile will be reviewed.</span>{" "}
             before appearing in search results.
           </p>
 
