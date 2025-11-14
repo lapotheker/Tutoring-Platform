@@ -57,7 +57,7 @@ export default function Navbar() {
               `}
             >
               <MessageSquare className="w-4 h-4" />
-              <span>My Dashboard</span>
+              <span>Student Dashboard</span>
             </Link>
           </div>
         </div>
