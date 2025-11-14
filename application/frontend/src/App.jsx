@@ -15,7 +15,6 @@ import SearchResults from "./pages/search/SearchResults.jsx";
 // Student pages
 import RequestSession from "./pages/student/RequestSession.jsx";
 import StudentDashboard from "./pages/student/StudentDashboard.jsx";
-import StudentMessages from "./pages/student/StudentMessages.jsx"; // NEW
 import MessageSent from "./pages/student/MessageSent.jsx";
 
 // Tutor pages
