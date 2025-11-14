@@ -5,6 +5,7 @@ import { dataAPI } from "../../services/api";
 
 export default function Home() {
   const navigate = useNavigate();
+  
 
   // Separate search inputs
   const [tutorName, setTutorName] = useState("");
