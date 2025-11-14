@@ -62,7 +62,7 @@ export default function StudentDashboard() {
           tutor_profile_id: 201,
           created_at: new Date().toISOString(),
           message_status: "Sent",
-          message_content: "Hi, I need help with CSC 648 project",
+          message_content: "Hi, I need help with my CSC 648 project",
         },
         {
           message_id: 2,
@@ -80,7 +80,7 @@ export default function StudentDashboard() {
           tutor_profile_id: 203,
           created_at: new Date(Date.now() - 172800000).toISOString(),
           message_status: "Reported",
-          message_content: "Need help with Python assignment",
+          message_content: "I need help with a Python assignment",
         },
       ];
       
