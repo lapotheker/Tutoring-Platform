@@ -1,33 +1,44 @@
-// src/pages/TutorDashboard.jsx
 import { useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
+// false = demo user allowed
+// true  = redirect to login if no user found
+const ENFORCE_LOGIN = false;
 
 export default function TutorDashboard() {
   const navigate = useNavigate();
 
-  // Load demo user from local or session storage
+  // Load saved user or use demo user (when login is not enforced)
   const user = useMemo(() => {
     try {
-      return JSON.parse(
-        localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser") || "null"
-      );
+      const stored =
+        localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser");
+
+      if (!stored && !ENFORCE_LOGIN) {
+        return { email: "demo_tutor@sfsu.edu" };
+      }
+      if (!stored) return null;
+
+      return JSON.parse(stored);
     } catch {
+      if (!ENFORCE_LOGIN) return { email: "demo_tutor@sfsu.edu" };
       return null;
     }
   }, []);
 
-  // Extract name from email or use fallback
+  // Create display name from email
   const displayName = useMemo(() => {
     if (!user?.email) return "Tutor";
-    const beforeAt = user.email.split("@")[0] || "Tutor";
+    const beforeAt = user.email.split("@")[0];
     return beforeAt.charAt(0).toUpperCase() + beforeAt.slice(1);
   }, [user]);
 
-  // Optional redirect if user not logged in
+  // Redirect only when login is required
   useEffect(() => {
-    if (!user) {
-      const next = encodeURIComponent("/tutor/dashboard");
-      navigate(`/login?next=${next}`, { replace: true });
+    if (ENFORCE_LOGIN && !user) {
+      navigate(`/login?next=${encodeURIComponent("/tutor/dashboard")}`, {
+        replace: true,
+      });
     }
   }, [user, navigate]);
 
@@ -36,7 +47,7 @@ export default function TutorDashboard() {
 
   return (
     <section className="space-y-6">
-      {/* ===== Header ===== */}
+      {/* Header */}
       <div className={card}>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
@@ -48,32 +59,32 @@ export default function TutorDashboard() {
             </div>
           </div>
           <div className="flex items-center gap-4 text-2xl">
-            <Link to="/inbox" title="Messages" className="hover:opacity-80">
+            <Link to="/inbox" className="hover:opacity-80">
               ✉️
             </Link>
-            <Link to="/" title="Home" className="hover:opacity-80">
+            <Link to="/" className="hover:opacity-80">
               🏠
             </Link>
           </div>
         </div>
 
-        <h1 className={`mt-4 text-center ${bigTitle}`}>SFSU TUTORING PLATFORM</h1>
+        <h1 className={`mt-4 text-center ${bigTitle}`}>SFSU Tutoring Page</h1>
       </div>
 
-      {/* ===== Profile Status ===== */}
+      {/* Profile Status */}
       <div className={card}>
-        <h2 className="text-lg md:text-xl font-extrabold">PROFILE STATUS</h2>
+        <h2 className="text-lg md:text-xl font-extrabold">Profile Status</h2>
 
         <div className="mt-4 rounded-xl border border-slate-300 bg-slate-50 p-4">
           <div className="text-lg md:text-xl font-extrabold">
-            YOU DON'T HAVE A TUTOR PROFILE YET
+            YOU DON&apos;T HAVE A TUTOR PROFILE YET
           </div>
           <p className="mt-2 text-slate-800">
             Create your profile to start offering tutoring services.
           </p>
           <p className="mt-1 text-slate-800">
             <span className="underline underline-offset-2">
-              Your profile will be reviewed by administrators
+              Your profile will be reviewed.
             </span>{" "}
             before appearing in search results.
           </p>
@@ -83,7 +94,7 @@ export default function TutorDashboard() {
               onClick={() => navigate("/tutor/profile-submitted")}
               className="rounded-md border px-5 py-2 font-semibold hover:bg-white"
             >
-              CREATE PROFILE
+              Create Profile
             </button>
           </div>
         </div>
