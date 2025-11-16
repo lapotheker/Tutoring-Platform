@@ -59,6 +59,23 @@ export default function Navbar() {
               <MessageSquare className="w-4 h-4" />
               <span>Student Dashboard</span>
             </Link>
+            
+            {/* Tutor Dashboard */}
+            <Link
+            to="/tutor/dashboard"
+            className={`
+              inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+               ${
+                 isActive("/tutor/dashboard")
+                  ? "bg-green-600 text-white shadow-sm"
+                  : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+                }
+              `}
+             >
+                   <span className="font-bold text-lg">🎓</span>
+                   <span>Tutor Dashboard</span>
+            </Link>
+            
           </div>
         </div>
       </div>
