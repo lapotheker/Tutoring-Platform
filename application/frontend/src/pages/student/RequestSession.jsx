@@ -134,18 +134,6 @@ export default function RequestSession() {
             />
           </div>
 
-          {/* LANGUAGE REQUEST */}
-          <div>
-            <div className={label}>LANGUAGE REQUEST:</div>
-            <input
-              type="text"
-              value={language}
-              onChange={(e) => setLanguage(e.target.value)}
-              placeholder="e.g., English, Spanish"
-              className={input}
-            />
-          </div>
-
           {/* MESSAGE */}
           <div>
             <div className={label}>MESSAGE:</div>
