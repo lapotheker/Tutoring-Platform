@@ -10,7 +10,6 @@ export default function RequestSession() {
   // --- Form state ---
   const [fromEmail, setFromEmail] = useState("");
   const [subject, setSubject] = useState("");
-  const [language, setLanguage] = useState("");
   const [message, setMessage] = useState("");
   const [err, setErr] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | sent
@@ -68,7 +67,6 @@ export default function RequestSession() {
       //     toTutorId: id,
       //     fromEmail: fromEmail.trim(),
       //     subject: subject.trim(),
-      //     languageRequest: language.trim(),
       //     message: message.trim(),
       //   }),
       // });
