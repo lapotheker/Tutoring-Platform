@@ -76,8 +76,8 @@ export default function RequestSession() {
       await new Promise((r) => setTimeout(r, 700));
       setStatus("sent");
 
-      // After sending, go back to results (keeps original filters), or back to profile:
-      navigate({ pathname: "/results", search }, { replace: true });
+      // After sending, go back to MessageSent confirmation screen
+      navigate({ pathname: "/message-sent", search }, { replace: true });
     } catch (e) {
       setStatus("idle");
       setErr(e?.message || "Something went wrong.");
