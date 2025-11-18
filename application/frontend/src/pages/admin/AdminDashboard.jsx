@@ -50,6 +50,11 @@ export default function AdminDashboard() {
     setSelectedIds(new Set());
   };
 
+  const viewSelected = () => {
+    console.log("View:", Array.from(selectedIds));
+    setSelectedIds(new Set());
+  }
+
   // --- styles ---------------------------------------------------------------
   const card = "rounded-2xl border border-slate-300 bg-white p-6 shadow-sm";
   const bigTitle = "text-2xl md:text-3xl font-extrabold tracking-wide";
@@ -97,6 +102,15 @@ export default function AdminDashboard() {
             >
               ❌ Reject
             </button>
+
+            <button
+              onClick={viewSelected}
+              disabled={noneSelected}
+              className={`rounded-md border px-3 py-1.5 text-sm font-semibold ${noneSelected ? "opacity-50 cursor-not-allowed" : "hover:bg-white"}`}
+            >
+              📄 View Profile
+            </button>
+
           </div>
         </div>
 
@@ -149,6 +163,15 @@ export default function AdminDashboard() {
                       title="Reject this tutor"
                     >
                       ✖️
+                    </button>
+
+                    {/*Viewing tutor profile button*/}
+                    <button
+                      onClick={() => console.log("View Profile:", tutor.id)}
+                      className="rounded-md border px-2 py-1 text-sm hover:bg-white"
+                      title="View tutor Profile"
+                    >
+                      📄
                     </button>
 
                   </div>

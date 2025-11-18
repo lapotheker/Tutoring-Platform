@@ -26,6 +26,8 @@ import TutorDashboardApproved from "./pages/tutor/TutorDashboardApproved.jsx";
 import TutorPolicy from "./pages/tutor/TutorPolicy.jsx";
 import TutorProfile from "./pages/tutor/TutorProfile.jsx";
 import TutorProfileSubmitted from "./pages/tutor/TutorProfileSubmitted.jsx";
+import Posting from "./pages/tutor/Posting.jsx";
+import AdminDashboard from "./pages/tutor/AdminDashboard";
 
 // Team member pages
 import DarienPage from "./pages/team/DarienPage.jsx";
@@ -61,6 +63,8 @@ export default function App() {
           <Route path="/tutor/dashboard" element={<TutorDashboard />} />
           <Route path="/tutor/profile-submitted" element={<TutorProfileSubmitted />} />
           <Route path="/tutor/dashboard-approved" element={<TutorDashboardApproved />} />
+          <Route path="/tutor/posting" element={<Posting />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
           {/* Team member pages */}
           <Route path="/member/yuhang-wei" element={<YuhangPage />} />
@@ -72,7 +76,6 @@ export default function App() {
           <Route path="/member/jonathan-tsang" element={<JonathanPage />} />
         </Routes>
       </main>
-
       <footer className="mt-10 border-t border-slate-200">
         <div className="mx-auto max-w-6xl px-4 py-8 text-sm text-slate-500 flex flex-col md:flex-row items-center justify-between gap-3">
           <div>© {new Date().getFullYear()} CSC648 Section04 Team04. All rights reserved.</div>
