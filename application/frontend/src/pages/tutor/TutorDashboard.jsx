@@ -23,14 +23,6 @@ export default function TutorDashboard() {
     return beforeAt.charAt(0).toUpperCase() + beforeAt.slice(1);
   }, [user]);
 
-  // Optional redirect if user not logged in
-  useEffect(() => {
-    if (!user) {
-      const next = encodeURIComponent("/tutor/dashboard");
-      navigate(`/login?next=${next}`, { replace: true });
-    }
-  }, [user, navigate]);
-
   const card = "rounded-2xl border border-slate-300 bg-white p-6 shadow-sm";
   const bigTitle = "text-2xl md:text-3xl font-extrabold tracking-wide";
 
