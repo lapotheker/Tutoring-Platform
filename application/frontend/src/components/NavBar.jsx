@@ -3,35 +3,11 @@ import { Link, useLocation } from "react-router-dom";
 import { MessageSquare } from "lucide-react";
 
 export default function Navbar() {
-<<<<<<< HEAD
-  return (
-    <header className="sticky top-0 z-40 backdrop-blur bg-white/80 border-b border-slate-200">
-      <nav className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="h-9 w-9 rounded-2xl bg-slate-900 text-white grid place-items-center font-semibold">
-            04
-          </div>
-          <div>
-            <div className="font-semibold leading-tight">CSC648 Section04 Team04</div>
-            <div className="text-xs text-slate-500 -mt-0.5">Fall 2025</div>
-          </div>
-        </div>
-        <div className="flex items-center gap-2 text-sm">
-          <Nav to="/">Home</Nav>
-          <Nav to="/about">About</Nav>
-          <Nav to="/admin">Admin</Nav>
-        </div>
-      </nav>
-    </header>
-  );
-}
-=======
   const location = useLocation();
 
   const isActive = (path) => {
     return location.pathname === path;
   };
->>>>>>> 9755849db06a36ea8ee792ab81401a74ea41e05a
 
   return (
     <nav className="border-b border-slate-200 bg-white shadow-sm">
@@ -92,6 +68,23 @@ export default function Navbar() {
               <span className="font-bold text-lg">🎓</span>
               <span>Tutor Dashboard</span>
             </Link>
+            
+            {/* Admin Dashboard */}
+            <Link
+              to="/admin/dashboard"
+              className={`
+                inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+                ${
+                  isActive("/admin/dashboard")
+                    ? "bg-purple-400 text-white shadow-sm"
+                    : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
+                }
+              `}
+            >
+              <span className="font-bold text-lg">🛠️</span>
+              <span>Admin Dashboard</span>
+            </Link>
+
           </div>
         </div>
       </div>

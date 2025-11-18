@@ -87,7 +87,7 @@ export default function AdminDashboard() {
               {allSelected ? "Clear" : "Select all"}
             </button>
 
-            {/*Approve And Reject Buttons */}
+            {/*Approve, Reject, and view profile buttons */}
             <button
               onClick={approveSelected}
               disabled={noneSelected}
@@ -190,7 +190,6 @@ export default function AdminDashboard() {
       <div className={card}>
         <h2 className="text-lg md:text-xl font-extrabold">Reports</h2>
         <p className="mt-2 text-slate-800">View system logs and recent activity.</p>
-        {/* Admin Action Log*/}
         
       </div>
       
