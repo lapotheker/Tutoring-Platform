@@ -199,6 +199,84 @@ const tutorModel = {
     const [rows] = await pool.execute(query);
     return rows;
   },
+
+    /**
+   * Create new tutor profile
+   */
+  async createTutorProfile(profileData) {
+    const connection = await pool.getConnection();
+    
+    try {
+      await connection.beginTransaction();
+
+      // For demo - using existing tutor user (Darien)
+      // In real app, this would come from authentication
+      const tutorUserId = 2; // Darien's user_id
+      const adminUserId = 1; // Alice Admin's user_id
+
+      // 1. Insert tutor profile
+      const [profileResult] = await connection.execute(
+        `INSERT INTO tutor_profile 
+         (tutor_user_id, display_name, hourly_rate, availability_summary, 
+          approval_status, visibility, created_by, updated_by) 
+         VALUES (?, ?, ?, ?, 'Pending', 'Public', ?, ?)`,
+        [
+          tutorUserId, 
+          profileData.displayName, 
+          parseFloat(profileData.hourlyRate), 
+          profileData.availabilitySummary,
+          adminUserId, 
+          adminUserId
+        ]
+      );
+
+      const tutorProfileId = profileResult.insertId;
+
+      // 2. Handle courses
+      if (profileData.courses && profileData.courses.length > 0) {
+        for (const courseName of profileData.courses) {
+          const [courseRows] = await connection.execute(
+            'SELECT course_id FROM course_number WHERE code LIKE ?',
+            [`%${courseName.trim()}%`]
+          );
+          
+          if (courseRows.length > 0) {
+            await connection.execute(
+              'INSERT INTO tutor_profile_course (tutor_profile_id, course_id) VALUES (?, ?)',
+              [tutorProfileId, courseRows[0].course_id]
+            );
+          }
+        }
+      }
+
+      // 3. Handle subject tags
+      if (profileData.subjects && profileData.subjects.length > 0) {
+        for (const subjectName of profileData.subjects) {
+          const [subjectRows] = await connection.execute(
+            'SELECT tag_id FROM subject_tag WHERE tag_name LIKE ?',
+            [`%${subjectName.trim()}%`]
+          );
+          
+          if (subjectRows.length > 0) {
+            await connection.execute(
+              'INSERT INTO tutor_profile_subject_tag (tutor_profile_id, tag_id) VALUES (?, ?)',
+              [tutorProfileId, subjectRows[0].tag_id]
+            );
+          }
+        }
+      }
+
+      await connection.commit();
+      return { success: true, tutorProfileId };
+
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  },
 };
+
 
 module.exports = tutorModel;
