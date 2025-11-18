@@ -72,7 +72,7 @@ export default function TutorDashboard() {
 
           <div className="mt-5">
             <button
-              onClick={() => navigate("/tutor/profile-submitted")}
+              onClick={() => navigate("/tutor/posting")}
               className="rounded-md border px-5 py-2 font-semibold hover:bg-white"
             >
               CREATE PROFILE
