@@ -9,6 +9,9 @@ import About from "./pages/public/About.jsx";
 import Login from "./pages/public/Login.jsx";
 import RegisterPage from "./pages/public/Register.jsx";
 
+//admin page
+import AdminPage from "./pages/admin/AdminDashboard.jsx"
+
 // Search results
 import SearchResults from "./pages/search/SearchResults.jsx";
 
@@ -44,6 +47,9 @@ export default function App() {
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterPage />} />
+
+          <Route path="/admin" element={<AdminPage/>} />
+
 
           {/* Student and Tutor Modules */}
           <Route path="/dashboard" element={<StudentDashboard />} />
