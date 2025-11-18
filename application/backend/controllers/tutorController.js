@@ -62,6 +62,47 @@ const tutorController = {
       });
     }
   },
+
+    /**
+   * Create new tutor profile
+   * POST /api/tutors/profile
+   */
+  async createTutorProfile(req, res) {
+    try {
+      const profileData = {
+        displayName: req.body.fullName, // Map from frontend's fullName to display_name
+        hourlyRate: req.body.hourlyRate,
+        availabilitySummary: req.body.availability,
+        courses: req.body.courses ? req.body.courses.split(',').map(c => c.trim()) : [],
+        subjects: req.body.subjects ? req.body.subjects.split(',').map(s => s.trim()) : [],
+        bio: req.body.bio,
+        mode: req.body.mode
+      };
+
+      // Validate required fields
+      if (!profileData.displayName || !profileData.hourlyRate || !profileData.availabilitySummary) {
+        return res.status(400).json({
+          success: false,
+          error: "Missing required fields: fullName, hourlyRate, availability"
+        });
+      }
+
+      const result = await tutorModel.createTutorProfile(profileData);
+
+      res.json({
+        success: true,
+        message: "Tutor profile submitted for admin approval",
+        tutorProfileId: result.tutorProfileId
+      });
+
+    } catch (error) {
+      console.error("Error in createTutorProfile controller:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to create tutor profile"
+      });
+    }
+  },
 };
 
 module.exports = tutorController;
