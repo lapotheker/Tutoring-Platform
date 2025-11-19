@@ -1,10 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [user, setUser] = useState(null);
   const [query, setQuery] = useState("");
+
+  const tab = new URLSearchParams(location.search).get("tab");
 
   // Try to read demo user from storage (set by Login.jsx). Prefer localStorage, then sessionStorage.
   useEffect(() => {
@@ -25,6 +28,17 @@ export default function StudentDashboard() {
     if (!left) return "Student";
     return left.charAt(0).toUpperCase() + left.slice(1);
   }, [user]);
+
+  if (tab === "messages") {
+    return (
+      <section className="space-y-6">
+        <div className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
+          <h1 className="text-xl font-extrabold tracking-wide mb-4">Inbox</h1>
+          <MessagesList />
+        </div>
+      </section>
+    );
+  }
 
   // Submit handler: navigate to Home with a query param so Home can perform a search
   function onSearch(e) {
@@ -49,7 +63,7 @@ export default function StudentDashboard() {
 
           {/* Right: quick actions */}
           <div className="flex items-center gap-3 text-2xl">
-            <Link to="/inbox" title="Messages" className="hover:opacity-80">
+            <Link to="/dashboard?tab=messages" title="Messages" className="hover:opacity-80">
               ✉️
             </Link>
             <Link to="/" title="Home" className="hover:opacity-80">
@@ -107,5 +121,51 @@ export default function StudentDashboard() {
         </div>
       </div>
     </section>
+  );
+}
+
+function MessagesList() {
+  const [messages, setMessages] = useState([]);
+
+  useEffect(() => {
+    const raw =
+      localStorage.getItem("demoUser") ||
+      sessionStorage.getItem("demoUser");
+
+    if (!raw) return;
+
+    const user = JSON.parse(raw);
+    if (!user?.user_id) return;
+
+    const base = import.meta.env.VITE_API_BASE_URL || "";
+
+    fetch(`${base}/api/messages/user/5`)
+      .then((res) => res.json())
+      .then((json) => {
+        if (json.success) setMessages(json.data);
+      })
+      .catch(() => {});
+  }, []);
+
+  if (messages.length === 0) {
+    return <p className="text-sm text-slate-600">No messages yet.</p>;
+  }
+
+  return (
+    <ul className="space-y-3">
+      {messages.map((m) => (
+        <li key={m.message_id} className="border p-3 rounded bg-slate-50">
+          <p className="text-sm">
+            <strong>Message:</strong> {m.message}
+          </p>
+          <p className="text-xs text-slate-500 mt-1">
+            From #{m.sender_user_id} → To #{m.recipient_user_id}
+          </p>
+          <p className="text-xs text-slate-400">
+            {new Date(m.created_at).toLocaleString()}
+          </p>
+        </li>
+      ))}
+    </ul>
   );
 }
