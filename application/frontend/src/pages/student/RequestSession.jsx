@@ -9,7 +9,6 @@ export default function RequestSession() {
 
   // --- Form state ---
   const [fromEmail, setFromEmail] = useState("");
-  const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
   const [err, setErr] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | sent
@@ -40,7 +39,6 @@ export default function RequestSession() {
     if (!fromEmail || !/^[^@\s]+@sfsu\.edu$/i.test(fromEmail)) {
       return "FROM must be a valid @sfsu.edu email.";
     }
-    if (!subject.trim()) return "SUBJECT is required.";
     if (!message.trim()) return "MESSAGE is required.";
     return "";
   }
@@ -118,19 +116,6 @@ export default function RequestSession() {
               required
             />
             <p className="text-xs text-slate-500 mt-1">(Must use @sfsu.edu email)</p>
-          </div>
-
-          {/* SUBJECT */}
-          <div>
-            <div className={label}>SUBJECT:</div>
-            <input
-              type="text"
-              value={subject}
-              onChange={(e) => setSubject(e.target.value)}
-              placeholder="e.g., CSC 648 tutoring request"
-              className={input}
-              required
-            />
           </div>
 
           {/* MESSAGE */}
