@@ -58,19 +58,20 @@ export default function RequestSession() {
     setStatus("sending");
 
     try {
-      // Hook this up to your backend later:
-      // const base = import.meta.env.VITE_API_BASE_URL || "";
-      // const res = await fetch(`${base}/api/messages`, {
-      //   method: "POST",
-      //   headers: { "Content-Type": "application/json" },
-      //   body: JSON.stringify({
-      //     toTutorId: id,
-      //     fromEmail: fromEmail.trim(),
-      //     subject: subject.trim(),
-      //     message: message.trim(),
-      //   }),
-      // });
-      // if (!res.ok) throw new Error("Failed to send message");
+      // Store sent message in backend
+      const base = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";;
+
+      const res = await fetch(`${base}/api/messages`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sender_user_id: parseInt(demoUser?.user_id || demoUser?.id, 5), // student's user ID
+          recipient_user_id: parseInt(id, 10), // tutor's user_id from URL
+          message: message.trim(), // backend only accepts this field
+        }),
+      });
+
+      if (!res.ok) throw new Error("Failed to send message");
 
       // Demo: simulate a short network delay
       await new Promise((r) => setTimeout(r, 700));
