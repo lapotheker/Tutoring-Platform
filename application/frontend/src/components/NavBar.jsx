@@ -39,7 +39,7 @@ export default function Navbar() {
 
             {/* Dashboard Link - Prominent in top right */}
             <Link
-              to="/dashboard?tab=messages"
+              to="/dashboard"
               className={`
                 inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
                 ${
@@ -68,7 +68,7 @@ export default function Navbar() {
               <span className="font-bold text-lg">🎓</span>
               <span>Tutor Dashboard</span>
             </Link>
-            
+
             {/* Admin Dashboard */}
             <Link
               to="/admin/dashboard"
@@ -84,7 +84,6 @@ export default function Navbar() {
               <span className="font-bold text-lg">🛠️</span>
               <span>Admin Dashboard</span>
             </Link>
-
           </div>
         </div>
       </div>
