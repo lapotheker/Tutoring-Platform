@@ -120,6 +120,22 @@ export default function StudentDashboard() {
           </div>
         </div>
       </div>
+
+      {/* ===== Become a Tutor ===== */}
+      <div className="rounded-2xl border border-slate-300 bg-white">
+        <div className="border-b border-slate-200 p-4 font-semibold">Want to tutor?</div>
+        <div className="p-4">
+          <p className="text-sm text-slate-700 mb-4">
+            Share your knowledge and help fellow students! Apply to become a tutor on our platform.
+          </p>
+          <button
+            onClick={() => navigate("/tutor/policy")}
+            className="rounded-lg bg-blue-600 px-4 py-2 text-white font-medium shadow hover:bg-blue-700"
+          >
+            BECOME A TUTOR
+          </button>
+        </div>
+      </div>
     </section>
   );
 }
@@ -128,9 +144,7 @@ function MessagesList() {
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
-    const raw =
-      localStorage.getItem("demoUser") ||
-      sessionStorage.getItem("demoUser");
+    const raw = localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser");
 
     if (!raw) return;
 
@@ -161,9 +175,7 @@ function MessagesList() {
           <p className="text-xs text-slate-500 mt-1">
             From #{m.sender_user_id} → To #{m.recipient_user_id}
           </p>
-          <p className="text-xs text-slate-400">
-            {new Date(m.created_at).toLocaleString()}
-          </p>
+          <p className="text-xs text-slate-400">{new Date(m.created_at).toLocaleString()}</p>
         </li>
       ))}
     </ul>

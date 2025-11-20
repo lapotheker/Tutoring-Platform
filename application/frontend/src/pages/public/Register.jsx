@@ -1,4 +1,4 @@
-// src/pages/public/RegisterPage.jsx (or Signup.jsx)
+// src/pages/public/Register.jsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
@@ -9,8 +9,6 @@ export default function Signup() {
     confirmPassword: "",
     firstName: "",
     lastName: "",
-    roleStudent: false,
-    roleTutor: false,
     acceptTos: false,
   });
   const [errors, setErrors] = useState({});
@@ -33,10 +31,6 @@ export default function Signup() {
     if (!form.firstName) e.firstName = "First name is required";
     if (!form.lastName) e.lastName = "Last name is required";
 
-    const selected = Number(!!form.roleStudent) + Number(!!form.roleTutor);
-    if (selected === 0) e.role = "Select a role";
-    if (selected > 1) e.role = "Please choose only one role";
-
     if (!form.acceptTos) e.acceptTos = "You must agree to Terms and Privacy Policy";
 
     setErrors(e);
@@ -50,8 +44,20 @@ export default function Signup() {
 
     setSubmitting(true);
     try {
-      await new Promise((r) => setTimeout(r, 700)); // demo
-      setServerMsg("Demo: submitted. Connect API to persist.");
+      // In real app, this would call your API
+      // const response = await fetch('/api/register', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({
+      //     fullName: `${form.firstName} ${form.lastName}`,
+      //     email: form.email,
+      //     password: form.password,
+      //     role: 1, // Everyone registers as Student (role = 1)
+      //   }),
+      // });
+
+      await new Promise((r) => setTimeout(r, 700)); // demo delay
+      setServerMsg("Demo: Account created as Student. Connect API to persist.");
     } catch (err) {
       setServerMsg(err.message || "Something went wrong");
     } finally {
@@ -66,7 +72,6 @@ export default function Signup() {
 
   return (
     <div className="mx-auto max-w-xl">
-      {/* Back to Home OUTSIDE the card */}
       <Link
         to="/"
         className="inline-block mb-3 text-slate-600 text-sm font-medium hover:text-blue-600"
@@ -76,6 +81,9 @@ export default function Signup() {
 
       <section className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
         <h1 className="text-center text-2xl font-extrabold tracking-wide">REGISTER NEW ACCOUNT</h1>
+        <p className="text-center text-sm text-slate-600 mt-2">
+          All users register as Students. You can upgrade to Tutor later.
+        </p>
 
         <form onSubmit={onSubmit} className="mt-6 space-y-4">
           {/* Email */}
@@ -162,48 +170,27 @@ export default function Signup() {
             </div>
           </div>
 
-          {/* Roles + Terms — unified spacing/alignment */}
-          <fieldset>
-            <legend className="text-sm font-medium text-slate-700 mb-2">I am a:</legend>
-
-            <div className="space-y-3">
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={form.roleStudent}
-                  onChange={(e) => update("roleStudent", e.target.checked)}
-                />
-                <span className="leading-tight">Student seeking tutoring</span>
-              </label>
-
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={form.roleTutor}
-                  onChange={(e) => update("roleTutor", e.target.checked)}
-                />
-                <span className="leading-tight">Tutor offering services</span>
-              </label>
-
-              <label className="flex items-center gap-2 text-sm">
-                <input
-                  type="checkbox"
-                  checked={form.acceptTos}
-                  onChange={(e) => update("acceptTos", e.target.checked)}
-                />
-                <span className="leading-tight">
-                  I agree to{" "}
-                  <a className="underline" href="/terms" target="_blank" rel="noreferrer">
-                    Terms of Service
-                  </a>{" "}
-                  and{" "}
-                  <a className="underline" href="/privacy" target="_blank" rel="noreferrer">
-                    Privacy Policy
-                  </a>
-                </span>
-              </label>
-            </div>
-          </fieldset>
+          {/* Terms acceptance */}
+          <div>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={form.acceptTos}
+                onChange={(e) => update("acceptTos", e.target.checked)}
+              />
+              <span className="leading-tight">
+                I agree to{" "}
+                <a className="underline" href="/terms" target="_blank" rel="noreferrer">
+                  Terms of Service
+                </a>{" "}
+                and{" "}
+                <a className="underline" href="/privacy" target="_blank" rel="noreferrer">
+                  Privacy Policy
+                </a>
+              </span>
+            </label>
+            {errors.acceptTos && <p className={errClass}>{errors.acceptTos}</p>}
+          </div>
 
           {/* Submit */}
           <button
