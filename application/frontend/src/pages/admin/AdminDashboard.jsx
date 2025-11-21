@@ -21,7 +21,8 @@ export default function AdminDashboard() {
   // --- selection state ------------------------------------------------------
   const [selectedIds, setSelectedIds] = useState(() => new Set());
 
-  const allSelected = selectedIds.size === pendingTutorExamples.length && pendingTutorExamples.length > 0;
+  const allSelected =
+    selectedIds.size === pendingTutorExamples.length && pendingTutorExamples.length > 0;
   const noneSelected = selectedIds.size === 0;
 
   const toggleOne = (id) => {
@@ -53,7 +54,7 @@ export default function AdminDashboard() {
   const viewSelected = () => {
     console.log("View:", Array.from(selectedIds));
     setSelectedIds(new Set());
-  }
+  };
 
   // --- styles ---------------------------------------------------------------
   const card = "rounded-2xl border border-slate-300 bg-white p-6 shadow-sm";
@@ -63,9 +64,7 @@ export default function AdminDashboard() {
     <section className="space-y-6">
       {/* ===== Header ===== */}
       <div className={card}>
-        <div className="flex items-start justify-between">
-          
-        </div>
+        <div className="flex items-start justify-between"></div>
         <h1 className={`mt-4 text-center ${bigTitle}`}>ADMIN DASHBOARD</h1>
       </div>
 
@@ -74,16 +73,14 @@ export default function AdminDashboard() {
         <div className="flex items-center justify-between">
           <h2 className="text-lg md:text-xl font-extrabold">Moderation Queue</h2>
           <div className="flex items-center gap-2">
-
             {/* Select all / Clear selections Button */}
             <button
-              //toggles on all checkmarks on click 
+              //toggles on all checkmarks on click
               onClick={toggleAll}
               className="rounded-md border px-3 py-1.5 text-sm font-semibold hover:bg-white"
               aria-pressed={allSelected}
               title={allSelected ? "Clear selection" : "Select all"}
             >
-
               {allSelected ? "Clear" : "Select all"}
             </button>
 
@@ -110,7 +107,6 @@ export default function AdminDashboard() {
             >
               📄 View Profile
             </button>
-
           </div>
         </div>
 
@@ -141,12 +137,10 @@ export default function AdminDashboard() {
                     <span className="font-medium">{tutor.name}</span>
                   </label>
 
-                  
                   <span className="text-sm text-slate-600">{tutor.subject}</span>
 
                   {/*Approve or Rejection*/}
                   <div className="ml-auto flex items-center gap-2">
-
                     {/*Approval Button*/}
                     <button
                       onClick={() => console.log("Approve one:", tutor.id)}
@@ -173,7 +167,6 @@ export default function AdminDashboard() {
                     >
                       📄
                     </button>
-
                   </div>
                 </li>
               );
@@ -190,9 +183,8 @@ export default function AdminDashboard() {
       <div className={card}>
         <h2 className="text-lg md:text-xl font-extrabold">Reports</h2>
         <p className="mt-2 text-slate-800">View system logs and recent activity.</p>
-        
       </div>
-      
+
       {/*Admin Action Log*/}
       <div className={card}>
         <h2 className="text-lg md:text-xl font-extrabold mb-3">Admin Action Log</h2>
@@ -205,7 +197,6 @@ export default function AdminDashboard() {
                 <th className="px-4 py-2 text-left font-semibold text-slate-700"> Action</th>
                 <th className="px-4 py-2 text-left font-semibold text-slate-700"> Target</th>
                 <th className="px-4 py-2 text-left font-semibold text-slate-700"> Resolution</th>
-                
               </tr>
             </thead>
 
@@ -236,8 +227,6 @@ export default function AdminDashboard() {
           </table>
         </div>
       </div>
-
-
     </section>
   );
 }

@@ -10,7 +10,7 @@ import Login from "./pages/public/Login.jsx";
 import RegisterPage from "./pages/public/Register.jsx";
 
 //admin page
-import AdminPage from "./pages/admin/AdminDashboard.jsx"
+import AdminPage from "./pages/admin/AdminDashboard.jsx";
 
 // Search results
 import SearchResults from "./pages/search/SearchResults.jsx";
@@ -50,8 +50,7 @@ export default function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterPage />} />
 
-          <Route path="/admin" element={<AdminPage/>} />
-
+          <Route path="/admin" element={<AdminPage />} />
 
           {/* Student and Tutor Modules */}
           <Route path="/dashboard" element={<StudentDashboard />} />
@@ -65,7 +64,6 @@ export default function App() {
           <Route path="/tutor/dashboard-approved" element={<TutorDashboardApproved />} />
           <Route path="/tutor/posting" element={<Posting />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
-          
 
           {/* Team member pages */}
           <Route path="/member/yuhang-wei" element={<YuhangPage />} />

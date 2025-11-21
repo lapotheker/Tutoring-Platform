@@ -1,52 +1,86 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { tutorAPI } from "../../services/api";
+import FiltersSidebar from "../../components/FiltersSidebar";
 
 export default function SearchResults() {
   const { search } = useLocation();
   const navigate = useNavigate();
   const params = new URLSearchParams(search);
 
-  // States
-  const [tutors, setTutors] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  // Read query parameters
+  // URL → state
   const searchText = params.get("search") || "";
   const subject = params.get("subject") || "";
   const course = params.get("course") || "";
   const language = params.get("language") || "";
   const minRate = params.get("minRate") || "";
   const maxRate = params.get("maxRate") || "";
-  const days = params.get("days") || "";
-  const times = params.get("times") || "";
+  const daysParam = params.get("days") || "";
+  const timesParam = params.get("times") || "";
+  const days = daysParam ? daysParam.split(",") : [];
+  const times = timesParam ? timesParam.split(",") : [];
 
-  // Controlled input for the top search bar
+  // State for results
+  const [tutors, setTutors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // State for top input bar
   const [q, setQ] = useState(searchText || course);
   useEffect(() => {
     setQ(searchText || course);
   }, [searchText, course]);
 
-  // Fetch tutors from API whenever filters change
+  // Filters object for sidebar
+  const filters = {
+    subject,
+    language,
+    minRate,
+    maxRate,
+    days,
+    times,
+  };
+
+  // Update UPL when filters change
+  function updateFilters(next) {
+    const p = new URLSearchParams(search);
+
+    // Subject
+    next.subject ? p.set("subject", next.subject) : p.delete("subject");
+
+    // Language
+    next.language ? p.set("language", next.language) : p.delete("language");
+
+    // Rate
+    next.minRate ? p.set("minRate", next.minRate) : p.delete("minRate");
+    next.maxRate ? p.set("maxRate", next.maxRate) : p.delete("maxRate");
+
+    // Days
+    next.days?.length ? p.set("days", next.days.join(",")) : p.delete("days");
+
+    // Times
+    next.times?.length ? p.set("times", next.times.join(",")) : p.delete("times");
+
+    navigate(`/results?${p.toString()}`);
+  }
+
+  // Fetch tutors whenever search parameters change
   useEffect(() => {
     async function fetchTutors() {
       setLoading(true);
       setError(null);
 
       try {
-        const searchParams = {
+        const response = await tutorAPI.searchTutors({
           search: searchText,
           subject,
           course,
           language,
           minRate,
           maxRate,
-          days,
-          times,
-        };
-
-        const response = await tutorAPI.searchTutors(searchParams);
+          days: daysParam,
+          times: timesParam,
+        });
 
         if (response.success) {
           setTutors(response.data);
@@ -62,30 +96,23 @@ export default function SearchResults() {
     }
 
     fetchTutors();
-  }, [searchText, subject, course, language, minRate, maxRate, days, times]);
+  }, [searchText, subject, course, language, minRate, maxRate, daysParam, timesParam]);
 
   const showingLabel = tutors.length ? `Showing 1–${tutors.length}` : "Showing 0";
   const searchTitle = course || searchText || subject || "All";
 
-  // Update the URL with the new search value
   function submitHeaderSearch() {
     const p = new URLSearchParams(search);
     const value = q.trim();
 
-    if (value) {
-      p.set("search", value);
-    } else {
-      p.delete("search");
-    }
-    // Uncomment this line if you want to clear "course" param when searching
-    // p.delete("course");
+    value ? p.set("search", value) : p.delete("search");
 
     navigate(`/results?${p.toString()}`);
   }
 
   return (
-    <section className="space-y-6">
-      {/* ===== Header Bar ===== */}
+    <div className="mx-auto max-w-7xl px-4 py-6">
+      {/* TOP HEADER */}
       <div className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm text-center relative">
         <Link
           to="/"
@@ -102,9 +129,7 @@ export default function SearchResults() {
               type="text"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") submitHeaderSearch();
-              }}
+              onKeyDown={(e) => e.key === "Enter" && submitHeaderSearch()}
               placeholder="Search by keyword or course"
               className="flex-1 outline-none text-sm"
             />
@@ -112,8 +137,6 @@ export default function SearchResults() {
               type="button"
               onClick={submitHeaderSearch}
               className="grid place-items-center h-9 w-9 rounded-full bg-slate-900 text-white"
-              aria-label="Search"
-              title="Search"
             >
               <svg
                 viewBox="0 0 24 24"
@@ -130,90 +153,94 @@ export default function SearchResults() {
         </div>
       </div>
 
-      {/* ===== Results Header ===== */}
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-lg md:text-xl font-extrabold">Search Results – "{searchTitle}"</h2>
-          <div className="text-sm text-slate-600">{showingLabel}</div>
+      {/* MAIN CONTENT: RESULTS LEFT + SIDEBAR RIGHT */}
+      <div className="mt-6 flex flex-col gap-6 lg:flex-row">
+        {/* LEFT COLUMN – Tutor Results */}
+        <div className="flex-1 max-w-4xl">
+          <div className="flex items-baseline justify-between">
+            <h2 className="text-lg md:text-xl font-extrabold">Search Results – "{searchTitle}"</h2>
+            <div className="text-sm text-slate-600">{showingLabel}</div>
+          </div>
+
+          {loading && <div className="mt-8 text-center text-slate-600">Loading tutors...</div>}
+
+          {error && <div className="mt-8 text-center text-red-600">{error}</div>}
+
+          {!loading && !error && (
+            <div className="mt-4 space-y-5">
+              {tutors.map((t) => (
+                <article
+                  key={t.tutor_profile_id}
+                  className="rounded border border-slate-300 bg-white p-4"
+                >
+                  <div className="flex gap-4">
+                    <div className="h-12 w-12 rounded-full bg-slate-200 grid place-items-center text-slate-600 text-xl overflow-hidden">
+                      {t.profile_photo ? (
+                        <img
+                          src={t.profile_photo}
+                          alt={t.display_name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        "👤"
+                      )}
+                    </div>
+
+                    <div className="flex-1">
+                      <div className="flex items-start justify-between">
+                        <h3 className="font-extrabold tracking-wide">
+                          {t.display_name.toUpperCase()}
+                        </h3>
+                        <div className="font-semibold">${t.hourly_rate}/hour</div>
+                      </div>
+
+                      <div className="text-sm">
+                        <div>{t.full_name}</div>
+                        <div>Courses: {t.courses || "N/A"}</div>
+                        <div>Subject Tags: {t.subject_tags || "N/A"}</div>
+                        <div>Languages: {t.languages || "N/A"}</div>
+                        <div>Availability: {t.availability_summary}</div>
+                      </div>
+
+                      <div className="mt-3 flex gap-2">
+                        <Link
+                          to={`/tutors/${t.tutor_profile_id}${search}`}
+                          className="inline-block rounded border px-4 py-1 text-sm font-medium hover:bg-slate-50"
+                        >
+                          VIEW PROFILE
+                        </Link>
+
+                        <Link
+                          to={{
+                            pathname: `/tutor/request/${t.tutor_profile_id}`,
+                            search: `?to=${encodeURIComponent(t.display_name)}${
+                              search ? `&${search.slice(1)}` : ""
+                            }`,
+                          }}
+                          className="inline-block rounded bg-slate-900 text-white px-4 py-1 text-sm font-medium hover:bg-black"
+                        >
+                          CONTACT
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              ))}
+
+              {tutors.length === 0 && (
+                <div className="text-slate-600 text-center">
+                  No results found. Try adjusting your filters.
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Loading State */}
-        {loading && <div className="mt-8 text-center text-slate-600">Loading tutors...</div>}
-
-        {/* Error State */}
-        {error && <div className="mt-8 text-center text-red-600">{error}</div>}
-
-        {/* Result Cards */}
-        {!loading && !error && (
-          <div className="mt-4 space-y-5">
-            {tutors.map((t) => (
-              <article
-                key={t.tutor_profile_id}
-                className="rounded border border-slate-300 bg-white p-4"
-              >
-                <div className="flex gap-4">
-                  <div className="h-12 w-12 rounded-full bg-slate-200 grid place-items-center text-slate-600 text-xl overflow-hidden">
-                    {t.profile_photo ? (
-                      <img
-                        src={t.profile_photo}
-                        alt={t.display_name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      "👤"
-                    )}
-                  </div>
-
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between">
-                      <h3 className="font-extrabold tracking-wide">
-                        {t.display_name.toUpperCase()}
-                      </h3>
-                      <div className="font-semibold">${t.hourly_rate}/hour</div>
-                    </div>
-
-                    <div className="text-sm">
-                      <div>{t.full_name}</div>
-                      <div>Courses: {t.courses || "N/A"}</div>
-                      <div>Subject Tags: {t.subject_tags || "N/A"}</div>
-                      <div>Languages: {t.languages || "N/A"}</div>
-                      <div>Availability: {t.availability_summary}</div>
-                    </div>
-
-                    <div className="mt-3 flex gap-2">
-                      <Link
-                        to={`/tutors/${t.tutor_profile_id}${search}`}
-                        className="inline-block rounded border px-4 py-1 text-sm font-medium hover:bg-slate-50"
-                      >
-                        VIEW PROFILE
-                      </Link>
-
-                      <Link
-                        to={{
-                          pathname: `/tutor/request/${t.tutor_profile_id}`,
-                          search: `?to=${encodeURIComponent(t.display_name)}${
-                            search ? `&${search.slice(1)}` : ""
-                          }`,
-                        }}
-                        className="inline-block rounded bg-slate-900 text-white px-4 py-1 text-sm font-medium hover:bg-black"
-                      >
-                        CONTACT
-                      </Link>
-                    </div>
-                  </div>
-                </div>
-              </article>
-            ))}
-
-            {/* Empty State */}
-            {tutors.length === 0 && (
-              <div className="text-slate-600 text-center">
-                No results found. Try adjusting your filters.
-              </div>
-            )}
-          </div>
-        )}
+        {/* RIGHT COLUMN – Filters Sidebar */}
+        <div className="w-full lg:w-80 shrink-0">
+          <FiltersSidebar filters={filters} onFiltersChange={updateFilters} />
+        </div>
       </div>
-    </section>
+    </div>
   );
 }

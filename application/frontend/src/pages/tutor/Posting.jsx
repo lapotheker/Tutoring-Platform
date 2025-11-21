@@ -44,52 +44,51 @@ export default function Posting() {
   //   setMessage("Profile saved locally (M3 demo). Check console output.");
   // }
   async function onSubmit(e) {
-  e.preventDefault();
-  if (!validate()) return;
-  
-  setMessage("Submitting profile...");
+    e.preventDefault();
+    if (!validate()) return;
 
-  try {
-    // Use absolute URL to your backend
-    const response = await fetch('http://localhost:3000/api/tutors/profile', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fullName: form.fullName,
-        bio: form.bio,
-        subjects: form.subjects,
-        courses: form.courses,
-        hourlyRate: form.hourlyRate,
-        mode: form.mode,
-        availability: form.availability,
-        contactMethod: form.contactMethod
-      })
-    });
+    setMessage("Submitting profile...");
 
-    const data = await response.json();
-
-    if (data.success) {
-      setMessage("Profile submitted successfully! Awaiting admin approval.");
-      // Clear form
-      setForm({
-        fullName: "",
-        bio: "",
-        subjects: "",
-        courses: "",
-        hourlyRate: "",
-        mode: "online",
-        availability: "",
-        contactMethod: "platform",
+    try {
+      // Use absolute URL to your backend
+      const response = await fetch("http://localhost:3000/api/tutors/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.fullName,
+          bio: form.bio,
+          subjects: form.subjects,
+          courses: form.courses,
+          hourlyRate: form.hourlyRate,
+          mode: form.mode,
+          availability: form.availability,
+          contactMethod: form.contactMethod,
+        }),
       });
-    } else {
-      setMessage("Failed to submit profile: " + (data.error || "Unknown error"));
-    }
 
-  } catch (error) {
-    console.error("Error submitting profile:", error);
-    setMessage("Network error - please try again");
+      const data = await response.json();
+
+      if (data.success) {
+        setMessage("Profile submitted successfully! Awaiting admin approval.");
+        // Clear form
+        setForm({
+          fullName: "",
+          bio: "",
+          subjects: "",
+          courses: "",
+          hourlyRate: "",
+          mode: "online",
+          availability: "",
+          contactMethod: "platform",
+        });
+      } else {
+        setMessage("Failed to submit profile: " + (data.error || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Error submitting profile:", error);
+      setMessage("Network error - please try again");
+    }
   }
-}
 
   return (
     <div className="mx-auto max-w-3xl">
