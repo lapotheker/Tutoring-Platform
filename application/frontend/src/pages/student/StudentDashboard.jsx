@@ -31,18 +31,16 @@ const FAKE_SESSIONS = [
     status: "completed",
     ratingGiven: 5,
     notes: `Agenda:
-- Requirements walkthrough
-- Monorepo structure
-- CI basics
+- Functional and nonfunctional requirements walkthrough
+- UI design principles and example mockups
 
-Action items:
-- Push starter repo by Wed
-- Open PR for service contracts`,
+Homework:
+- Update search based on new simplified design`,
   },
   {
     id: "sess_0999",
-    title: "Discrete Math – Induction Practice",
-    course: "MATH 301",
+    title: "Calculus II – Convergent Series Practice",
+    course: "MATH 227",
     tutor: { id: 203, name: "Priya Patel" },
     when: daysFromNow(-6),
     durationMin: 60,
@@ -50,12 +48,8 @@ Action items:
     status: "completed",
     ratingGiven: 4,
     notes: `Covered:
-- Weak vs strong induction
-- Classic sums
-- Tips for basis & step
-
-Homework:
-- 4 induction proofs from worksheet`,
+- Integral Test
+- Comparsion Test`,
   },
 ];
 
@@ -132,7 +126,6 @@ export default function StudentDashboard() {
     return left.charAt(0).toUpperCase() + left.slice(1);
   }, [user]);
 
-
   const handleMessageTutor = (tutor) => {
     navigate("/dashboard?tab=messages", {
       state: { composeTo: { id: tutor.id, name: tutor.name } },
@@ -142,17 +135,13 @@ export default function StudentDashboard() {
 
   const handleRebookTutor = (tutor) => {
     const tutorId = String(tutor.user_id ?? tutor.id);
-    const search = location.search || ""; 
+    const search = location.search || "";
     navigate({ pathname: `/tutor/request/${tutorId}`, search });
   };
 
-  const handleViewNotes = (session) => {
-    setOpenNotesFor(session);
-  };
-
-  const handleJoinLink = (url) => {
+  const handleViewNotes = (session) => setOpenNotesFor(session);
+  const handleJoinLink = (url) =>
     window.open(url || "https://zoom.us/j/123456789", "_blank", "noopener,noreferrer");
-  };
 
   if (tab === "messages") {
     return (
@@ -182,8 +171,8 @@ export default function StudentDashboard() {
   function onSearch(e) {
     e.preventDefault();
     const target = query.trim();
-    if (!target) return navigate("/");
-    navigate(`/?q=${encodeURIComponent(target)}`);
+    if (!target) return navigate("/results");
+    navigate(`/results?q=${encodeURIComponent(target)}`);
   }
 
   const upcoming = FAKE_SESSIONS.filter((s) => s.status === "upcoming").sort((a, b) => a.when - b.when);
@@ -222,6 +211,7 @@ export default function StudentDashboard() {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search by course, subject, or name"
                 className="flex-1 outline-none text-sm"
+                aria-label="Search"
               />
               <button
                 type="submit"
@@ -235,6 +225,7 @@ export default function StudentDashboard() {
         </div>
       </div>
 
+      {/* ===== Upcoming ===== */}
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold">Upcoming Session</div>
         <div className="p-4 text-sm text-slate-700">
@@ -280,6 +271,7 @@ export default function StudentDashboard() {
         </div>
       </div>
 
+      {/* ===== Recent Activity ===== */}
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold">Recent Activity</div>
         <div className="p-4 text-sm text-slate-700">

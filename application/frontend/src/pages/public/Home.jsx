@@ -9,8 +9,8 @@ export default function Home() {
   function onSearch(e) {
     e.preventDefault();
     const target = query.trim();
-    if (!target) return navigate("/");
-    navigate(`/?q=${encodeURIComponent(target)}`);
+    if (!target) return navigate("/results"); 
+    navigate(`/results?q=${encodeURIComponent(target)}`);
   }
 
   return (
@@ -38,6 +38,7 @@ export default function Home() {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search by course, subject, or name"
                 className="flex-1 outline-none text-sm"
+                aria-label="Search"
               />
               <button
                 type="submit"
@@ -49,7 +50,7 @@ export default function Home() {
             </div>
           </form>
         </div>
-     
+
         <div className="mt-8 flex items-center justify-center gap-4">
           <Link
             to="/register"
