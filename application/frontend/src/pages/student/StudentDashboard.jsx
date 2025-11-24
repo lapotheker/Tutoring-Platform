@@ -18,6 +18,7 @@ const FAKE_SESSIONS = [
     durationMin: 60,
     mode: "Online (Zoom)",
     status: "upcoming",
+    meetingUrl: "https://zoom.us/j/123456789",
   },
   {
     id: "sess_1000",
@@ -29,6 +30,14 @@ const FAKE_SESSIONS = [
     mode: "In-person · Library Room 210",
     status: "completed",
     ratingGiven: 5,
+    notes: `Agenda:
+- Requirements walkthrough
+- Monorepo structure
+- CI basics
+
+Action items:
+- Push starter repo by Wed
+- Open PR for service contracts`,
   },
   {
     id: "sess_0999",
@@ -40,6 +49,13 @@ const FAKE_SESSIONS = [
     mode: "Online (Google Meet)",
     status: "completed",
     ratingGiven: 4,
+    notes: `Covered:
+- Weak vs strong induction
+- Classic sums
+- Tips for basis & step
+
+Homework:
+- 4 induction proofs from worksheet`,
   },
 ];
 
@@ -83,10 +99,8 @@ const FAKE_MESSAGES_TEMPLATE = (currentUserId = 5) => [
 ];
 
 const fmtDateTime = (d) =>
-  new Intl.DateTimeFormat(undefined, {
-    dateStyle: "medium",
-    timeStyle: "short",
-  }).format(typeof d === "string" ? new Date(d) : d);
+  new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" })
+    .format(typeof d === "string" ? new Date(d) : d);
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
@@ -94,18 +108,21 @@ export default function StudentDashboard() {
   const [user, setUser] = useState(null);
   const [query, setQuery] = useState("");
 
+  const [composeTo, setComposeTo] = useState(null);
+
+  const [openNotesFor, setOpenNotesFor] = useState(null);
+
   const tab = new URLSearchParams(location.search).get("tab");
 
   useEffect(() => {
     const raw = localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser");
     if (raw) {
-      try {
-        setUser(JSON.parse(raw));
-      } catch {
-        setUser(null);
-      }
+      try { setUser(JSON.parse(raw)); } catch { setUser(null); }
     }
-  }, []);
+    if (location.state?.composeTo) {
+      setComposeTo(location.state.composeTo);
+    }
+  }, [location.state]);
 
   const displayName = useMemo(() => {
     if (!user?.email) return "Student";
@@ -113,6 +130,26 @@ export default function StudentDashboard() {
     if (!left) return "Student";
     return left.charAt(0).toUpperCase() + left.slice(1);
   }, [user]);
+
+  const handleMessageTutor = (tutor) => {
+    navigate("/dashboard?tab=messages", {
+      state: { composeTo: { id: tutor.id, name: tutor.name } },
+      replace: false,
+    });
+  };
+
+  const handleRebookTutor = (tutor) => {
+    const params = new URLSearchParams({ tutorId: String(tutor.id), name: tutor.name, rebook: "1" });
+    navigate(`/booking/new?${params.toString()}`);
+  };
+
+  const handleViewNotes = (session) => {
+    setOpenNotesFor(session);
+  };
+
+  const handleJoinLink = (url) => {
+    window.open(url || "https://zoom.us/j/123456789", "_blank", "noopener,noreferrer");
+  };
 
   if (tab === "messages") {
     return (
@@ -124,6 +161,15 @@ export default function StudentDashboard() {
               ← Back to Dashboard
             </Link>
           </div>
+
+          {composeTo && (
+            <ComposeBar
+              composeTo={composeTo}
+              onSent={() => setComposeTo(null)}
+              currentUserId={user?.user_id ?? 5}
+            />
+          )}
+
           <MessagesList currentUserId={user?.user_id ?? 5} />
         </div>
       </section>
@@ -137,12 +183,8 @@ export default function StudentDashboard() {
     navigate(`/?q=${encodeURIComponent(target)}`);
   }
 
-  const upcoming = FAKE_SESSIONS.filter((s) => s.status === "upcoming").sort(
-    (a, b) => a.when - b.when
-  );
-  const recent = FAKE_SESSIONS.filter((s) => s.status === "completed").sort(
-    (a, b) => b.when - a.when
-  );
+  const upcoming = FAKE_SESSIONS.filter((s) => s.status === "upcoming").sort((a, b) => a.when - b.when);
+  const recent = FAKE_SESSIONS.filter((s) => s.status === "completed").sort((a, b) => b.when - a.when);
 
   return (
     <section className="space-y-8">
@@ -166,9 +208,7 @@ export default function StudentDashboard() {
         </div>
 
         <div className="mt-4 text-center">
-          <h1 className="text-xl md:text-2xl font-extrabold tracking-wide">
-            SFSU TUTORING PLATFORM
-          </h1>
+          <h1 className="text-xl md:text-2xl font-extrabold tracking-wide">SFSU TUTORING PLATFORM</h1>
           <h2 className="mt-2 text-lg md:text-xl font-bold">Find A Tutor</h2>
 
           <form onSubmit={onSearch} className="mt-4 flex items-center justify-center">
@@ -218,10 +258,16 @@ export default function StudentDashboard() {
                     {fmtDateTime(s.when)} · {s.durationMin} min · {s.mode}
                   </div>
                   <div className="mt-3 flex gap-2">
-                    <button className="rounded-md bg-slate-900 text-white px-3 py-1 text-xs hover:bg-black">
+                    <button
+                      className="rounded-md bg-slate-900 text-white px-3 py-1 text-xs hover:bg-black"
+                      onClick={() => handleJoinLink(s.meetingUrl)}
+                    >
                       Join / Open Link
                     </button>
-                    <button className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100">
+                    <button
+                      className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
+                      onClick={() => handleMessageTutor(s.tutor)}
+                    >
                       Message Tutor
                     </button>
                   </div>
@@ -257,16 +303,28 @@ export default function StudentDashboard() {
                   <div className="mt-1 text-xs text-slate-600">
                     {fmtDateTime(s.when)} · {s.durationMin} min · {s.mode}
                   </div>
-                  <div className="mt-3 flex gap-2">
-                    <button className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100">
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
+                      onClick={() => handleViewNotes(s)}
+                    >
                       View Notes
                     </button>
-                    <button className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100">
+                    <button
+                      className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
+                      onClick={() => handleRebookTutor(s.tutor)}
+                    >
                       Rebook Tutor
                     </button>
-                    <button className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100">
-                      {s.ratingGiven ? `Your Rating: ${"★".repeat(s.ratingGiven)}` : "Rate Session"}
+                    <button
+                      className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
+                      onClick={() => handleMessageTutor(s.tutor)}
+                    >
+                      Message Tutor
                     </button>
+                    <span className="text-xs text-slate-500 ml-auto">
+                      {s.ratingGiven ? `Your Rating: ${"★".repeat(s.ratingGiven)}` : "Not rated"}
+                    </span>
                   </div>
                 </li>
               ))}
@@ -275,7 +333,6 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* ===== Messages Preview ===== */}
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold flex items-center justify-between">
           <span>Messages</span>
@@ -287,8 +344,6 @@ export default function StudentDashboard() {
           <MessagesPreview currentUserId={user?.user_id ?? 5} />
         </div>
       </div>
-
-      {/* ===== Become a Tutor ===== */}
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold">Want to tutor?</div>
         <div className="p-4">
@@ -303,7 +358,47 @@ export default function StudentDashboard() {
           </button>
         </div>
       </div>
+
+      {openNotesFor && (
+        <NotesModal session={openNotesFor} onClose={() => setOpenNotesFor(null)} />
+      )}
     </section>
+  );
+}
+
+
+function ComposeBar({ composeTo, onSent, currentUserId }) {
+  const [text, setText] = useState("");
+
+  const send = () => {
+    setText("");
+    onSent?.();
+    alert(`Message sent to ${composeTo.name} (demo)`);
+  };
+
+  return (
+    <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
+      <div className="text-sm mb-2">
+        Compose to <span className="font-medium">{composeTo.name}</span>
+      </div>
+      <div className="flex gap-2">
+        <input
+          className="flex-1 border rounded px-3 py-1.5 text-sm"
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Write a message…"
+        />
+        <button
+          onClick={send}
+          className="rounded bg-slate-900 text-white px-3 py-1.5 text-sm hover:bg-black"
+        >
+          Send
+        </button>
+      </div>
+      <div className="mt-1 text-xs text-slate-500">
+        Demo only — wire to POST /api/messages later.
+      </div>
+    </div>
   );
 }
 
@@ -392,5 +487,46 @@ function MessagesList({ currentUserId }) {
         );
       })}
     </ul>
+  );
+}
+
+function NotesModal({ session, onClose }) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
+      role="dialog"
+      aria-modal="true"
+    >
+      <div className="w-[min(640px,92vw)] rounded-xl bg-white shadow-lg">
+        <div className="flex items-center justify-between border-b border-slate-200 p-4">
+          <div className="font-semibold text-slate-800 text-sm">
+            Session Notes — {session.title}
+          </div>
+          <button
+            className="rounded-md border border-slate-300 px-2 py-1 text-xs hover:bg-slate-100"
+            onClick={onClose}
+            aria-label="Close"
+          >
+            Close
+          </button>
+        </div>
+        <div className="p-4">
+          <div className="text-xs text-slate-600 mb-2">
+            {session.course} · {fmtDateTime(session.when)} · {session.durationMin} min
+          </div>
+          <pre className="whitespace-pre-wrap text-sm text-slate-800 bg-slate-50 p-3 rounded-md border border-slate-200">
+{session.notes || "No notes available for this session (demo)."}
+          </pre>
+          <div className="mt-4 flex justify-end gap-2">
+            <button className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100">
+              Download (.txt)
+            </button>
+            <button className="rounded-md bg-blue-600 text-white px-3 py-1 text-xs hover:bg-blue-700">
+              Share
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }
