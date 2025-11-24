@@ -105,6 +105,7 @@ const fmtDateTime = (d) =>
 export default function StudentDashboard() {
   const navigate = useNavigate();
   const location = useLocation();
+
   const [user, setUser] = useState(null);
   const [query, setQuery] = useState("");
 
@@ -131,6 +132,7 @@ export default function StudentDashboard() {
     return left.charAt(0).toUpperCase() + left.slice(1);
   }, [user]);
 
+
   const handleMessageTutor = (tutor) => {
     navigate("/dashboard?tab=messages", {
       state: { composeTo: { id: tutor.id, name: tutor.name } },
@@ -139,8 +141,9 @@ export default function StudentDashboard() {
   };
 
   const handleRebookTutor = (tutor) => {
-    const params = new URLSearchParams({ tutorId: String(tutor.id), name: tutor.name, rebook: "1" });
-    navigate(`/booking/new?${params.toString()}`);
+    const tutorId = String(tutor.user_id ?? tutor.id);
+    const search = location.search || ""; 
+    navigate({ pathname: `/tutor/request/${tutorId}`, search });
   };
 
   const handleViewNotes = (session) => {
@@ -166,11 +169,11 @@ export default function StudentDashboard() {
             <ComposeBar
               composeTo={composeTo}
               onSent={() => setComposeTo(null)}
-              currentUserId={user?.user_id ?? 5}
+              currentUserId={user?.user_id ?? user?.id ?? 5}
             />
           )}
 
-          <MessagesList currentUserId={user?.user_id ?? 5} />
+          <MessagesList currentUserId={user?.user_id ?? user?.id ?? 5} />
         </div>
       </section>
     );
@@ -232,7 +235,6 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* ===== Upcoming ===== */}
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold">Upcoming Session</div>
         <div className="p-4 text-sm text-slate-700">
@@ -278,7 +280,6 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* ===== Recent Activity ===== */}
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold">Recent Activity</div>
         <div className="p-4 text-sm text-slate-700">
@@ -290,7 +291,7 @@ export default function StudentDashboard() {
           ) : (
             <ul className="space-y-3">
               {recent.map((s) => (
-                <li key={s.id} className="rounded-xl border border-slate-200 bg-white p-4">
+                <li key={s.id} className="rounded-2xl border border-slate-200 bg-white p-4">
                   <div className="flex items-center justify-between">
                     <div className="font-semibold">{s.title}</div>
                     <span className="text-xs rounded-full bg-emerald-100 text-emerald-700 px-2 py-0.5">
@@ -341,24 +342,11 @@ export default function StudentDashboard() {
           </Link>
         </div>
         <div className="p-4">
-          <MessagesPreview currentUserId={user?.user_id ?? 5} />
-        </div>
-      </div>
-      <div className="rounded-2xl border border-slate-300 bg-white">
-        <div className="border-b border-slate-200 p-4 font-semibold">Want to tutor?</div>
-        <div className="p-4">
-          <p className="text-sm text-slate-700 mb-4">
-            Share your knowledge and help fellow students! Apply to become a tutor on our platform.
-          </p>
-          <button
-            onClick={() => navigate("/tutor/policy")}
-            className="rounded-lg bg-blue-600 px-4 py-2 text-white font-medium shadow hover:bg-blue-700"
-          >
-            BECOME A TUTOR
-          </button>
+          <MessagesPreview currentUserId={user?.user_id ?? user?.id ?? 5} />
         </div>
       </div>
 
+      {/* Notes Modal */}
       {openNotesFor && (
         <NotesModal session={openNotesFor} onClose={() => setOpenNotesFor(null)} />
       )}
@@ -367,7 +355,7 @@ export default function StudentDashboard() {
 }
 
 
-function ComposeBar({ composeTo, onSent, currentUserId }) {
+function ComposeBar({ composeTo, onSent }) {
   const [text, setText] = useState("");
 
   const send = () => {
@@ -395,9 +383,7 @@ function ComposeBar({ composeTo, onSent, currentUserId }) {
           Send
         </button>
       </div>
-      <div className="mt-1 text-xs text-slate-500">
-        Demo only — wire to POST /api/messages later.
-      </div>
+      <div className="mt-1 text-xs text-slate-500">Demo only — wire to POST /api/messages later.</div>
     </div>
   );
 }
