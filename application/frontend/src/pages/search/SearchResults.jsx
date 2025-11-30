@@ -24,6 +24,7 @@ export default function SearchResults() {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [failedImages, setFailedImages] = useState(new Set()); // Track failed image loads
 
   // State for top input bar
   const [q, setQ] = useState(searchText || course);
@@ -41,7 +42,7 @@ export default function SearchResults() {
     times,
   };
 
-  // Update UPL when filters change
+  // Update URL when filters change
   function updateFilters(next) {
     const p = new URLSearchParams(search);
 
@@ -64,11 +65,46 @@ export default function SearchResults() {
     navigate(`/results?${p.toString()}`);
   }
 
+  // Handle image loading errors
+  const handleImageError = (tutorProfileId) => {
+    setFailedImages(prev => new Set(prev).add(tutorProfileId));
+  };
+
+  // Get proper photo URL - handles backend paths and default images
+  const getProfilePhotoUrl = (tutor) => {
+    // If image failed to load previously, use default
+    if (failedImages.has(tutor.tutor_profile_id)) {
+      return getDefaultProfilePhoto();
+    }
+
+    // If no profile photo, use default
+    if (!tutor.profile_photo) {
+      return getDefaultProfilePhoto();
+    }
+
+    // If it's already a full URL, use it directly
+    if (tutor.profile_photo.startsWith('http')) {
+      return tutor.profile_photo;
+    }
+
+    // If it's a relative path from backend, construct full URL
+    // Adjust this base URL according to your backend setup
+    const baseUrl = process.env.REACT_APP_API_URL || '';
+    return `${baseUrl}${tutor.profile_photo.startsWith('/') ? '' : '/'}${tutor.profile_photo}`;
+  };
+
+  // Get default profile photo
+  const getDefaultProfilePhoto = () => {
+    // You can use a local image or an external default avatar
+    return '/images/default-avatar.png'; // Make sure this file exists in your public folder
+  };
+
   // Fetch tutors whenever search parameters change
   useEffect(() => {
     async function fetchTutors() {
       setLoading(true);
       setError(null);
+      setFailedImages(new Set()); // Reset failed images on new search
 
       try {
         const response = await tutorAPI.searchTutors({
@@ -168,64 +204,75 @@ export default function SearchResults() {
 
           {!loading && !error && (
             <div className="mt-4 space-y-5">
-              {tutors.map((t) => (
-                <article
-                  key={t.tutor_profile_id}
-                  className="rounded border border-slate-300 bg-white p-4"
-                >
-                  <div className="flex gap-4">
-                    <div className="h-12 w-12 rounded-full bg-slate-200 grid place-items-center text-slate-600 text-xl overflow-hidden">
-                      {t.profile_photo ? (
-                        <img
-                          src={t.profile_photo}
-                          alt={t.display_name}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        "👤"
-                      )}
+              {tutors.map((t) => {
+                const photoUrl = getProfilePhotoUrl(t);
+                const isDefaultAvatar = photoUrl.includes('default-avatar.png');
+
+                return (
+                  <article
+                    key={t.tutor_profile_id}
+                    className="rounded border border-slate-300 bg-white p-4"
+                  >
+                    <div className="flex gap-4">
+                      <div className="h-12 w-12 rounded-full bg-slate-200 grid place-items-center text-slate-600 text-xl overflow-hidden flex-shrink-0">
+                        {!isDefaultAvatar ? (
+                          <img
+                            src={photoUrl}
+                            alt={`${t.display_name}'s profile`}
+                            className="w-full h-full object-cover"
+                            onError={() => handleImageError(t.tutor_profile_id)}
+                            loading="lazy"
+                          />
+                        ) : (
+                          <img
+                            src={photoUrl}
+                            alt="Default avatar"
+                            className="w-full h-full object-cover"
+                          />
+                        )}
+                      </div>
+
+                      <div className="flex-1">
+                        <div className="flex items-start justify-between">
+                          <h3 className="font-extrabold tracking-wide">
+                            {t.display_name.toUpperCase()}
+                          </h3>
+                          <div className="font-semibold">${t.hourly_rate}/hour</div>
+                        </div>
+
+                        <div className="text-sm">
+                          <div>{t.full_name}</div>
+                          <div>Courses: {t.courses || "N/A"}</div>
+                          <div>Subject Tags: {t.subject_tags || "N/A"}</div>
+                          <div>Languages: {t.languages || "N/A"}</div>
+                          <div>Availability: {t.availability_summary}</div>
+                        </div>
+
+                        <div className="mt-3 flex gap-2">
+                          <Link
+                            to={`/tutors/${t.tutor_profile_id}${search}`}
+                            className="inline-block rounded border px-4 py-1 text-sm font-medium hover:bg-slate-50"
+                          >
+                            VIEW PROFILE
+                          </Link>
+
+                          <Link
+                            to={{
+                              pathname: `/tutor/request/${t.tutor_profile_id}`,
+                              search: `?to=${encodeURIComponent(t.display_name)}${
+                                search ? `&${search.slice(1)}` : ""
+                              }`,
+                            }}
+                            className="inline-block rounded bg-slate-900 text-white px-4 py-1 text-sm font-medium hover:bg-black"
+                          >
+                            CONTACT
+                          </Link>
+                        </div>
+                      </div>
                     </div>
-
-                    <div className="flex-1">
-                      <div className="flex items-start justify-between">
-                        <h3 className="font-extrabold tracking-wide">
-                          {t.display_name.toUpperCase()}
-                        </h3>
-                        <div className="font-semibold">${t.hourly_rate}/hour</div>
-                      </div>
-
-                      <div className="text-sm">
-                        <div>{t.full_name}</div>
-                        <div>Courses: {t.courses || "N/A"}</div>
-                        <div>Subject Tags: {t.subject_tags || "N/A"}</div>
-                        <div>Languages: {t.languages || "N/A"}</div>
-                        <div>Availability: {t.availability_summary}</div>
-                      </div>
-
-                      <div className="mt-3 flex gap-2">
-                        <Link
-                          to={`/tutors/${t.tutor_profile_id}${search}`}
-                          className="inline-block rounded border px-4 py-1 text-sm font-medium hover:bg-slate-50"
-                        >
-                          VIEW PROFILE
-                        </Link>
-
-                        <Link
-                          to={{
-                            pathname: `/tutor/request/${t.tutor_profile_id}`,
-                            search: `?to=${encodeURIComponent(t.display_name)}${
-                              search ? `&${search.slice(1)}` : ""
-                            }`,
-                          }}
-                          className="inline-block rounded bg-slate-900 text-white px-4 py-1 text-sm font-medium hover:bg-black"
-                        >
-                          CONTACT
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </article>
-              ))}
+                  </article>
+                );
+              })}
 
               {tutors.length === 0 && (
                 <div className="text-slate-600 text-center">
