@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { tutorAPI } from "../../services/api";
 import FiltersSidebar from "../../components/FiltersSidebar";
+import defaultProfileImage from "../../assets/default-profile.jpg";
 
 export default function SearchResults() {
   const { search } = useLocation();
@@ -67,7 +68,7 @@ export default function SearchResults() {
 
   // Handle image loading errors
   const handleImageError = (tutorProfileId) => {
-    setFailedImages(prev => new Set(prev).add(tutorProfileId));
+    setFailedImages((prev) => new Set(prev).add(tutorProfileId));
   };
 
   // Get proper photo URL - handles backend paths and default images
@@ -83,20 +84,20 @@ export default function SearchResults() {
     }
 
     // If it's already a full URL, use it directly
-    if (tutor.profile_photo.startsWith('http')) {
+    if (tutor.profile_photo.startsWith("http")) {
       return tutor.profile_photo;
     }
 
     // If it's a relative path from backend, construct full URL
     // Adjust this base URL according to your backend setup
-    const baseUrl = process.env.REACT_APP_API_URL || '';
-    return `${baseUrl}${tutor.profile_photo.startsWith('/') ? '' : '/'}${tutor.profile_photo}`;
+    const baseUrl = import.meta.env.VITE_API_URL || "";
+    return `${baseUrl}${tutor.profile_photo.startsWith("/") ? "" : "/"}${tutor.profile_photo}`;
   };
 
   // Get default profile photo
   const getDefaultProfilePhoto = () => {
     // You can use a local image or an external default avatar
-    return '/images/default-avatar.png'; // Make sure this file exists in your public folder
+    return defaultProfileImage; // Make sure this file exists in your public folder
   };
 
   // Fetch tutors whenever search parameters change
@@ -206,7 +207,7 @@ export default function SearchResults() {
             <div className="mt-4 space-y-5">
               {tutors.map((t) => {
                 const photoUrl = getProfilePhotoUrl(t);
-                const isDefaultAvatar = photoUrl.includes('default-avatar.png');
+                const isDefaultAvatar = photoUrl.includes("default-avatar.png");
 
                 return (
                   <article
