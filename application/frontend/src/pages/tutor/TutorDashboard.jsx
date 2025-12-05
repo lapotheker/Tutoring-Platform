@@ -6,7 +6,8 @@ export default function TutorDashboard() {
   const navigate = useNavigate();
 
   // Load demo user from local/session storage (used for milestone demo only)
-  const user = useMemo(() => {
+  // commented out for testing
+  /*const user = useMemo(() => {
     try {
       return JSON.parse(
         localStorage.getItem("demoUser") ||
@@ -17,6 +18,12 @@ export default function TutorDashboard() {
       return null;
     }
   }, []);
+*/
+// Hardcoded demo user for testing and to view edit tutor profile page feature
+const user = {
+  email: "demo_tutor@sfsu.edu",
+  role: "tutor",
+};
 
   // Extract a display name from the email (before the @ symbol)
   const displayName = useMemo(() => {
@@ -156,6 +163,18 @@ export default function TutorDashboard() {
             before appearing in search results.
           </p>
 
+          <div className="mt-4">
+
+{/* Edit Profile Link */}
+  <Link
+    to="/tutor/profile/edit"
+    className="inline-flex items-center justify-center rounded-2xl bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-green-700 transition"
+  >
+    Edit Profile
+  </Link>
+</div>
+
+
           <div className="mt-5">
             <button
               onClick={() => navigate("/tutor/posting")}
@@ -282,8 +301,7 @@ export default function TutorDashboard() {
         </div>
 
         <p className="mt-3 text-[11px] text-slate-500">
-          * These are demo messages for milestone UI. They can be replaced with
-          real backend data later.
+          * These are demo messages to be replaced with backend data later.
         </p>
       </div>
     </section>
