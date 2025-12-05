@@ -1,4 +1,7 @@
+//src/pages/tutor/EditTutorProfile.jsx
 import { useState } from "react";
+import { Link } from "react-router-dom";
+
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const TIMES = ["Morning", "Afternoon", "Evening"];
@@ -82,6 +85,15 @@ export default function EditTutorProfile() {
 
   return (
     <section className="rounded-2xl border border-slate-300 bg-white p-6 md:p-8 shadow-sm max-w-3xl mx-auto">
+
+    {/* back to dashboard */}
+<Link
+  to="/tutor/dashboard"
+  className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline mb-4"
+>
+  ← Back to Dashboard
+</Link>
+ 
       <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide mb-2">
         Edit Tutor Profile
       </h1>
