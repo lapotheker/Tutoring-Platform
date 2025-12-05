@@ -28,6 +28,7 @@ import TutorProfile from "./pages/tutor/TutorProfile.jsx";
 import TutorProfileSubmitted from "./pages/tutor/TutorProfileSubmitted.jsx";
 import Posting from "./pages/tutor/Posting.jsx";
 import AdminDashboard from "./pages/admin/AdminDashboard";
+import EditTutorProfile from "./pages/tutor/EditTutorProfile.jsx";
 
 // Team member pages
 import DarienPage from "./pages/team/DarienPage.jsx";
@@ -63,6 +64,7 @@ export default function App() {
           <Route path="/tutor/profile-submitted" element={<TutorProfileSubmitted />} />
           <Route path="/tutor/dashboard-approved" element={<TutorDashboardApproved />} />
           <Route path="/tutor/posting" element={<Posting />} />
+          <Route path="/tutor/profile/edit" element={<EditTutorProfile />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
           {/* Team member pages */}
