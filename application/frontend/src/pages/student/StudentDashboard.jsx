@@ -53,45 +53,6 @@ Homework:
   },
 ];
 
-const FAKE_MESSAGES_TEMPLATE = (currentUserId = 5) => [
-  {
-    message_id: "m_5007",
-    sender_user_id: currentUserId,
-    recipient_user_id: 202,
-    to_name: "David Kim",
-    from_name: "You",
-    message: "Hi David! Are you available this Friday at 2pm?",
-    created_at: daysFromNow(-1).toISOString(),
-  },
-  {
-    message_id: "m_5006",
-    sender_user_id: 202,
-    recipient_user_id: currentUserId,
-    to_name: "You",
-    from_name: "David Kim",
-    message: "Hi! Yes, Friday 2pm works. I’ll send a Zoom link.",
-    created_at: daysFromNow(-1).toISOString(),
-  },
-  {
-    message_id: "m_5005",
-    sender_user_id: currentUserId,
-    recipient_user_id: 201,
-    to_name: "Alice Nguyen",
-    from_name: "You",
-    message: "Thanks for the tips on linked lists — super helpful!",
-    created_at: daysFromNow(-5).toISOString(),
-  },
-  {
-    message_id: "m_5004",
-    sender_user_id: 203,
-    recipient_user_id: currentUserId,
-    to_name: "You",
-    from_name: "Priya Patel",
-    message: "Uploading the induction worksheet shortly.",
-    created_at: daysFromNow(-6).toISOString(),
-  },
-];
-
 const fmtDateTime = (d) =>
   new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" })
     .format(typeof d === "string" ? new Date(d) : d);
@@ -102,9 +63,10 @@ export default function StudentDashboard() {
 
   const [user, setUser] = useState(null);
   const [query, setQuery] = useState("");
+  const [messages, setMessages] = useState([]);
+  const [loadingMessages, setLoadingMessages] = useState(false);
 
   const [composeTo, setComposeTo] = useState(null);
-
   const [openNotesFor, setOpenNotesFor] = useState(null);
 
   const tab = new URLSearchParams(location.search).get("tab");
@@ -112,12 +74,41 @@ export default function StudentDashboard() {
   useEffect(() => {
     const raw = localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser");
     if (raw) {
-      try { setUser(JSON.parse(raw)); } catch { setUser(null); }
+      try { 
+        const userData = JSON.parse(raw);
+        setUser(userData);
+        // Fetch messages when user is set
+        if (userData?.user_id) {
+          fetchMessages(userData.user_id);
+        }
+      } catch { 
+        setUser(null); 
+      }
     }
     if (location.state?.composeTo) {
       setComposeTo(location.state.composeTo);
     }
   }, [location.state]);
+
+  const fetchMessages = async (userId) => {
+    setLoadingMessages(true);
+    try {
+      const response = await fetch(`http://localhost:3000/api/messages/user/${userId}`);
+      const data = await response.json();
+      
+      if (data.success) {
+        setMessages(data.data || []);
+      } else {
+        console.error("Failed to fetch messages:", data.error);
+        setMessages([]);
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      setMessages([]);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
 
   const displayName = useMemo(() => {
     if (!user?.email) return "Student";
@@ -143,6 +134,8 @@ export default function StudentDashboard() {
   const handleJoinLink = (url) =>
     window.open(url || "https://zoom.us/j/123456789", "_blank", "noopener,noreferrer");
 
+  const currentUserId = user?.user_id ?? user?.id;
+
   if (tab === "messages") {
     return (
       <section className="space-y-6">
@@ -157,12 +150,25 @@ export default function StudentDashboard() {
           {composeTo && (
             <ComposeBar
               composeTo={composeTo}
-              onSent={() => setComposeTo(null)}
-              currentUserId={user?.user_id ?? user?.id ?? 5}
+              onSent={() => {
+                setComposeTo(null);
+                if (currentUserId) {
+                  fetchMessages(currentUserId);
+                }
+              }}
+              currentUserId={currentUserId}
+              existingMessages={messages}
             />
           )}
 
-          <MessagesList currentUserId={user?.user_id ?? user?.id ?? 5} />
+          {loadingMessages ? (
+            <p className="text-sm text-slate-600">Loading messages...</p>
+          ) : (
+            <MessagesList 
+              messages={messages} 
+              currentUserId={currentUserId} 
+            />
+          )}
         </div>
       </section>
     );
@@ -334,7 +340,14 @@ export default function StudentDashboard() {
           </Link>
         </div>
         <div className="p-4">
-          <MessagesPreview currentUserId={user?.user_id ?? user?.id ?? 5} />
+          {loadingMessages ? (
+            <p className="text-sm text-slate-600">Loading messages...</p>
+          ) : (
+            <MessagesPreview 
+              messages={messages} 
+              currentUserId={currentUserId} 
+            />
+          )}
         </div>
       </div>
 
@@ -347,14 +360,68 @@ export default function StudentDashboard() {
 }
 
 
-function ComposeBar({ composeTo, onSent }) {
+function ComposeBar({ composeTo, onSent, currentUserId, existingMessages }) {
   const [text, setText] = useState("");
+  const [sending, setSending] = useState(false);
+  const [error, setError] = useState("");
 
-  const send = () => {
-    setText("");
-    onSent?.();
-    alert(`Message sent to ${composeTo.name} (demo)`);
+  // Check if user has already sent a message to this tutor
+  const alreadyMessaged = existingMessages.some(
+    (m) => m.sender_user_id === currentUserId && m.recipient_user_id === composeTo.id
+  );
+
+  const send = async () => {
+    if (!text.trim()) {
+      setError("Message cannot be empty");
+      return;
+    }
+
+    if (alreadyMessaged) {
+      setError("You have already sent a message to this tutor");
+      return;
+    }
+
+    setError("");
+    setSending(true);
+
+    try {
+      const response = await fetch("http://localhost:3000/api/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sender_user_id: currentUserId,
+          recipient_user_id: composeTo.id,
+          message: text.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        setText("");
+        onSent?.();
+        alert(`Message sent to ${composeTo.name} successfully!`);
+      } else {
+        setError(data.error || "Failed to send message");
+      }
+    } catch (error) {
+      console.error("Error sending message:", error);
+      setError("Network error - please try again");
+    } finally {
+      setSending(false);
+    }
   };
+
+  if (alreadyMessaged) {
+    return (
+      <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3">
+        <div className="text-sm text-amber-800">
+          ⚠️ You have already sent a message to <span className="font-medium">{composeTo.name}</span>.
+          Only one message per tutor is allowed to prevent spam.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 p-3">
@@ -367,26 +434,27 @@ function ComposeBar({ composeTo, onSent }) {
           value={text}
           onChange={(e) => setText(e.target.value)}
           placeholder="Write a message…"
+          disabled={sending}
         />
         <button
           onClick={send}
-          className="rounded bg-slate-900 text-white px-3 py-1.5 text-sm hover:bg-black"
+          disabled={sending}
+          className="rounded bg-slate-900 text-white px-3 py-1.5 text-sm hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          Send
+          {sending ? "Sending..." : "Send"}
         </button>
       </div>
-      <div className="mt-1 text-xs text-slate-500">Demo only — wire to POST /api/messages later.</div>
+      {error && (
+        <div className="mt-2 text-xs text-red-600">{error}</div>
+      )}
+      <div className="mt-1 text-xs text-slate-500">
+        Note: You can only send one message per tutor to keep communication simple.
+      </div>
     </div>
   );
 }
 
-function MessagesPreview({ currentUserId }) {
-  const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    setMessages(FAKE_MESSAGES_TEMPLATE(currentUserId));
-  }, [currentUserId]);
-
+function MessagesPreview({ messages, currentUserId }) {
   if (messages.length === 0) {
     return <p className="text-sm text-slate-600">No messages yet.</p>;
   }
@@ -403,7 +471,9 @@ function MessagesPreview({ currentUserId }) {
         return (
           <li key={m.message_id} className="border p-3 rounded bg-slate-50 text-sm">
             <div className="flex items-center justify-between">
-              <div className="font-medium">{isSent ? `To ${m.to_name}` : `From ${m.from_name}`}</div>
+              <div className="font-medium">
+                {isSent ? `To ${m.recipient_name}` : `From ${m.sender_name}`}
+              </div>
               <div className="text-xs text-slate-500">{fmtDateTime(m.created_at)}</div>
             </div>
             <p className="mt-1">{m.message}</p>
@@ -423,13 +493,7 @@ function MessagesPreview({ currentUserId }) {
   );
 }
 
-function MessagesList({ currentUserId }) {
-  const [messages, setMessages] = useState([]);
-
-  useEffect(() => {
-    setMessages(FAKE_MESSAGES_TEMPLATE(currentUserId));
-  }, [currentUserId]);
-
+function MessagesList({ messages, currentUserId }) {
   if (messages.length === 0) {
     return <p className="text-sm text-slate-600">No messages yet.</p>;
   }
@@ -444,7 +508,7 @@ function MessagesList({ currentUserId }) {
           <li key={m.message_id} className="border p-3 rounded bg-slate-50">
             <div className="flex items-center justify-between">
               <div className="text-sm font-medium">
-                {isSent ? `To ${m.to_name}` : `From ${m.from_name}`}
+                {isSent ? `To ${m.recipient_name}` : `From ${m.sender_name}`}
               </div>
               <div className="text-xs text-slate-500">{fmtDateTime(m.created_at)}</div>
             </div>
