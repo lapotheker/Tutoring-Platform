@@ -9,7 +9,8 @@ export default function Posting() {
     courses: "",
     hourlyRate: "",
     mode: "online",
-    availability: "",
+    availabilityDays: [],
+    availabilityTimes: [],
     contactMethod: "platform",
   });
   const [errors, setErrors] = useState({});
@@ -32,17 +33,12 @@ export default function Posting() {
     if (!form.courses.trim()) e.courses = "Enter at least one course";
     if (!form.hourlyRate || Number(form.hourlyRate) <= 0)
       e.hourlyRate = "Enter a valid hourly rate";
-    if (!form.availability.trim()) e.availability = "Availability summary required";
+    if (form.availabilityDays.length === 0) e.availabilityDays = "Select at least one day";
+    if (form.availabilityTimes.length === 0) e.availabilityTimes = "Select at least one time slot";
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
-  // function onSubmit(e) {
-  //   e.preventDefault();
-  //   if (!validate()) return;
-  //   console.log("Tutor Profile (Mock POST):", form);
-  //   setMessage("Profile saved locally (M3 demo). Check console output.");
-  // }
   async function onSubmit(e) {
     e.preventDefault();
     if (!validate()) return;
@@ -61,7 +57,8 @@ export default function Posting() {
           courses: form.courses,
           hourlyRate: form.hourlyRate,
           mode: form.mode,
-          availability: form.availability,
+          availabilityDays: form.availabilityDays,
+          availabilityTimes: form.availabilityTimes,
           contactMethod: form.contactMethod,
         }),
       });
@@ -78,7 +75,8 @@ export default function Posting() {
           courses: "",
           hourlyRate: "",
           mode: "online",
-          availability: "",
+          availabilityDays: [],
+          availabilityTimes: [],
           contactMethod: "platform",
         });
       } else {
@@ -171,7 +169,7 @@ export default function Posting() {
             <select
               className={inputClass}
               value={form.mode}
-              onChange={(e) => update("Preference", e.target.value)}
+              onChange={(e) => update("mode", e.target.value)}
             >
               <option value="online">Online</option>
               <option value="in-person">In-person</option>
@@ -181,14 +179,56 @@ export default function Posting() {
 
           {/* Availability */}
           <div>
-            <label className={labelClass}>Availability Summary *</label>
-            <textarea
-              className={inputClass + " min-h-20"}
-              value={form.availability}
-              onChange={(e) => update("availability", e.target.value)}
-              placeholder="e.g., Weekdays after 6pm; Weekends 10am–3pm"
-            />
-            {errors.availability && <p className={errClass}>{errors.availability}</p>}
+            <label className={labelClass}>Available Days *</label>
+            <div className="flex flex-wrap gap-2 mt-2">
+              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                <button
+                  key={day}
+                  type="button"
+                  onClick={() => {
+                    const days = form.availabilityDays.includes(day)
+                      ? form.availabilityDays.filter((d) => d !== day)
+                      : [...form.availabilityDays, day];
+                    update("availabilityDays", days);
+                  }}
+                  className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                    form.availabilityDays.includes(day)
+                      ? "bg-slate-900 text-white"
+                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
+                  }`}
+                >
+                  {day}
+                </button>
+              ))}
+            </div>
+            {errors.availabilityDays && <p className={errClass}>{errors.availabilityDays}</p>}
+          </div>
+
+          <div>
+            <label className={labelClass}>Available Times *</label>
+            <div className="space-y-2 mt-2">
+              {[
+                { value: "morning", label: "Morning (8am–12pm)" },
+                { value: "afternoon", label: "Afternoon (12pm–5pm)" },
+                { value: "evening", label: "Evening (5pm–10pm)" },
+              ].map((time) => (
+                <label key={time.value} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.availabilityTimes.includes(time.value)}
+                    onChange={(e) => {
+                      const times = e.target.checked
+                        ? [...form.availabilityTimes, time.value]
+                        : form.availabilityTimes.filter((t) => t !== time.value);
+                      update("availabilityTimes", times);
+                    }}
+                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
+                  />
+                  <span className="text-sm text-slate-700">{time.label}</span>
+                </label>
+              ))}
+            </div>
+            {errors.availabilityTimes && <p className={errClass}>{errors.availabilityTimes}</p>}
           </div>
 
           {/* Contact Method */}
@@ -216,7 +256,8 @@ export default function Posting() {
                   courses: "",
                   hourlyRate: "",
                   mode: "online",
-                  availability: "",
+                  availabilityDays: [],
+                  availabilityTimes: [],
                   contactMethod: "platform",
                 })
               }
