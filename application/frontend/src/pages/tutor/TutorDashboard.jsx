@@ -10,9 +10,7 @@ export default function TutorDashboard() {
   /*const user = useMemo(() => {
     try {
       return JSON.parse(
-        localStorage.getItem("demoUser") ||
-          sessionStorage.getItem("demoUser") ||
-          "null"
+        localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser") || "null"
       );
     } catch {
       return null;
@@ -121,9 +119,7 @@ const user = {
               👤
             </div>
             <div>
-              <div className="text-2xl font-extrabold">
-                Welcome, {displayName}!
-              </div>
+              <div className="text-2xl font-extrabold">Welcome, {displayName}!</div>
             </div>
           </div>
 
@@ -138,9 +134,7 @@ const user = {
           </div>
         </div>
 
-        <h1 className={`mt-4 text-center ${bigTitle}`}>
-          SFSU TUTORING PLATFORM
-        </h1>
+        <h1 className={`mt-4 text-center ${bigTitle}`}>SFSU TUTORING PLATFORM</h1>
       </div>
 
       {/* ===== Profile Status Section (Required: must not be removed) ===== */}
@@ -189,25 +183,16 @@ const user = {
       {/* ===== Upcoming Sessions Section ===== */}
       <div className={card}>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg md:text-xl font-extrabold">
-            UPCOMING SESSIONS
-          </h2>
-          <span className="text-xs text-slate-500">
-            {upcomingSessions.length} scheduled
-          </span>
+          <h2 className="text-lg md:text-xl font-extrabold">UPCOMING SESSIONS</h2>
+          <span className="text-xs text-slate-500">{upcomingSessions.length} scheduled</span>
         </div>
 
         <div className="mt-4 space-y-3">
           {upcomingSessions.map((s) => (
-            <div
-              key={s.id}
-              className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm"
-            >
+            <div key={s.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm">
               {/* Session header */}
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-slate-900">
-                  {s.student}
-                </span>
+                <span className="font-semibold text-slate-900">{s.student}</span>
                 <span className="text-xs text-slate-600">{s.time}</span>
               </div>
 
@@ -230,20 +215,13 @@ const user = {
       {/* ===== Recent Activity Section ===== */}
       <div className={card}>
         <div className="flex items-center justify-between">
-          <h2 className="text-lg md:text-xl font-extrabold">
-            RECENT ACTIVITY
-          </h2>
-          <span className="text-xs text-slate-500">
-            Last {recentActivity.length} items
-          </span>
+          <h2 className="text-lg md:text-xl font-extrabold">RECENT ACTIVITY</h2>
+          <span className="text-xs text-slate-500">Last {recentActivity.length} items</span>
         </div>
 
         <ol className="mt-3 space-y-2 text-sm">
           {recentActivity.map((item) => (
-            <li
-              key={item.id}
-              className="flex items-start gap-2 border-l border-slate-300 pl-3"
-            >
+            <li key={item.id} className="flex items-start gap-2 border-l border-slate-300 pl-3">
               {/* Activity bullet */}
               <span className="mt-1 h-2 w-2 rounded-full bg-blue-500" />
               <div>
@@ -272,23 +250,17 @@ const user = {
               key={msg.id}
               type="button"
               className={`w-full rounded-xl border p-3 text-left text-sm transition hover:bg-slate-50 ${
-                msg.unread
-                  ? "border-blue-300 bg-blue-50"
-                  : "border-slate-200 bg-white"
+                msg.unread ? "border-blue-300 bg-blue-50" : "border-slate-200 bg-white"
               }`}
             >
               {/* Message header */}
               <div className="flex items-center justify-between">
-                <span className="font-semibold text-slate-900">
-                  {msg.student}
-                </span>
+                <span className="font-semibold text-slate-900">{msg.student}</span>
                 <span className="text-xs text-slate-600">{msg.time}</span>
               </div>
 
               {/* Message snippet */}
-              <p className="mt-1 line-clamp-2 text-xs text-slate-700">
-                {msg.snippet}
-              </p>
+              <p className="mt-1 line-clamp-2 text-xs text-slate-700">{msg.snippet}</p>
 
               {/* Unread badge */}
               {msg.unread && (

@@ -25,22 +25,14 @@ export default function Home() {
             whileHover={{ scale: 1.08, rotate: -2 }}
             className="flex h-16 w-16 items-center justify-center rounded-3xl bg-emerald-600 shadow-2xl ring-4 ring-emerald-100"
           >
-            <span
-              role="img"
-              aria-label="gator mascot"
-              className="text-3xl leading-none"
-            >
+            <span role="img" aria-label="gator mascot" className="text-3xl leading-none">
               🐊
             </span>
           </motion.div>
 
           <div className="text-left">
-            <p className="text-sm font-semibold tracking-wide text-slate-800">
-              ScholarlyGator
-            </p>
-            <p className="text-xs text-slate-500">
-              Your friendly SFSU study companion
-            </p>
+            <p className="text-sm font-semibold tracking-wide text-slate-800">ScholarlyGator</p>
+            <p className="text-xs text-slate-500">Your friendly SFSU study companion</p>
           </div>
         </div>
 
@@ -61,9 +53,8 @@ export default function Home() {
           transition={{ duration: 0.35, delay: 0.05 }}
           className="mt-3 text-base md:text-lg text-slate-600 max-w-2xl mx-auto"
         >
-          We&apos;re here to help you feel more confident in your classes. Connect
-          with fellow SFSU students and tutors who understand your professors and your courses.
-
+          We&apos;re here to help you feel more confident in your classes. Connect with fellow SFSU
+          students and tutors who understand your professors and your courses.
         </motion.p>
 
         {/* easier navigation*/}
@@ -129,9 +120,7 @@ export default function Home() {
 
         {/* editied why section */}
         <div className="mt-8 text-left mx-auto max-w-xl">
-          <h2 className="text-lg font-extrabold text-slate-900">
-            Why students use SFSU Tutoring
-          </h2>
+          <h2 className="text-lg font-extrabold text-slate-900">Why students use SFSU Tutoring</h2>
           <ul className="mt-2 list-disc pl-6 space-y-1 text-slate-700 text-sm md:text-base">
             <li>All tutors are verified SFSU students or faculty.</li>
             <li>Find help by course, subject, or the exact class you&apos;re taking.</li>

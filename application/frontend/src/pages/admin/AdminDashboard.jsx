@@ -18,23 +18,31 @@ export default function AdminDashboard() {
     []
   );
 
-
   const reportExamples = useMemo(
     () => [
-      {id: "r1", name: "#AF2C1", reason: "inappropriate content", 
+      {
+        id: "r1",
+        name: "#AF2C1",
+        reason: "inappropriate content",
         link: "https://in.pinterest.com/pin/mood-board--1266706140449957/",
         type: "image",
-        status: "under review"
+        status: "under review",
       },
-      {id: "r2", name: "#AF2C2", reason: "inappropriate content",
+      {
+        id: "r2",
+        name: "#AF2C2",
+        reason: "inappropriate content",
         link: "https://media.tenor.com/vAH8YsQznr8AAAPo/cat-cat-vibing.mp4",
         type: "gif",
-        status: "under review"
+        status: "under review",
       },
-      {id: "r2", name: "#AF2C3", reason: "inappropriate content", 
+      {
+        id: "r2",
+        name: "#AF2C3",
+        reason: "inappropriate content",
         link: "https://i.kym-cdn.com/entries/icons/original/000/052/772/dog_closing_eyes_meme_cover.jpg",
         type: "image",
-        status: "under review"
+        status: "under review",
       },
     ],
     []
@@ -105,7 +113,7 @@ export default function AdminDashboard() {
             >
               {allSelected ? "Clear" : "Select all"}
             </button>
- 
+
             {/*Approve, Reject, and view profile buttons */}
             <button
               onClick={approveSelected}
@@ -201,9 +209,6 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-
-
-
       {/* ===== Reports (placeholder for now ) ===== */}
       <div className={card}>
         <h2 className="text-lg md:text-xl font-extrabold">Reports</h2>
@@ -211,7 +216,7 @@ export default function AdminDashboard() {
 
         {/* Headers for the table sections */}
         <div className="mt-4 rounded-xl border border-slate-200">
-          <table className = "min-w-full text-sm">
+          <table className="min-w-full text-sm">
             <thead className="bg-slate-50">
               <tr>
                 <th className="px-4 py-2 text-left font-semibold text-slate-700"> ID</th>
@@ -222,95 +227,82 @@ export default function AdminDashboard() {
               </tr>
             </thead>
 
-          <tbody>
-            {reportExamples.map((report) => {
-              const checked = selectedIds.has(report.id);
-              return (
-                <tr
-                  key={report.id}
-                  className="border-t hover:bg-slate-50 focus-within:bg-slate-50"
-                >
-                  {/* Checkbox for each tutor in the list*/}
-                  <td className="inline-flex items-center gap-2 cursor-pointer select-none">
-                    <input
-                      type="checkbox"
-                      className="h-4 w-4 accent-slate-700"
-                      checked={checked}
-                      onChange={() => toggleOne(report.id)}
-                      aria-checked={checked}
-                      aria-label={`Select ${report.id}`}
-                    />
-                    <span className="font-medium">{report.name}</span>
+            <tbody>
+              {reportExamples.map((report) => {
+                const checked = selectedIds.has(report.id);
+                return (
+                  <tr
+                    key={report.id}
+                    className="border-t hover:bg-slate-50 focus-within:bg-slate-50"
+                  >
+                    {/* Checkbox for each tutor in the list*/}
+                    <td className="inline-flex items-center gap-2 cursor-pointer select-none">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 accent-slate-700"
+                        checked={checked}
+                        onChange={() => toggleOne(report.id)}
+                        aria-checked={checked}
+                        aria-label={`Select ${report.id}`}
+                      />
+                      <span className="font-medium">{report.name}</span>
+                    </td>
+
+                    {/** ID */}
+                    <td className="px-4 py-2 align-middle font-medium">{report.name}</td>
+
+                    {/** TYPE */}
+                    <td className="px-4 py-2 align-middle font-medium">{report.type}</td>
+
+                    {/** REASON */}
+                    <td className="px-4 py-2 align-middle font-medium">{report.reason}</td>
+
+                    {/** STATUS */}
+                    <td className="px-4 py-2 align-middle font-medium">{report.status}</td>
+
+                    {/*ACTIONS*/}
+                    <div className="flex items-center gap-2 justify-end">
+                      {/*Approval Button*/}
+                      <button
+                        onClick={() => console.log("Approve one:", report.id)}
+                        className="rounded-md border px-2 py-1 text-sm hover:bg-white"
+                        title="Approve this tutor"
+                      >
+                        ✔️
+                      </button>
+
+                      {/*Rejection Button*/}
+                      <button
+                        onClick={() => console.log("Reject one:", report.id)}
+                        className="rounded-md border px-2 py-1 text-sm hover:bg-white"
+                        title="Reject this tutor"
+                      >
+                        ✖️
+                      </button>
+
+                      {/*Viewing tutor profile button*/}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          window.open(report.link, "_blank", "noopener,noreferrer");
+                        }}
+                        className="rounded-md border px-2 py-1 text-sm hover:bg-white"
+                        title="View tutor Profile"
+                      >
+                        📄
+                      </button>
+                    </div>
+                  </tr>
+                );
+              })}
+
+              {reportExamples.length === 0 && (
+                <tr>
+                  <td colSpan={6} className="px-4 py-6 text-center text-slate-500">
+                    No reports found
                   </td>
-
-                  
-                  {/** ID */}
-                  <td className = "px-4 py-2 align-middle font-medium">
-                    {report.name}
-                  </td>
-
-                  {/** TYPE */}
-                  <td className = "px-4 py-2 align-middle font-medium">
-                    {report.type}
-                  </td>
-
-                  {/** REASON */}
-                  <td className = "px-4 py-2 align-middle font-medium">
-                    {report.reason}
-                  </td>
-
-                  {/** STATUS */}
-                  <td className = "px-4 py-2 align-middle font-medium">
-                    {report.status}
-                  </td>
-
-
-                  {/*ACTIONS*/}
-                  <div className="flex items-center gap-2 justify-end">
-                    {/*Approval Button*/}
-                    <button
-                      onClick={() => console.log("Approve one:", report.id)}
-                      className="rounded-md border px-2 py-1 text-sm hover:bg-white"
-                      title="Approve this tutor"
-                    >
-                      ✔️
-                    </button>
-
-                    {/*Rejection Button*/}
-                    <button
-                      onClick={() => console.log("Reject one:", report.id)}
-                      className="rounded-md border px-2 py-1 text-sm hover:bg-white"
-                      title="Reject this tutor"
-                    >
-                      ✖️
-                    </button>
-
-                    {/*Viewing tutor profile button*/}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        window.open(report.link, "_blank", "noopener,noreferrer");
-                      }}
-                      className="rounded-md border px-2 py-1 text-sm hover:bg-white"
-                      title="View tutor Profile"
-                    >
-                      📄
-                    </button>
-                  </div>
                 </tr>
-              );
-            })}
-
-            {reportExamples.length === 0 && (
-              <tr>
-                <td
-                  colSpan={6}
-                  className="px-4 py-6 text-center text-slate-500"
-                >
-                  No reports found
-                </td>
-              </tr>
-            )}
+              )}
             </tbody>
           </table>
         </div>

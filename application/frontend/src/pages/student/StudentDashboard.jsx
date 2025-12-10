@@ -54,8 +54,9 @@ Homework:
 ];
 
 const fmtDateTime = (d) =>
-  new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" })
-    .format(typeof d === "string" ? new Date(d) : d);
+  new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(
+    typeof d === "string" ? new Date(d) : d
+  );
 
 export default function StudentDashboard() {
   const navigate = useNavigate();
@@ -181,8 +182,12 @@ export default function StudentDashboard() {
     navigate(`/results?q=${encodeURIComponent(target)}`);
   }
 
-  const upcoming = FAKE_SESSIONS.filter((s) => s.status === "upcoming").sort((a, b) => a.when - b.when);
-  const recent = FAKE_SESSIONS.filter((s) => s.status === "completed").sort((a, b) => b.when - a.when);
+  const upcoming = FAKE_SESSIONS.filter((s) => s.status === "upcoming").sort(
+    (a, b) => a.when - b.when
+  );
+  const recent = FAKE_SESSIONS.filter((s) => s.status === "completed").sort(
+    (a, b) => b.when - a.when
+  );
 
   return (
     <section className="space-y-8">
@@ -206,7 +211,9 @@ export default function StudentDashboard() {
         </div>
 
         <div className="mt-4 text-center">
-          <h1 className="text-xl md:text-2xl font-extrabold tracking-wide">SFSU TUTORING PLATFORM</h1>
+          <h1 className="text-xl md:text-2xl font-extrabold tracking-wide">
+            SFSU TUTORING PLATFORM
+          </h1>
           <h2 className="mt-2 text-lg md:text-xl font-bold">Find A Tutor</h2>
 
           <form onSubmit={onSearch} className="mt-4 flex items-center justify-center">
@@ -352,9 +359,7 @@ export default function StudentDashboard() {
       </div>
 
       {/* Notes Modal */}
-      {openNotesFor && (
-        <NotesModal session={openNotesFor} onClose={() => setOpenNotesFor(null)} />
-      )}
+      {openNotesFor && <NotesModal session={openNotesFor} onClose={() => setOpenNotesFor(null)} />}
     </section>
   );
 }
@@ -557,7 +562,7 @@ function NotesModal({ session, onClose }) {
             {session.course} · {fmtDateTime(session.when)} · {session.durationMin} min
           </div>
           <pre className="whitespace-pre-wrap text-sm text-slate-800 bg-slate-50 p-3 rounded-md border border-slate-200">
-{session.notes || "No notes available for this session (demo)."}
+            {session.notes || "No notes available for this session (demo)."}
           </pre>
           <div className="mt-4 flex justify-end gap-2">
             <button className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100">
