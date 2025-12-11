@@ -1,58 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
-const now = new Date();
-const daysFromNow = (n) => {
-  const d = new Date(now);
-  d.setDate(d.getDate() + n);
-  return d;
-};
-
-const FAKE_SESSIONS = [
-  {
-    id: "sess_1001",
-    title: "Data Structures – Linked Lists",
-    course: "CSC 340",
-    tutor: { id: 201, name: "Alice Nguyen" },
-    when: daysFromNow(1),
-    durationMin: 60,
-    mode: "Online (Zoom)",
-    status: "upcoming",
-    meetingUrl: "https://zoom.us/j/123456789",
-  },
-  {
-    id: "sess_1000",
-    title: "Software Engineering – Project Setup",
-    course: "CSC 648",
-    tutor: { id: 202, name: "David Kim" },
-    when: daysFromNow(-2),
-    durationMin: 90,
-    mode: "In-person · Library Room 210",
-    status: "completed",
-    ratingGiven: 5,
-    notes: `Agenda:
-- Functional and nonfunctional requirements walkthrough
-- UI design principles and example mockups
-
-Homework:
-- Update search based on new simplified design`,
-  },
-  {
-    id: "sess_0999",
-    title: "Calculus II – Convergent Series Practice",
-    course: "MATH 227",
-    tutor: { id: 203, name: "Priya Patel" },
-    when: daysFromNow(-6),
-    durationMin: 60,
-    mode: "Online (Google Meet)",
-    status: "completed",
-    ratingGiven: 4,
-    notes: `Covered:
-- Integral Test
-- Comparsion Test`,
-  },
-];
-
 const fmtDateTime = (d) =>
   new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(
     typeof d === "string" ? new Date(d) : d
@@ -66,6 +14,8 @@ export default function StudentDashboard() {
   const [query, setQuery] = useState("");
   const [messages, setMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
+  const [sessions, setSessions] = useState([]);
+  const [loadingSessions, setLoadingSessions] = useState(false);
 
   const [composeTo, setComposeTo] = useState(null);
   const [openNotesFor, setOpenNotesFor] = useState(null);
@@ -75,15 +25,16 @@ export default function StudentDashboard() {
   useEffect(() => {
     const raw = localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser");
     if (raw) {
-      try { 
+      try {
         const userData = JSON.parse(raw);
         setUser(userData);
-        // Fetch messages when user is set
+        // Fetch messages and sessions when user is set
         if (userData?.user_id) {
           fetchMessages(userData.user_id);
+          fetchSessions(userData.user_id);
         }
-      } catch { 
-        setUser(null); 
+      } catch {
+        setUser(null);
       }
     }
     if (location.state?.composeTo) {
@@ -96,7 +47,7 @@ export default function StudentDashboard() {
     try {
       const response = await fetch(`http://localhost:3000/api/messages/user/${userId}`);
       const data = await response.json();
-      
+
       if (data.success) {
         setMessages(data.data || []);
       } else {
@@ -108,6 +59,26 @@ export default function StudentDashboard() {
       setMessages([]);
     } finally {
       setLoadingMessages(false);
+    }
+  };
+
+  const fetchSessions = async (userId) => {
+    setLoadingSessions(true);
+    try {
+      const response = await fetch(`http://localhost:3000/api/sessions/student/${userId}`);
+      const data = await response.json();
+
+      if (data.success) {
+        setSessions(data.data || []);
+      } else {
+        console.error("Failed to fetch sessions:", data.error);
+        setSessions([]);
+      }
+    } catch (error) {
+      console.error("Error fetching sessions:", error);
+      setSessions([]);
+    } finally {
+      setLoadingSessions(false);
     }
   };
 
@@ -129,6 +100,12 @@ export default function StudentDashboard() {
     const tutorId = String(tutor.user_id ?? tutor.id);
     const search = location.search || "";
     navigate({ pathname: `/tutor/request/${tutorId}`, search });
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("demoUser");
+    sessionStorage.removeItem("demoUser");
+    navigate("/login");
   };
 
   const handleViewNotes = (session) => setOpenNotesFor(session);
@@ -165,10 +142,7 @@ export default function StudentDashboard() {
           {loadingMessages ? (
             <p className="text-sm text-slate-600">Loading messages...</p>
           ) : (
-            <MessagesList 
-              messages={messages} 
-              currentUserId={currentUserId} 
-            />
+            <MessagesList messages={messages} currentUserId={currentUserId} />
           )}
         </div>
       </section>
@@ -182,12 +156,34 @@ export default function StudentDashboard() {
     navigate(`/results?q=${encodeURIComponent(target)}`);
   }
 
-  const upcoming = FAKE_SESSIONS.filter((s) => s.status === "upcoming").sort(
-    (a, b) => a.when - b.when
-  );
-  const recent = FAKE_SESSIONS.filter((s) => s.status === "completed").sort(
-    (a, b) => b.when - a.when
-  );
+  // Transform database sessions to match component format
+  const upcoming = sessions
+    .filter((s) => s.status === "upcoming")
+    .map((s) => ({
+      id: s.session_id,
+      title: s.course_info,
+      course: s.course_info.split(" - ")[0] || s.course_info,
+      tutor: { id: s.tutor_user_id, name: s.tutor_name },
+      when: new Date(s.session_datetime),
+      durationMin: 60,
+      mode: s.location_mode,
+      status: s.status,
+    }))
+    .sort((a, b) => a.when - b.when);
+
+  const recent = sessions
+    .filter((s) => s.status === "completed")
+    .map((s) => ({
+      id: s.session_id,
+      title: s.course_info,
+      course: s.course_info.split(" - ")[0] || s.course_info,
+      tutor: { id: s.tutor_user_id, name: s.tutor_name },
+      when: new Date(s.session_datetime),
+      durationMin: 60,
+      mode: s.location_mode,
+      status: s.status,
+    }))
+    .sort((a, b) => b.when - a.when);
 
   return (
     <section className="space-y-8">
@@ -242,7 +238,9 @@ export default function StudentDashboard() {
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold">Upcoming Session</div>
         <div className="p-4 text-sm text-slate-700">
-          {upcoming.length === 0 ? (
+          {loadingSessions ? (
+            <p className="text-sm text-slate-600">Loading sessions...</p>
+          ) : upcoming.length === 0 ? (
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <p>No upcoming sessions scheduled.</p>
               <p>Find a tutor and book your first session!</p>
@@ -288,7 +286,9 @@ export default function StudentDashboard() {
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold">Recent Activity</div>
         <div className="p-4 text-sm text-slate-700">
-          {recent.length === 0 ? (
+          {loadingSessions ? (
+            <p className="text-sm text-slate-600">Loading sessions...</p>
+          ) : recent.length === 0 ? (
             <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
               <p>No completed sessions yet.</p>
               <p>Book a session to see it here.</p>
@@ -339,6 +339,7 @@ export default function StudentDashboard() {
         </div>
       </div>
 
+      {/* ===== Messages ===== */}
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold flex items-center justify-between">
           <span>Messages</span>
@@ -350,10 +351,7 @@ export default function StudentDashboard() {
           {loadingMessages ? (
             <p className="text-sm text-slate-600">Loading messages...</p>
           ) : (
-            <MessagesPreview 
-              messages={messages} 
-              currentUserId={currentUserId} 
-            />
+            <MessagesPreview messages={messages} currentUserId={currentUserId} />
           )}
         </div>
       </div>
@@ -363,7 +361,6 @@ export default function StudentDashboard() {
     </section>
   );
 }
-
 
 function ComposeBar({ composeTo, onSent, currentUserId, existingMessages }) {
   const [text, setText] = useState("");
@@ -421,8 +418,9 @@ function ComposeBar({ composeTo, onSent, currentUserId, existingMessages }) {
     return (
       <div className="mb-4 rounded-lg border border-amber-300 bg-amber-50 p-3">
         <div className="text-sm text-amber-800">
-          ⚠️ You have already sent a message to <span className="font-medium">{composeTo.name}</span>.
-          Only one message per tutor is allowed to prevent spam.
+          ⚠️ You have already sent a message to{" "}
+          <span className="font-medium">{composeTo.name}</span>. Only one message per tutor is
+          allowed to prevent spam.
         </div>
       </div>
     );
@@ -449,9 +447,7 @@ function ComposeBar({ composeTo, onSent, currentUserId, existingMessages }) {
           {sending ? "Sending..." : "Send"}
         </button>
       </div>
-      {error && (
-        <div className="mt-2 text-xs text-red-600">{error}</div>
-      )}
+      {error && <div className="mt-2 text-xs text-red-600">{error}</div>}
       <div className="mt-1 text-xs text-slate-500">
         Note: You can only send one message per tutor to keep communication simple.
       </div>
@@ -562,7 +558,7 @@ function NotesModal({ session, onClose }) {
             {session.course} · {fmtDateTime(session.when)} · {session.durationMin} min
           </div>
           <pre className="whitespace-pre-wrap text-sm text-slate-800 bg-slate-50 p-3 rounded-md border border-slate-200">
-            {session.notes || "No notes available for this session (demo)."}
+            {session.notes || "No notes available for this session."}
           </pre>
           <div className="mt-4 flex justify-end gap-2">
             <button className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100">

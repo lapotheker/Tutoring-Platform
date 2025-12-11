@@ -1,11 +1,13 @@
-const db = require("../config/db");
+const express = require("express");
+const router = express.Router();
+const db = require("../db/pool");
 
 /**
  * POST /api/messages
  * Create a new message from student to tutor
  * Enforces: one message per student-tutor pair to prevent spam
  */
-exports.sendMessage = async (req, res) => {
+router.post("/", async (req, res) => {
   const { sender_user_id, recipient_user_id, message } = req.body;
 
   // Validation
@@ -27,7 +29,7 @@ exports.sendMessage = async (req, res) => {
     // Check if student has already sent a message to this tutor
     const [existing] = await db.query(
       `SELECT message_id 
-       FROM messages 
+       FROM in_site_message 
        WHERE sender_user_id = ? AND recipient_user_id = ?
        LIMIT 1`,
       [sender_user_id, recipient_user_id]
@@ -36,33 +38,38 @@ exports.sendMessage = async (req, res) => {
     if (existing.length > 0) {
       return res.status(400).json({
         success: false,
-        error: "You have already sent a message to this tutor. Only one message per tutor is allowed.",
+        error:
+          "You have already sent a message to this tutor. Only one message per tutor is allowed.",
       });
     }
 
     const [senderResult] = await db.query(
-      "SELECT user_id, full_name, email FROM users WHERE user_id = ?",
+      "SELECT user_id, full_name FROM user WHERE user_id = ?",
       [sender_user_id]
     );
 
     const [recipientResult] = await db.query(
-      "SELECT user_id, full_name, email FROM users WHERE user_id = ?",
+      "SELECT user_id, full_name FROM user WHERE user_id = ?",
       [recipient_user_id]
     );
 
     if (senderResult.length === 0) {
-      return res.status(404).json({ success: false, error: "Sender not found" });
+      return res
+        .status(404)
+        .json({ success: false, error: "Sender not found" });
     }
 
     if (recipientResult.length === 0) {
-      return res.status(404).json({ success: false, error: "Recipient not found" });
+      return res
+        .status(404)
+        .json({ success: false, error: "Recipient not found" });
     }
 
     const sender = senderResult[0];
     const recipient = recipientResult[0];
 
     const [result] = await db.query(
-      `INSERT INTO messages (sender_user_id, recipient_user_id, message, created_at)
+      `INSERT INTO in_site_message (sender_user_id, recipient_user_id, message, created_at)
        VALUES (?, ?, ?, NOW())`,
       [sender_user_id, recipient_user_id, message.trim()]
     );
@@ -76,9 +83,9 @@ exports.sendMessage = async (req, res) => {
         m.created_at,
         s.full_name AS sender_name,
         r.full_name AS recipient_name
-       FROM messages m
-       JOIN users s ON m.sender_user_id = s.user_id
-       JOIN users r ON m.recipient_user_id = r.user_id
+       FROM in_site_message m
+       JOIN user s ON m.sender_user_id = s.user_id
+       JOIN user r ON m.recipient_user_id = r.user_id
        WHERE m.message_id = ?`,
       [result.insertId]
     );
@@ -95,13 +102,13 @@ exports.sendMessage = async (req, res) => {
       error: "Failed to send message",
     });
   }
-};
+});
 
 /**
  * GET /api/messages/user/:userId
  * Get all messages for a specific user (sent and received)
  */
-exports.getMessagesForUser = async (req, res) => {
+router.get("/user/:userId", async (req, res) => {
   const { userId } = req.params;
 
   if (!userId) {
@@ -122,9 +129,9 @@ exports.getMessagesForUser = async (req, res) => {
         m.created_at,
         s.full_name AS sender_name,
         r.full_name AS recipient_name
-       FROM messages m
-       JOIN users s ON m.sender_user_id = s.user_id
-       JOIN users r ON m.recipient_user_id = r.user_id
+       FROM in_site_message m
+       JOIN user s ON m.sender_user_id = s.user_id
+       JOIN user r ON m.recipient_user_id = r.user_id
        WHERE m.sender_user_id = ? OR m.recipient_user_id = ?
        ORDER BY m.created_at DESC`,
       [userId, userId]
@@ -141,13 +148,13 @@ exports.getMessagesForUser = async (req, res) => {
       error: "Failed to fetch messages",
     });
   }
-};
+});
 
 /**
  * POST /api/messages/:messageId/report
  * Report a message for review
  */
-exports.reportMessage = async (req, res) => {
+router.post("/:messageId/report", async (req, res) => {
   const { messageId } = req.params;
   const { reporter_user_id, reason } = req.body;
 
@@ -161,7 +168,7 @@ exports.reportMessage = async (req, res) => {
   try {
     // Check if message exists
     const [messageExists] = await db.query(
-      "SELECT message_id FROM messages WHERE message_id = ?",
+      "SELECT message_id FROM in_site_message WHERE message_id = ?",
       [messageId]
     );
 
@@ -174,8 +181,8 @@ exports.reportMessage = async (req, res) => {
 
     // Check if already reported by this user
     const [alreadyReported] = await db.query(
-      `SELECT report_id FROM message_reports 
-       WHERE message_id = ? AND reporter_user_id = ?`,
+      `SELECT report_id FROM reported_item 
+       WHERE target_type = 'In-Site Message' AND target_id = ? AND created_by = ?`,
       [messageId, reporter_user_id]
     );
 
@@ -187,9 +194,9 @@ exports.reportMessage = async (req, res) => {
     }
 
     await db.query(
-      `INSERT INTO message_reports (message_id, reporter_user_id, reason, created_at)
-       VALUES (?, ?, ?, NOW())`,
-      [messageId, reporter_user_id, reason || "No reason provided"]
+      `INSERT INTO reported_item (target_type, target_id, report_reason, details, status, created_by, created_at)
+       VALUES ('In-Site Message', ?, 'Other', ?, 'New', ?, NOW())`,
+      [messageId, reason || "No reason provided", reporter_user_id]
     );
 
     return res.status(201).json({
@@ -203,4 +210,6 @@ exports.reportMessage = async (req, res) => {
       error: "Failed to report message",
     });
   }
-};
+});
+
+module.exports = router;

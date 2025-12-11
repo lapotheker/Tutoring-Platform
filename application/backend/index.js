@@ -7,6 +7,8 @@ const PORT = process.env.PORT || 3000;
 const tutorRoutes = require("./routes/tutorRoutes");
 const dataRoutes = require("./routes/dataRoutes");
 const messageRoutes = require("./routes/messageRoutes");
+const sessionRoutes = require("./routes/sessionRoutes");
+const authRoutes = require("./routes/authRoutes");
 
 // Middleware
 app.use(cors()); // Enable CORS for frontend communication
@@ -21,6 +23,8 @@ app.get("/api/health", (_req, res) => {
 app.use("/api/tutors", tutorRoutes);
 app.use("/api/data", dataRoutes);
 app.use("/api/messages", messageRoutes);
+app.use("/api/sessions", sessionRoutes);
+app.use("/api/auth", authRoutes);
 
 // 404 handler
 app.use((_req, res) => res.status(404).json({ error: "Not found" }));

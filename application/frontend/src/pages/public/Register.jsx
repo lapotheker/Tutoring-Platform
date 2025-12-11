@@ -1,8 +1,8 @@
-// src/pages/public/Register.jsx
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function Signup() {
+export default function Register() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -44,31 +44,34 @@ export default function Signup() {
 
     setSubmitting(true);
     try {
-      // In real app, this would call your API
-      // const response = await fetch('/api/register', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({
-      //     fullName: `${form.firstName} ${form.lastName}`,
-      //     email: form.email,
-      //     password: form.password,
-      //     role: 1, // Everyone registers as Student (role = 1)
-      //   }),
-      // });
+      const response = await fetch("http://localhost:3000/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          full_name: `${form.firstName} ${form.lastName}`,
+          sfsu_email: form.email.toLowerCase(),
+          password: form.password,
+          role: 1, // Student role
+        }),
+      });
 
-      await new Promise((r) => setTimeout(r, 700)); // demo delay
-      setServerMsg("Demo: Account created as Student. Connect API to persist.");
+      const data = await response.json();
+
+      if (data.success) {
+        setServerMsg("✓ Account created successfully! Redirecting to login...");
+        setTimeout(() => navigate("/login"), 2000);
+      } else {
+        setServerMsg(data.error || "Registration failed");
+      }
     } catch (err) {
-      setServerMsg(err.message || "Something went wrong");
+      setServerMsg(err.message || "Network error. Please try again.");
     } finally {
       setSubmitting(false);
     }
   }
 
-  const inputClass =
-    "w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
-  const labelClass = "block text-sm font-medium text-slate-700";
-  const errClass = "mt-1 text-xs text-red-600";
+  const inputStyle =
+    "w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500";
 
   return (
     <div className="mx-auto max-w-xl">
@@ -79,137 +82,128 @@ export default function Signup() {
         ← Back to Home
       </Link>
 
-      <section className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
-        <h1 className="text-center text-2xl font-extrabold tracking-wide">REGISTER NEW ACCOUNT</h1>
-        <p className="text-center text-sm text-slate-600 mt-2">
-          All users register as Students. You can upgrade to Tutor later.
-        </p>
+      <section className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm space-y-6">
+        <div className="text-center">
+          <h1 className="text-xl font-extrabold tracking-wide">SFSU TUTORING PLATFORM</h1>
+          <h2 className="mt-2 text-lg font-bold">CREATE ACCOUNT</h2>
+        </div>
 
-        <form onSubmit={onSubmit} className="mt-6 space-y-4">
-          {/* Email */}
-          <div>
-            <label className={labelClass} htmlFor="email">
-              Email
-            </label>
+        <form onSubmit={onSubmit} className="grid gap-4">
+          <label className="block">
+            <div className="text-sm text-slate-700 mb-1">Email:</div>
             <input
-              id="email"
               type="email"
-              className={inputClass}
               value={form.email}
               onChange={(e) => update("email", e.target.value)}
-              placeholder="name@sfsu.edu"
-              autoComplete="email"
+              placeholder="you@sfsu.edu"
+              className={inputStyle}
+              required
             />
-            <p className="text-xs text-slate-500 mt-1">(Must use @sfsu.edu email)</p>
-            {errors.email && <p className={errClass}>{errors.email}</p>}
-          </div>
+            {errors.email && <p className="text-xs text-red-600 mt-1">{errors.email}</p>}
+          </label>
 
-          {/* Password */}
-          <div>
-            <label className={labelClass} htmlFor="password">
-              Password
-            </label>
-            <input
-              id="password"
-              type="password"
-              className={inputClass}
-              value={form.password}
-              onChange={(e) => update("password", e.target.value)}
-              placeholder="Minimum 8 characters"
-              autoComplete="new-password"
-            />
-            <p className="text-xs text-slate-500 mt-1">(Min. 8 characters)</p>
-            {errors.password && <p className={errClass}>{errors.password}</p>}
-          </div>
-
-          {/* Confirm Password */}
-          <div>
-            <label className={labelClass} htmlFor="confirm">
-              Confirm Password
-            </label>
-            <input
-              id="confirm"
-              type="password"
-              className={inputClass}
-              value={form.confirmPassword}
-              onChange={(e) => update("confirmPassword", e.target.value)}
-              autoComplete="new-password"
-            />
-            {errors.confirmPassword && <p className={errClass}>{errors.confirmPassword}</p>}
-          </div>
-
-          {/* First / Last Name */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label className={labelClass} htmlFor="first">
-                First Name
-              </label>
+          <div className="grid grid-cols-2 gap-4">
+            <label className="block">
+              <div className="text-sm text-slate-700 mb-1">First Name:</div>
               <input
-                id="first"
                 type="text"
-                className={inputClass}
                 value={form.firstName}
                 onChange={(e) => update("firstName", e.target.value)}
-                autoComplete="given-name"
+                placeholder="John"
+                className={inputStyle}
+                required
               />
-              {errors.firstName && <p className={errClass}>{errors.firstName}</p>}
-            </div>
-            <div>
-              <label className={labelClass} htmlFor="last">
-                Last Name
-              </label>
+              {errors.firstName && <p className="text-xs text-red-600 mt-1">{errors.firstName}</p>}
+            </label>
+
+            <label className="block">
+              <div className="text-sm text-slate-700 mb-1">Last Name:</div>
               <input
-                id="last"
                 type="text"
-                className={inputClass}
                 value={form.lastName}
                 onChange={(e) => update("lastName", e.target.value)}
-                autoComplete="family-name"
+                placeholder="Smith"
+                className={inputStyle}
+                required
               />
-              {errors.lastName && <p className={errClass}>{errors.lastName}</p>}
-            </div>
-          </div>
-
-          {/* Terms acceptance */}
-          <div>
-            <label className="flex items-center gap-2 text-sm">
-              <input
-                type="checkbox"
-                checked={form.acceptTos}
-                onChange={(e) => update("acceptTos", e.target.checked)}
-              />
-              <span className="leading-tight">
-                I agree to{" "}
-                <a className="underline" href="/terms" target="_blank" rel="noreferrer">
-                  Terms of Service
-                </a>{" "}
-                and{" "}
-                <a className="underline" href="/privacy" target="_blank" rel="noreferrer">
-                  Privacy Policy
-                </a>
-              </span>
+              {errors.lastName && <p className="text-xs text-red-600 mt-1">{errors.lastName}</p>}
             </label>
-            {errors.acceptTos && <p className={errClass}>{errors.acceptTos}</p>}
           </div>
 
-          {/* Submit */}
+          <label className="block">
+            <div className="text-sm text-slate-700 mb-1">Password:</div>
+            <input
+              type="password"
+              value={form.password}
+              onChange={(e) => update("password", e.target.value)}
+              placeholder="••••••••"
+              className={inputStyle}
+              required
+            />
+            {errors.password && <p className="text-xs text-red-600 mt-1">{errors.password}</p>}
+          </label>
+
+          <label className="block">
+            <div className="text-sm text-slate-700 mb-1">Confirm Password:</div>
+            <input
+              type="password"
+              value={form.confirmPassword}
+              onChange={(e) => update("confirmPassword", e.target.value)}
+              placeholder="••••••••"
+              className={inputStyle}
+              required
+            />
+            {errors.confirmPassword && (
+              <p className="text-xs text-red-600 mt-1">{errors.confirmPassword}</p>
+            )}
+          </label>
+
+          <label className="inline-flex items-start gap-2 text-sm text-slate-700">
+            <input
+              type="checkbox"
+              checked={form.acceptTos}
+              onChange={(e) => update("acceptTos", e.target.checked)}
+              className="mt-0.5"
+            />
+            <span>
+              I agree to the{" "}
+              <Link to="/terms" className="text-blue-600 hover:underline">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link to="/privacy" className="text-blue-600 hover:underline">
+                Privacy Policy
+              </Link>
+            </span>
+          </label>
+          {errors.acceptTos && <p className="text-xs text-red-600">{errors.acceptTos}</p>}
+
+          {serverMsg && (
+            <div
+              className={`rounded-xl border px-3 py-2 text-sm ${
+                serverMsg.startsWith("✓")
+                  ? "border-green-300 bg-green-50 text-green-900"
+                  : "border-amber-300 bg-amber-50 text-amber-900"
+              }`}
+            >
+              {serverMsg}
+            </div>
+          )}
+
           <button
             type="submit"
             disabled={submitting}
-            className="w-full rounded-xl bg-blue-600 px-4 py-2 text-white font-semibold shadow hover:bg-blue-700 disabled:opacity-60"
+            className="rounded-xl bg-slate-900 px-4 py-2 text-white font-semibold hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {submitting ? "Registering..." : "REGISTER"}
+            {submitting ? "Creating Account..." : "CREATE ACCOUNT"}
           </button>
 
-          {/* Footnote */}
-          <p className="text-sm text-slate-600 text-center">
+          <p className="text-sm text-slate-700 text-center">
             Already have an account?{" "}
-            <Link className="underline text-blue-600 hover:no-underline" to="/login">
-              Login
+            <Link to="/login" className="font-medium text-blue-600 hover:underline">
+              Login here
             </Link>
           </p>
-
-          {serverMsg && <p className="text-sm text-center mt-2">{serverMsg}</p>}
         </form>
       </section>
     </div>
