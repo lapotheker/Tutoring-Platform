@@ -228,7 +228,28 @@ const tutorModel = {
     return rows;
   },
 
-  // ... keep getAllCourses, getAllSubjectTags, getAllLanguages methods unchanged ...
+  /**
+   * Get tutor profile by tutor_user_id (any status)
+   */
+  async getTutorProfileByUserId(tutorUserId) {
+    const [rows] = await pool.query(
+      `SELECT 
+         tp.tutor_profile_id,
+         tp.tutor_user_id,
+         tp.display_name,
+         tp.hourly_rate,
+         tp.approval_status,
+         tp.visibility,
+         tp.created_at,
+         tp.updated_at
+       FROM tutor_profile tp
+       WHERE tp.tutor_user_id = ?
+       ORDER BY tp.created_at DESC
+       LIMIT 1`,
+      [tutorUserId]
+    );
+    return rows[0] || null;
+  },
 
   /**
    * Create new tutor profile
@@ -294,7 +315,7 @@ const tutorModel = {
         }
       }
 
-      // Handle languages (NEW)
+      // Handle languages
       if (profileData.languages && profileData.languages.length > 0) {
         for (const languageName of profileData.languages) {
           const [langRows] = await connection.execute(

@@ -62,6 +62,35 @@ const tutorController = {
   },
 
   /**
+   * Get tutor profile by user id (any status)
+   * GET /api/tutors/profile/by-user/:userId
+   */
+  async getTutorProfileByUser(req, res) {
+    try {
+      const userId = req.params.userId;
+      const profile = await tutorModel.getTutorProfileByUserId(userId);
+
+      if (!profile) {
+        return res.status(404).json({
+          success: false,
+          error: "Tutor profile not found",
+        });
+      }
+
+      res.json({
+        success: true,
+        data: profile,
+      });
+    } catch (error) {
+      console.error("Error in getTutorProfileByUser controller:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to get tutor profile",
+      });
+    }
+  },
+
+  /**
    * Create new tutor profile
    * POST /api/tutors/profile
    */

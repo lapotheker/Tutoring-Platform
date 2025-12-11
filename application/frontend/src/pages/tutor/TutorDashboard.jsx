@@ -11,6 +11,7 @@ export default function TutorDashboard() {
   const [user, setUser] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [messages, setMessages] = useState([]);
+  const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
 
   // Load user from local/session storage
@@ -27,7 +28,6 @@ export default function TutorDashboard() {
         setUser(null);
       }
     } else {
-      // Redirect to login if no user found
       const next = encodeURIComponent("/tutor/dashboard");
       navigate(`/login?next=${next}`, { replace: true });
     }
@@ -36,20 +36,28 @@ export default function TutorDashboard() {
   const fetchDashboardData = async (userId) => {
     setLoading(true);
     try {
-      // Fetch Sessions
+      // Fetch sessions
       const sessionsRes = await fetch(`http://localhost:3000/api/sessions/tutor/${userId}`);
       const sessionsData = await sessionsRes.json();
       if (sessionsData.success) {
         setSessions(sessionsData.data || []);
       }
 
-      // Fetch Messages
+      // Fetch messages
       const messagesRes = await fetch(`http://localhost:3000/api/messages/user/${userId}`);
       const messagesData = await messagesRes.json();
       if (messagesData.success) {
-        // Filter for messages RECEIVED by the tutor
         const received = (messagesData.data || []).filter((m) => m.recipient_user_id === userId);
         setMessages(received);
+      }
+
+      // Fetch tutor profile (any status)
+      const profileRes = await fetch(`http://localhost:3000/api/tutors/profile/by-user/${userId}`);
+      const profileData = await profileRes.json();
+      if (profileData.success) {
+        setProfile(profileData.data);
+      } else {
+        setProfile(null); // no profile yet
       }
     } catch (error) {
       console.error("Error fetching dashboard data:", error);
@@ -68,12 +76,10 @@ export default function TutorDashboard() {
   const card = "rounded-2xl border border-slate-300 bg-white p-6 shadow-sm";
   const bigTitle = "text-2xl md:text-3xl font-extrabold tracking-wide";
 
-  // Filter sessions
   const upcomingSessions = sessions.filter(
     (s) => s.status === "upcoming" && new Date(s.session_datetime) > new Date()
   );
 
-  // Generate recent activity from completed sessions and new messages
   const recentActivity = [
     ...sessions
       .filter((s) => s.status === "completed")
@@ -92,6 +98,98 @@ export default function TutorDashboard() {
   ]
     .sort((a, b) => b.rawTime - a.rawTime)
     .slice(0, 5);
+
+  // Profile status rendering
+  const renderProfileStatus = () => {
+    if (loading) {
+      return <p className="text-sm text-slate-600">Loading profile status...</p>;
+    }
+
+    if (!profile) {
+      // No profile created yet
+      return (
+        <div className="mt-4 rounded-xl border border-slate-300 bg-slate-50 p-4">
+          <div className="text-lg md:text-xl font-extrabold">
+            You don&apos;t have a tutor profile yet
+          </div>
+          <p className="mt-2 text-slate-800">
+            Create your profile to start offering tutoring services.
+          </p>
+          <div className="mt-4 flex gap-3">
+            <Link
+              to="/tutor/posting"
+              className="inline-flex items-center justify-center rounded-2xl bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-green-700 transition"
+            >
+              Create Profile
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    if (profile.approval_status === "Pending") {
+      return (
+        <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 p-4">
+          <div className="text-lg md:text-xl font-extrabold text-amber-900">
+            Status: Pending Review
+          </div>
+          <p className="mt-2 text-slate-800">
+            Your profile has been submitted and is awaiting admin review.
+          </p>
+          <p className="mt-1 text-xs text-slate-600">
+            Submitted on: {new Date(profile.created_at).toLocaleString()}
+          </p>
+        </div>
+      );
+    }
+
+    if (profile.approval_status === "Rejected") {
+      return (
+        <div className="mt-4 rounded-xl border border-rose-300 bg-rose-50 p-4">
+          <div className="text-lg md:text-xl font-extrabold text-rose-900">Status: Rejected</div>
+          <p className="mt-2 text-slate-800">
+            Your profile was rejected. Please update and resubmit.
+          </p>
+          <div className="mt-4 flex gap-3">
+            <Link
+              to="/tutor/posting"
+              className="inline-flex items-center justify-center rounded-2xl bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-blue-700 transition"
+            >
+              Resubmit Profile
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    if (profile.approval_status === "Approved") {
+      return (
+        <div className="mt-4 rounded-xl border border-emerald-300 bg-emerald-50 p-4">
+          <div className="text-lg md:text-xl font-extrabold text-emerald-900">Status: Approved</div>
+          <p className="mt-2 text-slate-800">
+            Your profile is live. You can edit your profile anytime.
+          </p>
+          <div className="mt-4 flex gap-3">
+            <Link
+              to="/tutor/profile/edit"
+              className="inline-flex items-center justify-center rounded-2xl bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-green-700 transition"
+            >
+              Edit Profile
+            </Link>
+          </div>
+        </div>
+      );
+    }
+
+    // Fallback for any other status
+    return (
+      <div className="mt-4 rounded-xl border border-slate-300 bg-slate-50 p-4">
+        <div className="text-lg md:text-xl font-extrabold">
+          Profile Status: {profile.approval_status}
+        </div>
+      </div>
+    );
+  };
 
   return (
     <section className="space-y-6">
@@ -123,21 +221,7 @@ export default function TutorDashboard() {
       {/* ===== Profile Status Section ===== */}
       <div className={card}>
         <h2 className="text-lg md:text-xl font-extrabold">PROFILE STATUS</h2>
-
-        <div className="mt-4 rounded-xl border border-slate-300 bg-slate-50 p-4">
-          <div className="text-lg md:text-xl font-extrabold">YOUR TUTOR DASHBOARD</div>
-
-          <p className="mt-2 text-slate-800">Manage your upcoming sessions and messages here.</p>
-
-          <div className="mt-4">
-            <Link
-              to="/tutor/profile/edit"
-              className="inline-flex items-center justify-center rounded-2xl bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-green-700 transition"
-            >
-              Edit Profile
-            </Link>
-          </div>
-        </div>
+        {renderProfileStatus()}
       </div>
 
       {/* ===== Upcoming Sessions Section ===== */}
