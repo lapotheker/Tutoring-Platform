@@ -1,10 +1,30 @@
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+
+function getCurrentUser() {
+  try {
+    return (
+      JSON.parse(localStorage.getItem("demoUser")) || JSON.parse(sessionStorage.getItem("demoUser"))
+    );
+  } catch {
+    return null;
+  }
+}
 
 export default function Home() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
+  const [user, setUser] = useState(getCurrentUser());
+
+  // keep user state in sync if storage changes
+  useEffect(() => {
+    const syncUser = () => setUser(getCurrentUser());
+    window.addEventListener("storage", syncUser);
+    return () => window.removeEventListener("storage", syncUser);
+  }, []);
+
+  const isLoggedIn = useMemo(() => !!user, [user]);
 
   function onSearch(e) {
     e.preventDefault();
@@ -57,7 +77,6 @@ export default function Home() {
           students and tutors who understand your professors and your courses.
         </motion.p>
 
-        {/* easier navigation*/}
         <motion.p
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
@@ -67,7 +86,7 @@ export default function Home() {
           Not sure where to start? Try searching the class you need help with.
         </motion.p>
 
-        {/* updated search bar*/}
+        {/* updated search bar */}
         <div className="mt-8 flex items-center justify-center">
           <form onSubmit={onSearch} className="w-full max-w-xl">
             <div
@@ -101,24 +120,25 @@ export default function Home() {
           </form>
         </div>
 
-        {/* better style buttons  */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
-            to="/register"
-            className="w-full sm:w-auto rounded-full bg-slate-900 px-7 py-3 text-white font-medium shadow-lg hover:bg-black transition text-sm sm:text-base text-center"
-          >
-            I&apos;m new here – Get started
-          </Link>
-          <span className="text-slate-500 font-semibold hidden sm:inline">or</span>
-          <Link
-            to="/login"
-            className="w-full sm:w-auto rounded-full bg-blue-600 px-7 py-3 text-white font-medium shadow-lg hover:bg-blue-700 transition text-sm sm:text-base text-center"
-          >
-            Already have an account? Log in
-          </Link>
-        </div>
+        {/* Auth buttons: hidden when logged in */}
+        {!isLoggedIn && (
+          <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              to="/register"
+              className="w-full sm:w-auto rounded-full bg-slate-900 px-7 py-3 text-white font-medium shadow-lg hover:bg-black transition text-sm sm:text-base text-center"
+            >
+              I&apos;m new here – Get started
+            </Link>
+            <span className="text-slate-500 font-semibold hidden sm:inline">or</span>
+            <Link
+              to="/login"
+              className="w-full sm:w-auto rounded-full bg-blue-600 px-7 py-3 text-white font-medium shadow-lg hover:bg-blue-700 transition text-sm sm:text-base text-center"
+            >
+              Already have an account? Log in
+            </Link>
+          </div>
+        )}
 
-        {/* editied why section */}
         <div className="mt-8 text-left mx-auto max-w-xl">
           <h2 className="text-lg font-extrabold text-slate-900">Why students use SFSU Tutoring</h2>
           <ul className="mt-2 list-disc pl-6 space-y-1 text-slate-700 text-sm md:text-base">

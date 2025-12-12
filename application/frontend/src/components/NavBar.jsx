@@ -1,7 +1,7 @@
 // src/components/NavBar.jsx
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MessageSquare } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useState } from "react";
 
 function getCurrentUser() {
   try {
@@ -15,13 +15,34 @@ function getCurrentUser() {
 
 export default function Navbar() {
   const location = useLocation();
-  const user = useMemo(() => getCurrentUser(), []);
+  const navigate = useNavigate();
+  const [user, setUser] = useState(getCurrentUser());
+
+  // Update user when route changes (covers post-login navigation)
+  useEffect(() => {
+    setUser(getCurrentUser());
+  }, [location]);
+
+  // Keep user state in sync across tabs (optional)
+  useEffect(() => {
+    const syncUser = () => setUser(getCurrentUser());
+    window.addEventListener("storage", syncUser);
+    return () => window.removeEventListener("storage", syncUser);
+  }, []);
 
   const isActive = (path) => location.pathname === path;
 
   const showStudentDash = user?.role === 1 || user?.role === 2;
   const showTutorDash = user?.role === 2;
   const showAdminDash = user?.role === 3;
+  const isLoggedIn = !!user;
+
+  const handleLogout = () => {
+    localStorage.removeItem("demoUser");
+    sessionStorage.removeItem("demoUser");
+    setUser(null);
+    navigate("/login");
+  };
 
   return (
     <nav className="border-b border-slate-200 bg-white shadow-sm">
@@ -33,7 +54,7 @@ export default function Navbar() {
           </Link>
 
           {/* Navigation Links */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <Link
               to="/"
               className={`text-sm font-medium transition ${
@@ -94,6 +115,16 @@ export default function Navbar() {
                 <span className="font-bold text-lg">🛠️</span>
                 <span>Admin Dashboard</span>
               </Link>
+            )}
+
+            {/* Logout when logged in */}
+            {isLoggedIn && (
+              <button
+                onClick={handleLogout}
+                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-black transition"
+              >
+                Logout
+              </button>
             )}
           </div>
         </div>
