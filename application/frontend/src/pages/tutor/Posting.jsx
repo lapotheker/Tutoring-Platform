@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../../services/api";
 
 export default function Posting() {
   const [form, setForm] = useState({
@@ -48,7 +49,7 @@ export default function Posting() {
     setMessage("Submitting profile...");
 
     try {
-      const response = await fetch("http://localhost:3000/api/tutors/profile", {
+      const response = await fetch(`${API_BASE_URL}/tutors/profile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

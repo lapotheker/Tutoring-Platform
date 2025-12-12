@@ -1,6 +1,7 @@
 // src/pages/RequestSession.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
+import { API_BASE_URL } from "../../services/api";
 
 export default function RequestSession() {
   const { id } = useParams(); // /tutor/request/:id
@@ -57,7 +58,7 @@ export default function RequestSession() {
 
     try {
       // Store sent message in backend
-      const base = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+      const base = import.meta.env.VITE_API_BASE_URL || `${API_BASE_URL}`;
 
       const res = await fetch(`${base}/api/messages`, {
         method: "POST",

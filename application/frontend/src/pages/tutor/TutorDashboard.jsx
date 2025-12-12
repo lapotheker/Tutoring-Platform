@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../services/api";
 
 const fmtDateTime = (d) =>
   new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(
@@ -37,14 +38,14 @@ export default function TutorDashboard() {
     setLoading(true);
     try {
       // Fetch sessions
-      const sessionsRes = await fetch(`http://localhost:3000/api/sessions/tutor/${userId}`);
+      const sessionsRes = await fetch(`${API_BASE_URL}/sessions/tutor/${userId}`);
       const sessionsData = await sessionsRes.json();
       if (sessionsData.success) {
         setSessions(sessionsData.data || []);
       }
 
       // Fetch messages
-      const messagesRes = await fetch(`http://localhost:3000/api/messages/user/${userId}`);
+      const messagesRes = await fetch(`${API_BASE_URL}/messages/user/${userId}`);
       const messagesData = await messagesRes.json();
       if (messagesData.success) {
         const received = (messagesData.data || []).filter((m) => m.recipient_user_id === userId);
@@ -52,7 +53,7 @@ export default function TutorDashboard() {
       }
 
       // Fetch tutor profile (any status)
-      const profileRes = await fetch(`http://localhost:3000/api/tutors/profile/by-user/${userId}`);
+      const profileRes = await fetch(`${API_BASE_URL}/tutors/profile/by-user/${userId}`);
       const profileData = await profileRes.json();
       if (profileData.success) {
         setProfile(profileData.data);
