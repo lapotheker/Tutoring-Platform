@@ -22,10 +22,7 @@ import MessageSent from "./pages/student/MessageSent.jsx";
 
 // Tutor pages
 import TutorDashboard from "./pages/tutor/TutorDashboard.jsx";
-import TutorDashboardApproved from "./pages/tutor/TutorDashboardApproved.jsx";
-import TutorPolicy from "./pages/tutor/TutorPolicy.jsx";
 import TutorProfile from "./pages/tutor/TutorProfile.jsx";
-import TutorProfileSubmitted from "./pages/tutor/TutorProfileSubmitted.jsx";
 import Posting from "./pages/tutor/Posting.jsx";
 import EditTutorProfile from "./pages/tutor/EditTutorProfile.jsx";
 
@@ -87,14 +84,7 @@ export default function App() {
             path="/tutor/dashboard"
             element={<ProtectedRoute allowedRoles={[2]} element={<TutorDashboard />} />}
           />
-          <Route
-            path="/tutor/dashboard-approved"
-            element={<ProtectedRoute allowedRoles={[2]} element={<TutorDashboardApproved />} />}
-          />
-          <Route
-            path="/tutor/profile-submitted"
-            element={<ProtectedRoute allowedRoles={[2]} element={<TutorProfileSubmitted />} />}
-          />
+
           <Route
             path="/tutor/posting"
             element={<ProtectedRoute allowedRoles={[2]} element={<Posting />} />}
@@ -103,10 +93,7 @@ export default function App() {
             path="/tutor/profile/edit"
             element={<ProtectedRoute allowedRoles={[2]} element={<EditTutorProfile />} />}
           />
-          <Route
-            path="/tutor/policy"
-            element={<ProtectedRoute allowedRoles={[2]} element={<TutorPolicy />} />}
-          />
+
           <Route
             path="/tutor/request/:id"
             element={<ProtectedRoute allowedRoles={[1, 2]} element={<RequestSession />} />}
@@ -119,10 +106,6 @@ export default function App() {
           {/* Admin dashboard (role 3) */}
           <Route
             path="/admin"
-            element={<ProtectedRoute allowedRoles={[3]} element={<AdminDashboard />} />}
-          />
-          <Route
-            path="/admin/dashboard"
             element={<ProtectedRoute allowedRoles={[3]} element={<AdminDashboard />} />}
           />
 
