@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
+import { API_BASE_URL } from "../../services/api";
 
 const now = new Date();
 const fmtDateTime = (d) =>
@@ -45,7 +46,7 @@ export default function StudentDashboard() {
   const fetchMessages = async (userId) => {
     setLoadingMessages(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/messages/user/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/messages/user/${userId}`);
       const data = await response.json();
 
       if (data.success) {
@@ -64,7 +65,7 @@ export default function StudentDashboard() {
   const fetchSessions = async (userId) => {
     setLoadingSessions(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/sessions/student/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/sessions/student/${userId}`);
       const data = await response.json();
 
       if (data.success) {
@@ -91,7 +92,7 @@ export default function StudentDashboard() {
   const handleBecomeTutor = async () => {
     if (!user?.user_id) return;
     try {
-      const res = await fetch("http://localhost:3000/api/auth/upgrade-to-tutor", {
+      const res = await fetch(`${API_BASE_URL}/auth/upgrade-to-tutor`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: user.user_id }),
@@ -420,7 +421,7 @@ function ComposeBar({ composeTo, onSent, currentUserId, existingMessages }) {
     setSending(true);
 
     try {
-      const response = await fetch("http://localhost:3000/api/messages", {
+      const response = await fetch(`${API_BASE_URL}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

@@ -1,6 +1,7 @@
 // src/pages/tutor/EditTutorProfile.jsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../../services/api";
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const TIMES = ["Morning", "Afternoon", "Evening"];
@@ -87,7 +88,7 @@ export default function EditTutorProfile() {
     try {
       // Call the existing POST /api/tutors/profile endpoint
       // This counts as "editing the profile and resubmitting for admin review"
-      const res = await fetch("http://localhost:3000/api/tutors/profile", {
+      const res = await fetch(`${API_BASE_URL}/tutors/profile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { API_BASE_URL } from "../../services/api";
 
 const TUTOR_STATUS = ["Pending", "Approved", "Rejected", "Removed"];
 const REPORT_STATUS = ["New", "Under Review", "Resolved", "Dismissed"];
@@ -40,9 +41,9 @@ export default function AdminDashboard() {
     setLoading(true);
     try {
       const [tutorsRes, reportsRes, actionsRes] = await Promise.all([
-        fetch("http://localhost:3000/api/admin/pending-tutors"),
-        fetch("http://localhost:3000/api/admin/reports"),
-        fetch("http://localhost:3000/api/admin/actions?limit=20"),
+        fetch(`${API_BASE_URL}/admin/pending-tutors`),
+        fetch(`${API_BASE_URL}/admin/reports`),
+        fetch(`${API_BASE_URL}/admin/actions?limit=20`),
       ]);
 
       const tutorsData = await tutorsRes.json();
@@ -84,7 +85,7 @@ export default function AdminDashboard() {
     try {
       await Promise.all(
         Array.from(selectedIds).map((id) =>
-          fetch(`http://localhost:3000/api/admin/tutors/${id}/status`, {
+          fetch(`${API_BASE_URL}/admin/tutors/${id}/status`, {
             method: "PATCH",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ status, admin_user_id: adminId, notes }),
@@ -102,7 +103,7 @@ export default function AdminDashboard() {
     const adminId = user?.user_id;
     if (!REPORT_STATUS.includes(status)) return;
     try {
-      await fetch(`http://localhost:3000/api/admin/reports/${reportId}/status`, {
+      await fetch(`${API_BASE_URL}/admin/reports/${reportId}/status`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status, admin_user_id: adminId, notes }),
@@ -117,7 +118,7 @@ export default function AdminDashboard() {
     setDetailLoading(true);
     setProfileDetail(null);
     try {
-      const res = await fetch(`http://localhost:3000/api/admin/tutors/${profileId}/detail`);
+      const res = await fetch(`${API_BASE_URL}/admin/tutors/${profileId}/detail`);
       const data = await res.json();
       if (data.success) setProfileDetail(data.data);
     } catch (err) {
@@ -131,7 +132,7 @@ export default function AdminDashboard() {
     setDetailLoading(true);
     setMessageDetail(null);
     try {
-      const res = await fetch(`http://localhost:3000/api/admin/messages/${messageId}/detail`);
+      const res = await fetch(`${API_BASE_URL}/admin/messages/${messageId}/detail`);
       const data = await res.json();
       if (data.success) setMessageDetail(data.data);
     } catch (err) {
