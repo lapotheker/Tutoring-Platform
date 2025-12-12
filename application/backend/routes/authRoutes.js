@@ -128,4 +128,40 @@ router.get("/user/:email", async (req, res) => {
   }
 });
 
+/**
+ * PATCH /api/auth/upgrade-to-tutor
+ * body: { user_id }
+ */
+router.patch("/upgrade-to-tutor", async (req, res) => {
+  const { user_id } = req.body;
+
+  if (!user_id) {
+    return res.status(400).json({
+      success: false,
+      error: "user_id is required",
+    });
+  }
+
+  try {
+    const result = await authModel.upgradeToTutor(user_id);
+
+    if (!result.success) {
+      return res.status(400).json(result);
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: result.alreadyTutor
+        ? "User is already a tutor"
+        : "Upgraded to tutor successfully",
+    });
+  } catch (error) {
+    console.error("Error upgrading to tutor:", error);
+    return res.status(500).json({
+      success: false,
+      error: "Failed to upgrade to tutor",
+    });
+  }
+});
+
 module.exports = router;

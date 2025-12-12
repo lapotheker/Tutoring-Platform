@@ -1,13 +1,27 @@
 // src/components/NavBar.jsx
 import { Link, useLocation } from "react-router-dom";
 import { MessageSquare } from "lucide-react";
+import { useMemo } from "react";
+
+function getCurrentUser() {
+  try {
+    return (
+      JSON.parse(localStorage.getItem("demoUser")) || JSON.parse(sessionStorage.getItem("demoUser"))
+    );
+  } catch {
+    return null;
+  }
+}
 
 export default function Navbar() {
   const location = useLocation();
+  const user = useMemo(() => getCurrentUser(), []);
 
-  const isActive = (path) => {
-    return location.pathname === path;
-  };
+  const isActive = (path) => location.pathname === path;
+
+  const showStudentDash = user?.role === 1 || user?.role === 2;
+  const showTutorDash = user?.role === 2;
+  const showAdminDash = user?.role === 3;
 
   return (
     <nav className="border-b border-slate-200 bg-white shadow-sm">
@@ -37,53 +51,50 @@ export default function Navbar() {
               About
             </Link>
 
-            {/* Dashboard Link - Prominent in top right */}
-            <Link
-              to="/dashboard"
-              className={`
-                inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
-                ${
+            {/* Student Dashboard (role 1 or 2) */}
+            {showStudentDash && (
+              <Link
+                to="/dashboard"
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive("/dashboard")
                     ? "bg-blue-600 text-white shadow-sm"
                     : "bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
-                }
-              `}
-            >
-              <MessageSquare className="w-4 h-4" />
-              <span>Student Dashboard</span>
-            </Link>
+                }`}
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Student Dashboard</span>
+              </Link>
+            )}
 
-            {/* Tutor Dashboard */}
-            <Link
-              to="/tutor/dashboard"
-              className={`
-              inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
-               ${
-                 isActive("/tutor/dashboard")
-                   ? "bg-green-600 text-white shadow-sm"
-                   : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
-               }
-              `}
-            >
-              <span className="font-bold text-lg">🎓</span>
-              <span>Tutor Dashboard</span>
-            </Link>
+            {/* Tutor Dashboard (role 2) */}
+            {showTutorDash && (
+              <Link
+                to="/tutor/dashboard"
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                  isActive("/tutor/dashboard")
+                    ? "bg-green-600 text-white shadow-sm"
+                    : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+                }`}
+              >
+                <span className="font-bold text-lg">🎓</span>
+                <span>Tutor Dashboard</span>
+              </Link>
+            )}
 
-            {/* Admin Dashboard */}
-            <Link
-              to="/admin/dashboard"
-              className={`
-                inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
-                ${
+            {/* Admin Dashboard (role 3) */}
+            {showAdminDash && (
+              <Link
+                to="/admin/dashboard"
+                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive("/admin/dashboard")
-                    ? "bg-purple-400 text-white shadow-sm"
+                    ? "bg-purple-500 text-white shadow-sm"
                     : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
-                }
-              `}
-            >
-              <span className="font-bold text-lg">🛠️</span>
-              <span>Admin Dashboard</span>
-            </Link>
+                }`}
+              >
+                <span className="font-bold text-lg">🛠️</span>
+                <span>Admin Dashboard</span>
+              </Link>
+            )}
           </div>
         </div>
       </div>

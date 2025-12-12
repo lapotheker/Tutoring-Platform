@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 
+const now = new Date();
 const fmtDateTime = (d) =>
   new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(
     typeof d === "string" ? new Date(d) : d
@@ -28,7 +29,6 @@ export default function StudentDashboard() {
       try {
         const userData = JSON.parse(raw);
         setUser(userData);
-        // Fetch messages and sessions when user is set
         if (userData?.user_id) {
           fetchMessages(userData.user_id);
           fetchSessions(userData.user_id);
@@ -51,7 +51,6 @@ export default function StudentDashboard() {
       if (data.success) {
         setMessages(data.data || []);
       } else {
-        console.error("Failed to fetch messages:", data.error);
         setMessages([]);
       }
     } catch (error) {
@@ -71,7 +70,6 @@ export default function StudentDashboard() {
       if (data.success) {
         setSessions(data.data || []);
       } else {
-        console.error("Failed to fetch sessions:", data.error);
         setSessions([]);
       }
     } catch (error) {
@@ -83,36 +81,70 @@ export default function StudentDashboard() {
   };
 
   const displayName = useMemo(() => {
-    if (!user?.email) return "Student";
+    if (!user?.email && !user?.full_name) return "Student";
+    if (user?.full_name) return user.full_name.split(" ")[0] || "Student";
     const left = user.email.split("@")[0];
     if (!left) return "Student";
     return left.charAt(0).toUpperCase() + left.slice(1);
   }, [user]);
 
-  const handleMessageTutor = (tutor) => {
-    navigate("/dashboard?tab=messages", {
-      state: { composeTo: { id: tutor.id, name: tutor.name } },
-      replace: false,
-    });
+  const handleBecomeTutor = async () => {
+    if (!user?.user_id) return;
+    try {
+      const res = await fetch("http://localhost:3000/api/auth/upgrade-to-tutor", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ user_id: user.user_id }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        // Update stored user to role 2
+        const updated = { ...user, role: 2 };
+        localStorage.setItem("demoUser", JSON.stringify(updated));
+        sessionStorage.setItem("demoUser", JSON.stringify(updated));
+        setUser(updated);
+        navigate("/tutor/dashboard", { replace: true });
+      } else {
+        alert(data.error || "Failed to upgrade to tutor");
+      }
+    } catch (err) {
+      console.error("Upgrade error:", err);
+      alert("Network error upgrading to tutor");
+    }
   };
-
-  const handleRebookTutor = (tutor) => {
-    const tutorId = String(tutor.user_id ?? tutor.id);
-    const search = location.search || "";
-    navigate({ pathname: `/tutor/request/${tutorId}`, search });
-  };
-
-  const handleLogout = () => {
-    localStorage.removeItem("demoUser");
-    sessionStorage.removeItem("demoUser");
-    navigate("/login");
-  };
-
-  const handleViewNotes = (session) => setOpenNotesFor(session);
-  const handleJoinLink = (url) =>
-    window.open(url || "https://zoom.us/j/123456789", "_blank", "noopener,noreferrer");
 
   const currentUserId = user?.user_id ?? user?.id;
+
+  const upcoming = sessions
+    .filter((s) => s.status === "upcoming")
+    .map((s) => ({
+      id: s.session_id,
+      title: s.course_info,
+      course: s.course_info.split(" - ")[0] || s.course_info,
+      tutor: { id: s.tutor_user_id, name: s.tutor_name },
+      when: new Date(s.session_datetime),
+      durationMin: s.duration_minutes || 60,
+      mode: s.location_mode,
+      status: s.status,
+      meetingUrl: s.meeting_url,
+    }))
+    .sort((a, b) => a.when - b.when);
+
+  const recent = sessions
+    .filter((s) => s.status === "completed")
+    .map((s) => ({
+      id: s.session_id,
+      title: s.course_info,
+      course: s.course_info.split(" - ")[0] || s.course_info,
+      tutor: { id: s.tutor_user_id, name: s.tutor_name },
+      when: new Date(s.session_datetime),
+      durationMin: s.duration_minutes || 60,
+      mode: s.location_mode,
+      status: s.status,
+      ratingGiven: s.student_rating,
+      notes: s.student_notes,
+    }))
+    .sort((a, b) => b.when - a.when);
 
   if (tab === "messages") {
     return (
@@ -156,52 +188,23 @@ export default function StudentDashboard() {
     navigate(`/results?q=${encodeURIComponent(target)}`);
   }
 
-  // Transform database sessions to match component format
-  const upcoming = sessions
-    .filter((s) => s.status === "upcoming")
-    .map((s) => ({
-      id: s.session_id,
-      title: s.course_info,
-      course: s.course_info.split(" - ")[0] || s.course_info,
-      tutor: { id: s.tutor_user_id, name: s.tutor_name },
-      when: new Date(s.session_datetime),
-      durationMin: 60,
-      mode: s.location_mode,
-      status: s.status,
-    }))
-    .sort((a, b) => a.when - b.when);
-
-  const recent = sessions
-    .filter((s) => s.status === "completed")
-    .map((s) => ({
-      id: s.session_id,
-      title: s.course_info,
-      course: s.course_info.split(" - ")[0] || s.course_info,
-      tutor: { id: s.tutor_user_id, name: s.tutor_name },
-      when: new Date(s.session_datetime),
-      durationMin: 60,
-      mode: s.location_mode,
-      status: s.status,
-    }))
-    .sort((a, b) => b.when - a.when);
-
   return (
     <section className="space-y-8">
       <div className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-xl font-bold">
-              &#128100;
+              👤
             </div>
             <div className="text-lg md:text-xl font-semibold">Welcome, {displayName}!</div>
           </div>
 
           <div className="flex items-center gap-3 text-xl">
             <Link to="/dashboard?tab=messages" title="Messages" className="hover:opacity-80">
-              &#9993;
+              ✉️
             </Link>
             <Link to="/" title="Home" className="hover:opacity-80">
-              &#127968;
+              🏠
             </Link>
           </div>
         </div>
@@ -227,14 +230,26 @@ export default function StudentDashboard() {
                 className="grid place-items-center h-9 w-9 rounded-full bg-slate-900 text-white hover:bg-black"
                 aria-label="Search"
               >
-                <span>&#128269;</span>
+                <span>🔍</span>
               </button>
             </div>
           </form>
+
+          {/* Become a Tutor */}
+          {user?.role !== 2 && user?.role !== 3 && (
+            <div className="mt-4">
+              <button
+                onClick={handleBecomeTutor}
+                className="rounded-full bg-green-600 text-white px-4 py-2 text-sm font-semibold shadow hover:bg-green-700"
+              >
+                Become a Tutor (instant)
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* ===== Upcoming ===== */}
+      {/* Upcoming */}
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold">Upcoming Session</div>
         <div className="p-4 text-sm text-slate-700">
@@ -264,13 +279,23 @@ export default function StudentDashboard() {
                   <div className="mt-3 flex gap-2">
                     <button
                       className="rounded-md bg-slate-900 text-white px-3 py-1 text-xs hover:bg-black"
-                      onClick={() => handleJoinLink(s.meetingUrl)}
+                      onClick={() =>
+                        window.open(
+                          s.meetingUrl || "https://zoom.us/j/123456789",
+                          "_blank",
+                          "noopener,noreferrer"
+                        )
+                      }
                     >
                       Join / Open Link
                     </button>
                     <button
                       className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
-                      onClick={() => handleMessageTutor(s.tutor)}
+                      onClick={() =>
+                        navigate("/dashboard?tab=messages", {
+                          state: { composeTo: { id: s.tutor.id, name: s.tutor.name } },
+                        })
+                      }
                     >
                       Message Tutor
                     </button>
@@ -282,7 +307,7 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* ===== Recent Activity ===== */}
+      {/* Recent Activity */}
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold">Recent Activity</div>
         <div className="p-4 text-sm text-slate-700">
@@ -312,19 +337,28 @@ export default function StudentDashboard() {
                   <div className="mt-3 flex flex-wrap gap-2">
                     <button
                       className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
-                      onClick={() => handleViewNotes(s)}
+                      onClick={() => setOpenNotesFor(s)}
                     >
                       View Notes
                     </button>
                     <button
                       className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
-                      onClick={() => handleRebookTutor(s.tutor)}
+                      onClick={() =>
+                        navigate({
+                          pathname: `/tutor/request/${s.tutor.id}`,
+                          search: location.search,
+                        })
+                      }
                     >
                       Rebook Tutor
                     </button>
                     <button
                       className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
-                      onClick={() => handleMessageTutor(s.tutor)}
+                      onClick={() =>
+                        navigate("/dashboard?tab=messages", {
+                          state: { composeTo: { id: s.tutor.id, name: s.tutor.name } },
+                        })
+                      }
                     >
                       Message Tutor
                     </button>
@@ -339,7 +373,7 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* ===== Messages ===== */}
+      {/* Messages Preview */}
       <div className="rounded-2xl border border-slate-300 bg-white">
         <div className="border-b border-slate-200 p-4 font-semibold flex items-center justify-between">
           <span>Messages</span>
@@ -367,7 +401,6 @@ function ComposeBar({ composeTo, onSent, currentUserId, existingMessages }) {
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
 
-  // Check if user has already sent a message to this tutor
   const alreadyMessaged = existingMessages.some(
     (m) => m.sender_user_id === currentUserId && m.recipient_user_id === composeTo.id
   );
@@ -558,7 +591,7 @@ function NotesModal({ session, onClose }) {
             {session.course} · {fmtDateTime(session.when)} · {session.durationMin} min
           </div>
           <pre className="whitespace-pre-wrap text-sm text-slate-800 bg-slate-50 p-3 rounded-md border border-slate-200">
-            {session.notes || "No notes available for this session."}
+            {session.notes || "No notes available for this session (demo)."}
           </pre>
           <div className="mt-4 flex justify-end gap-2">
             <button className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100">

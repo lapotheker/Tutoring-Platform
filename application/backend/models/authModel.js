@@ -109,6 +109,35 @@ const authModel = {
       throw error;
     }
   },
+
+  /**
+   * Upgrade a user to tutor role (role = 2)
+   */
+  async upgradeToTutor(userId) {
+    const [users] = await pool.query(
+      "SELECT user_id, role FROM user WHERE user_id = ?",
+      [userId]
+    );
+
+    if (users.length === 0) {
+      return { success: false, error: "User not found" };
+    }
+
+    const user = users[0];
+
+    // Prevent changing admins
+    if (user.role === 3) {
+      return { success: false, error: "Admins cannot be converted to tutor" };
+    }
+
+    // Already tutor
+    if (user.role === 2) {
+      return { success: true, alreadyTutor: true };
+    }
+
+    await pool.query("UPDATE user SET role = 2 WHERE user_id = ?", [userId]);
+    return { success: true, upgraded: true };
+  },
 };
 
 module.exports = authModel;
