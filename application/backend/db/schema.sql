@@ -1,201 +1,204 @@
--- -- ============================================================
--- -- SFSU TUTORING PLATFORM - DATABASE SCHEMA
--- -- Complete schema with numeric roles and tutor_availability table
--- -- ============================================================
+-- ============================================================
+-- SFSU TUTORING PLATFORM - DATABASE SCHEMA
+-- Complete schema with numeric roles and tutor_availability table
+-- ============================================================
 
--- -- Step 1: Drop all existing tables (in reverse dependency order)
--- DROP TABLE IF EXISTS tutor_availability;
--- DROP TABLE IF EXISTS admin_action;
--- DROP TABLE IF EXISTS reported_item;
--- DROP TABLE IF EXISTS in_site_message;
--- DROP TABLE IF EXISTS sample_material;
--- DROP TABLE IF EXISTS tutor_profile_photo;
--- DROP TABLE IF EXISTS tutor_profile_language;
--- DROP TABLE IF EXISTS tutor_profile_subject_tag;
--- DROP TABLE IF EXISTS tutor_profile_course;
--- DROP TABLE IF EXISTS tutor_profile;
--- DROP TABLE IF EXISTS language;
--- DROP TABLE IF EXISTS subject_tag;
--- DROP TABLE IF EXISTS course_number;
--- DROP TABLE IF EXISTS user;
+-- Step 1: Drop all existing tables (in reverse dependency order)
+DROP TABLE IF EXISTS tutor_availability;
+DROP TABLE IF EXISTS admin_action;
+DROP TABLE IF EXISTS reported_item;
+DROP TABLE IF EXISTS in_site_message;
+DROP TABLE IF EXISTS sample_material;
+DROP TABLE IF EXISTS tutor_profile_photo;
+DROP TABLE IF EXISTS tutor_profile_language;
+DROP TABLE IF EXISTS tutor_profile_subject_tag;
+DROP TABLE IF EXISTS tutor_profile_course;
+DROP TABLE IF EXISTS tutor_profile;
+DROP TABLE IF EXISTS language;
+DROP TABLE IF EXISTS subject_tag;
+DROP TABLE IF EXISTS course_number;
+DROP TABLE IF EXISTS user;
 
--- -- Step 2: Create all tables
+-- Step 2: Create all tables
 
--- -- User table (role: 1=Student, 2=Tutor, 3=Administrator)
--- CREATE TABLE user (
---     user_id INT AUTO_INCREMENT PRIMARY KEY,
---     full_name VARCHAR(255) NOT NULL,
---     sfsu_email VARCHAR(255) NOT NULL UNIQUE,
---     password_hash VARCHAR(255) NOT NULL,
---     role INT NOT NULL COMMENT '1=Student, 2=Tutor, 3=Administrator',
---     account_status ENUM('Active', 'Disabled') NOT NULL DEFAULT 'Active',
---     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     last_login_at TIMESTAMP NULL,
---     CONSTRAINT chk_email CHECK (sfsu_email LIKE '%@sfsu.edu'),
---     CONSTRAINT chk_role CHECK (role IN (1, 2, 3))
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- User table (role: 1=Student, 2=Tutor, 3=Administrator)
+CREATE TABLE user (
+    user_id INT AUTO_INCREMENT PRIMARY KEY,
+    full_name VARCHAR(255) NOT NULL,
+    sfsu_email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    role INT NOT NULL COMMENT '1=Student, 2=Tutor, 3=Administrator',
+    account_status ENUM('Active', 'Disabled') NOT NULL DEFAULT 'Active',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    last_login_at TIMESTAMP NULL,
+    CONSTRAINT chk_email CHECK (sfsu_email LIKE '%@sfsu.edu'),
+    CONSTRAINT chk_role CHECK (role IN (1, 2, 3))
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Course Number table
--- CREATE TABLE course_number (
---     course_id INT AUTO_INCREMENT PRIMARY KEY,
---     code VARCHAR(50) NOT NULL UNIQUE,
---     title VARCHAR(255),
---     department VARCHAR(50),
---     notes TEXT
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Course Number table
+CREATE TABLE course_number (
+    course_id INT AUTO_INCREMENT PRIMARY KEY,
+    code VARCHAR(50) NOT NULL UNIQUE,
+    title VARCHAR(255),
+    department VARCHAR(50),
+    notes TEXT
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Subject Tag table
--- CREATE TABLE subject_tag (
---     tag_id INT AUTO_INCREMENT PRIMARY KEY,
---     tag_name VARCHAR(100) NOT NULL UNIQUE,
---     description TEXT,
---     status ENUM('Active', 'Deprecated') NOT NULL DEFAULT 'Active'
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Subject Tag table
+CREATE TABLE subject_tag (
+    tag_id INT AUTO_INCREMENT PRIMARY KEY,
+    tag_name VARCHAR(100) NOT NULL UNIQUE,
+    description TEXT,
+    status ENUM('Active', 'Deprecated') NOT NULL DEFAULT 'Active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Language table
--- CREATE TABLE language (
---     language_id INT AUTO_INCREMENT PRIMARY KEY,
---     language_name VARCHAR(100) NOT NULL UNIQUE,
---     status ENUM('Active', 'Deprecated') NOT NULL DEFAULT 'Active'
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Language table
+CREATE TABLE language (
+    language_id INT AUTO_INCREMENT PRIMARY KEY,
+    language_name VARCHAR(100) NOT NULL UNIQUE,
+    status ENUM('Active', 'Deprecated') NOT NULL DEFAULT 'Active'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Tutor Profile table
--- CREATE TABLE tutor_profile (
---     tutor_profile_id INT AUTO_INCREMENT PRIMARY KEY,
---     tutor_user_id INT NOT NULL,
---     display_name VARCHAR(255) NOT NULL,
---     hourly_rate DECIMAL(10, 2) NOT NULL,
---     approval_status ENUM('Pending', 'Approved', 'Rejected', 'Removed') NOT NULL DEFAULT 'Pending',
---     visibility ENUM('Public', 'Hidden') NOT NULL DEFAULT 'Public',
---     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
---     created_by INT NOT NULL,
---     updated_by INT NOT NULL,
---     FOREIGN KEY (tutor_user_id) REFERENCES user(user_id) ON DELETE CASCADE,
---     FOREIGN KEY (created_by) REFERENCES user(user_id),
---     FOREIGN KEY (updated_by) REFERENCES user(user_id)
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Tutor Profile table
+CREATE TABLE tutor_profile (
+    tutor_profile_id INT AUTO_INCREMENT PRIMARY KEY,
+    tutor_user_id INT NOT NULL,
+    display_name VARCHAR(255) NOT NULL,
+    hourly_rate DECIMAL(10, 2) NOT NULL,
+    approval_status ENUM('Pending', 'Approved', 'Rejected', 'Removed') NOT NULL DEFAULT 'Pending',
+    visibility ENUM('Public', 'Hidden') NOT NULL DEFAULT 'Public',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT NOT NULL,
+    updated_by INT NOT NULL,
+    FOREIGN KEY (tutor_user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (created_by) REFERENCES user(user_id),
+    FOREIGN KEY (updated_by) REFERENCES user(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Tutor Availability table
--- CREATE TABLE tutor_availability (
---     availability_id INT AUTO_INCREMENT PRIMARY KEY,
---     tutor_profile_id INT NOT NULL,
---     day_of_week ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
---     time_slot ENUM('Morning', 'Afternoon', 'Evening') NULL,
---     time_start TIME NULL,
---     time_end TIME NULL,
---     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE,
---     UNIQUE KEY unique_tutor_day_slot (tutor_profile_id, day_of_week, time_slot),
---     INDEX idx_tutor_profile_id (tutor_profile_id),
---     INDEX idx_day_of_week (day_of_week)
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Tutor Availability table
+CREATE TABLE tutor_availability (
+    availability_id INT AUTO_INCREMENT PRIMARY KEY,
+    tutor_profile_id INT NOT NULL,
+    day_of_week ENUM('Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday') NOT NULL,
+    time_slot ENUM('Morning', 'Afternoon', 'Evening') NULL,
+    time_start TIME NULL,
+    time_end TIME NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE,
+    UNIQUE KEY unique_tutor_day_slot (tutor_profile_id, day_of_week, time_slot),
+    INDEX idx_tutor_profile_id (tutor_profile_id),
+    INDEX idx_day_of_week (day_of_week)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Tutor Profile Course (junction table)
--- CREATE TABLE tutor_profile_course (
---     tutor_profile_id INT NOT NULL,
---     course_id INT NOT NULL,
---     PRIMARY KEY (tutor_profile_id, course_id),
---     FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE,
---     FOREIGN KEY (course_id) REFERENCES course_number(course_id) ON DELETE CASCADE
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Tutor Profile Course (junction table)
+CREATE TABLE tutor_profile_course (
+    tutor_profile_id INT NOT NULL,
+    course_id INT NOT NULL,
+    PRIMARY KEY (tutor_profile_id, course_id),
+    FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES course_number(course_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Tutor Profile Subject Tag (junction table)
--- CREATE TABLE tutor_profile_subject_tag (
---     tutor_profile_id INT NOT NULL,
---     tag_id INT NOT NULL,
---     PRIMARY KEY (tutor_profile_id, tag_id),
---     FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE,
---     FOREIGN KEY (tag_id) REFERENCES subject_tag(tag_id) ON DELETE CASCADE
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Tutor Profile Subject Tag (junction table)
+CREATE TABLE tutor_profile_subject_tag (
+    tutor_profile_id INT NOT NULL,
+    tag_id INT NOT NULL,
+    PRIMARY KEY (tutor_profile_id, tag_id),
+    FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE,
+    FOREIGN KEY (tag_id) REFERENCES subject_tag(tag_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Tutor Profile Language (junction table)
--- CREATE TABLE tutor_profile_language (
---     tutor_profile_id INT NOT NULL,
---     language_id INT NOT NULL,
---     PRIMARY KEY (tutor_profile_id, language_id),
---     FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE,
---     FOREIGN KEY (language_id) REFERENCES language(language_id) ON DELETE CASCADE
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Tutor Profile Language (junction table)
+CREATE TABLE tutor_profile_language (
+    tutor_profile_id INT NOT NULL,
+    language_id INT NOT NULL,
+    PRIMARY KEY (tutor_profile_id, language_id),
+    FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE,
+    FOREIGN KEY (language_id) REFERENCES language(language_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Tutor Profile Photo table
--- CREATE TABLE tutor_profile_photo (
---     media_id INT AUTO_INCREMENT PRIMARY KEY,
---     tutor_profile_id INT NOT NULL,
---     file_path VARCHAR(500) NOT NULL,
---     caption TEXT,
---     policy_check ENUM('Pending', 'Approved', 'Rejected') NOT NULL DEFAULT 'Pending',
---     uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Tutor Profile Photo table
+CREATE TABLE tutor_profile_photo (
+    media_id INT AUTO_INCREMENT PRIMARY KEY,
+    tutor_profile_id INT NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    caption TEXT,
+    policy_check ENUM('Pending', 'Approved', 'Rejected') NOT NULL DEFAULT 'Pending',
+    uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Sample Material table
--- CREATE TABLE sample_material (
---     media_id INT AUTO_INCREMENT PRIMARY KEY,
---     tutor_profile_id INT NOT NULL,
---     title VARCHAR(255),
---     type ENUM('PDF', 'Image', 'Link') NOT NULL,
---     file_path VARCHAR(500) NOT NULL,
---     policy_check ENUM('Pending', 'Approved', 'Rejected') NOT NULL DEFAULT 'Pending',
---     uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Sample Material table
+CREATE TABLE sample_material (
+    media_id INT AUTO_INCREMENT PRIMARY KEY,
+    tutor_profile_id INT NOT NULL,
+    title VARCHAR(255),
+    type ENUM('PDF', 'Image', 'Link') NOT NULL,
+    file_path VARCHAR(500) NOT NULL,
+    policy_check ENUM('Pending', 'Approved', 'Rejected') NOT NULL DEFAULT 'Pending',
+    uploaded_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- In-Site Message table
--- CREATE TABLE in_site_message (
---     message_id INT AUTO_INCREMENT PRIMARY KEY,
---     sender_user_id INT NOT NULL,
---     recipient_user_id INT NOT NULL,
---     message TEXT NOT NULL,
---     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     message_status ENUM('Sent', 'Reported', 'Removed') NOT NULL DEFAULT 'Sent',
---     linked_report_id INT NULL,
---     FOREIGN KEY (sender_user_id) REFERENCES user(user_id) ON DELETE CASCADE,
---     FOREIGN KEY (recipient_user_id) REFERENCES user(user_id) ON DELETE CASCADE
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- In-Site Message table
+CREATE TABLE in_site_message (
+    message_id INT AUTO_INCREMENT PRIMARY KEY,
+    sender_user_id INT NOT NULL,
+    recipient_user_id INT NOT NULL,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    message_status ENUM('Sent', 'Reported', 'Removed') NOT NULL DEFAULT 'Sent',
+    linked_report_id INT NULL,
+    FOREIGN KEY (sender_user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (recipient_user_id) REFERENCES user(user_id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Reported Item table
--- CREATE TABLE reported_item (
---     report_id INT AUTO_INCREMENT PRIMARY KEY,
---     target_type ENUM('Tutor Profile', 'In-Site Message', 'User') NOT NULL,
---     target_id INT NOT NULL,
---     report_reason ENUM('Harassment/Abuse', 'Inappropriate Content', 'Spam/Solicitation', 'Privacy/Safety', 'Other') NOT NULL,
---     details TEXT,
---     status ENUM('New', 'Under Review', 'Resolved', 'Dismissed') NOT NULL DEFAULT 'New',
---     created_by INT NOT NULL,
---     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     resolved_by INT NULL,
---     resolved_at TIMESTAMP NULL,
---     resolution_notes TEXT,
---     FOREIGN KEY (created_by) REFERENCES user(user_id) ON DELETE CASCADE,
---     FOREIGN KEY (resolved_by) REFERENCES user(user_id)
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Reported Item table
+CREATE TABLE reported_item (
+    report_id INT AUTO_INCREMENT PRIMARY KEY,
+    target_type ENUM('Tutor Profile', 'In-Site Message', 'User') NOT NULL,
+    target_id INT NOT NULL,
+    report_reason ENUM('Harassment/Abuse', 'Inappropriate Content', 'Spam/Solicitation', 'Privacy/Safety', 'Other') NOT NULL,
+    details TEXT,
+    status ENUM('New', 'Under Review', 'Resolved', 'Dismissed') NOT NULL DEFAULT 'New',
+    created_by INT NOT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    resolved_by INT NULL,
+    resolved_at TIMESTAMP NULL,
+    resolution_notes TEXT,
+    FOREIGN KEY (created_by) REFERENCES user(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (resolved_by) REFERENCES user(user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Add foreign key for linked_report_id after reported_item table is created
--- ALTER TABLE in_site_message
---     ADD FOREIGN KEY (linked_report_id) REFERENCES reported_item(report_id);
+-- Add foreign key for linked_report_id after reported_item table is created
+ALTER TABLE in_site_message
+    ADD FOREIGN KEY (linked_report_id) REFERENCES reported_item(report_id);
 
--- -- Admin Action table
--- CREATE TABLE admin_action (
---     admin_action_id INT AUTO_INCREMENT PRIMARY KEY,
---     action_type ENUM('ApproveProfile', 'RejectProfile', 'RemoveListing', 'DisableUser', 'ReenableUser', 'RemoveMessage') NOT NULL,
---     target_type ENUM('Tutor Profile', 'In-Site Message', 'User') NOT NULL,
---     target_id INT NOT NULL,
---     reason_notes TEXT,
---     performed_by INT NOT NULL,
---     timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     originating_report_id INT NULL,
---     FOREIGN KEY (performed_by) REFERENCES user(user_id) ON DELETE CASCADE,
---     FOREIGN KEY (originating_report_id) REFERENCES reported_item(report_id)
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+-- Admin Action table
+CREATE TABLE admin_action (
+    admin_action_id INT AUTO_INCREMENT PRIMARY KEY,
+    action_type ENUM('ApproveProfile', 'RejectProfile', 'RemoveListing', 'DisableUser', 'ReenableUser', 'RemoveMessage') NOT NULL,
+    target_type ENUM('Tutor Profile', 'In-Site Message', 'User') NOT NULL,
+    target_id INT NOT NULL,
+    reason_notes TEXT,
+    performed_by INT NOT NULL,
+    timestamp TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    originating_report_id INT NULL,
+    FOREIGN KEY (performed_by) REFERENCES user(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (originating_report_id) REFERENCES reported_item(report_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
--- -- Step 3: Create indexes for better query performance
--- CREATE INDEX idx_user_email ON user(sfsu_email);
--- CREATE INDEX idx_user_role ON user(role);
--- CREATE INDEX idx_tutor_profile_status ON tutor_profile(approval_status);
--- CREATE INDEX idx_tutor_profile_visibility ON tutor_profile(visibility);
--- CREATE INDEX idx_message_sender ON in_site_message(sender_user_id);
--- CREATE INDEX idx_message_recipient ON in_site_message(recipient_user_id);
--- CREATE INDEX idx_message_status ON in_site_message(message_status);
--- CREATE INDEX idx_report_status ON reported_item(status);
--- CREATE INDEX idx_report_target ON reported_item(target_type, target_id);
+-- Step 3: Create indexes for better query performance
+CREATE INDEX idx_user_email ON user(sfsu_email);
+CREATE INDEX idx_user_role ON user(role);
+CREATE INDEX idx_tutor_profile_status ON tutor_profile(approval_status);
+CREATE INDEX idx_tutor_profile_visibility ON tutor_profile(visibility);
+CREATE INDEX idx_message_sender ON in_site_message(sender_user_id);
+CREATE INDEX idx_message_recipient ON in_site_message(recipient_user_id);
+CREATE INDEX idx_message_status ON in_site_message(message_status);
+CREATE INDEX idx_report_status ON reported_item(status);
+CREATE INDEX idx_report_target ON reported_item(target_type, target_id);
+
+-- Success message
+SELECT 'Database schema created successfully!' AS Status;

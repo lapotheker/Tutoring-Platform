@@ -29,13 +29,6 @@ const FAKE_SESSIONS = [
     durationMin: 90,
     mode: "In-person · Library Room 210",
     status: "completed",
-    ratingGiven: 5,
-    notes: `Agenda:
-- Functional and nonfunctional requirements walkthrough
-- UI design principles and example mockups
-
-Homework:
-- Update search based on new simplified design`,
   },
   {
     id: "sess_0999",
@@ -46,10 +39,6 @@ Homework:
     durationMin: 60,
     mode: "Online (Google Meet)",
     status: "completed",
-    ratingGiven: 4,
-    notes: `Covered:
-- Integral Test
-- Comparsion Test`,
   },
 ];
 
@@ -67,7 +56,6 @@ export default function StudentDashboard() {
   const [loadingMessages, setLoadingMessages] = useState(false);
 
   const [composeTo, setComposeTo] = useState(null);
-  const [openNotesFor, setOpenNotesFor] = useState(null);
 
   const tab = new URLSearchParams(location.search).get("tab");
 
@@ -77,7 +65,6 @@ export default function StudentDashboard() {
       try { 
         const userData = JSON.parse(raw);
         setUser(userData);
-        // Fetch messages when user is set
         if (userData?.user_id) {
           fetchMessages(userData.user_id);
         }
@@ -116,23 +103,6 @@ export default function StudentDashboard() {
     if (!left) return "Student";
     return left.charAt(0).toUpperCase() + left.slice(1);
   }, [user]);
-
-  const handleMessageTutor = (tutor) => {
-    navigate("/dashboard?tab=messages", {
-      state: { composeTo: { id: tutor.id, name: tutor.name } },
-      replace: false,
-    });
-  };
-
-  const handleRebookTutor = (tutor) => {
-    const tutorId = String(tutor.user_id ?? tutor.id);
-    const search = location.search || "";
-    navigate({ pathname: `/tutor/request/${tutorId}`, search });
-  };
-
-  const handleViewNotes = (session) => setOpenNotesFor(session);
-  const handleJoinLink = (url) =>
-    window.open(url || "https://zoom.us/j/123456789", "_blank", "noopener,noreferrer");
 
   const currentUserId = user?.user_id ?? user?.id;
 
@@ -182,11 +152,15 @@ export default function StudentDashboard() {
   }
 
   const upcoming = FAKE_SESSIONS.filter((s) => s.status === "upcoming").sort((a, b) => a.when - b.when);
-  const recent = FAKE_SESSIONS.filter((s) => s.status === "completed").sort((a, b) => b.when - a.when);
+  const completed = FAKE_SESSIONS.filter((s) => s.status === "completed").sort((a, b) => b.when - a.when);
+
+  const card = "rounded-2xl border border-slate-300 bg-white p-6 shadow-sm";
+  const bigTitle = "text-2xl md:text-3xl font-extrabold tracking-wide";
 
   return (
-    <section className="space-y-8">
-      <div className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
+    <section className="space-y-6">
+      {/* ===== Header Section ===== */}
+      <div className={card}>
         <div className="flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="h-12 w-12 rounded-full bg-slate-200 flex items-center justify-center text-slate-600 text-xl font-bold">
@@ -206,7 +180,7 @@ export default function StudentDashboard() {
         </div>
 
         <div className="mt-4 text-center">
-          <h1 className="text-xl md:text-2xl font-extrabold tracking-wide">SFSU TUTORING PLATFORM</h1>
+          <h1 className={bigTitle}>SFSU TUTORING PLATFORM</h1>
           <h2 className="mt-2 text-lg md:text-xl font-bold">Find A Tutor</h2>
 
           <form onSubmit={onSearch} className="mt-4 flex items-center justify-center">
@@ -231,115 +205,91 @@ export default function StudentDashboard() {
         </div>
       </div>
 
-      {/* ===== Upcoming ===== */}
-      <div className="rounded-2xl border border-slate-300 bg-white">
-        <div className="border-b border-slate-200 p-4 font-semibold">Upcoming Session</div>
-        <div className="p-4 text-sm text-slate-700">
+      {/* ===== Upcoming Sessions ===== */}
+      <div className={card}>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg md:text-xl font-extrabold">UPCOMING SESSIONS</h2>
+          <span className="text-xs text-slate-500">{upcoming.length} scheduled</span>
+        </div>
+
+        <div className="mt-4 space-y-3">
           {upcoming.length === 0 ? (
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">
               <p>No upcoming sessions scheduled.</p>
-              <p>Find a tutor and book your first session!</p>
+              <p className="mt-1 text-slate-600">Find a tutor and book your first session!</p>
             </div>
           ) : (
-            <ul className="space-y-3">
-              {upcoming.map((s) => (
-                <li key={s.id} className="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="font-semibold">{s.title}</div>
-                    <span className="text-xs rounded-full bg-blue-100 text-blue-700 px-2 py-0.5">
-                      {s.status.toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="mt-1 text-xs text-slate-600">
-                    {s.course} · with <span className="font-medium">{s.tutor.name}</span>
-                  </div>
-                  <div className="mt-1 text-xs text-slate-600">
-                    {fmtDateTime(s.when)} · {s.durationMin} min · {s.mode}
-                  </div>
-                  <div className="mt-3 flex gap-2">
-                    <button
-                      className="rounded-md bg-slate-900 text-white px-3 py-1 text-xs hover:bg-black"
-                      onClick={() => handleJoinLink(s.meetingUrl)}
-                    >
-                      Join / Open Link
-                    </button>
-                    <button
-                      className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
-                      onClick={() => handleMessageTutor(s.tutor)}
-                    >
-                      Message Tutor
-                    </button>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            upcoming.map((s) => (
+              <div
+                key={s.id}
+                className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-slate-900">{s.title}</span>
+                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-blue-700">
+                    {s.status}
+                  </span>
+                </div>
+                <div className="mt-1 text-xs text-slate-700">
+                  {s.course} · with <span className="font-medium">{s.tutor.name}</span>
+                </div>
+                <div className="mt-1 text-xs text-slate-600">
+                  {fmtDateTime(s.when)} · {s.durationMin} min · {s.mode}
+                </div>
+              </div>
+            ))
           )}
         </div>
       </div>
 
-      {/* ===== Recent Activity ===== */}
-      <div className="rounded-2xl border border-slate-300 bg-white">
-        <div className="border-b border-slate-200 p-4 font-semibold">Recent Activity</div>
-        <div className="p-4 text-sm text-slate-700">
-          {recent.length === 0 ? (
-            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      {/* ===== Recent Activity (Completed Sessions) ===== */}
+      <div className={card}>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg md:text-xl font-extrabold">RECENT ACTIVITY</h2>
+          <span className="text-xs text-slate-500">
+            Last {completed.length} sessions
+          </span>
+        </div>
+
+        <div className="mt-4 space-y-3">
+          {completed.length === 0 ? (
+            <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm">
               <p>No completed sessions yet.</p>
-              <p>Book a session to see it here.</p>
+              <p className="mt-1 text-slate-600">Book a session to see it here.</p>
             </div>
           ) : (
-            <ul className="space-y-3">
-              {recent.map((s) => (
-                <li key={s.id} className="rounded-2xl border border-slate-200 bg-white p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="font-semibold">{s.title}</div>
-                    <span className="text-xs rounded-full bg-emerald-100 text-emerald-700 px-2 py-0.5">
-                      COMPLETED
-                    </span>
-                  </div>
-                  <div className="mt-1 text-xs text-slate-600">
-                    {s.course} · with <span className="font-medium">{s.tutor.name}</span>
-                  </div>
-                  <div className="mt-1 text-xs text-slate-600">
-                    {fmtDateTime(s.when)} · {s.durationMin} min · {s.mode}
-                  </div>
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <button
-                      className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
-                      onClick={() => handleViewNotes(s)}
-                    >
-                      View Notes
-                    </button>
-                    <button
-                      className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
-                      onClick={() => handleRebookTutor(s.tutor)}
-                    >
-                      Rebook Tutor
-                    </button>
-                    <button
-                      className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100"
-                      onClick={() => handleMessageTutor(s.tutor)}
-                    >
-                      Message Tutor
-                    </button>
-                    <span className="text-xs text-slate-500 ml-auto">
-                      {s.ratingGiven ? `Your Rating: ${"★".repeat(s.ratingGiven)}` : "Not rated"}
-                    </span>
-                  </div>
-                </li>
-              ))}
-            </ul>
+            completed.map((s) => (
+              <div
+                key={s.id}
+                className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-slate-900">{s.title}</span>
+                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
+                    {s.status}
+                  </span>
+                </div>
+                <div className="mt-1 text-xs text-slate-700">
+                  {s.course} · with <span className="font-medium">{s.tutor.name}</span>
+                </div>
+                <div className="mt-1 text-xs text-slate-600">
+                  {fmtDateTime(s.when)} · {s.durationMin} min · {s.mode}
+                </div>
+              </div>
+            ))
           )}
         </div>
       </div>
 
-      <div className="rounded-2xl border border-slate-300 bg-white">
-        <div className="border-b border-slate-200 p-4 font-semibold flex items-center justify-between">
-          <span>Messages</span>
+      {/* ===== Messages Section ===== */}
+      <div className={card}>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg md:text-xl font-extrabold">MESSAGES</h2>
           <Link to="/dashboard?tab=messages" className="text-sm text-blue-600 hover:underline">
             View all →
           </Link>
         </div>
-        <div className="p-4">
+        <div className="mt-4">
           {loadingMessages ? (
             <p className="text-sm text-slate-600">Loading messages...</p>
           ) : (
@@ -349,23 +299,20 @@ export default function StudentDashboard() {
             />
           )}
         </div>
-      </div>
 
-      {/* Notes Modal */}
-      {openNotesFor && (
-        <NotesModal session={openNotesFor} onClose={() => setOpenNotesFor(null)} />
-      )}
+        <p className="mt-3 text-[11px] text-slate-500">
+          * These are demo messages to be replaced with backend data later.
+        </p>
+      </div>
     </section>
   );
 }
-
 
 function ComposeBar({ composeTo, onSent, currentUserId, existingMessages }) {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState("");
 
-  // Check if user has already sent a message to this tutor
   const alreadyMessaged = existingMessages.some(
     (m) => m.sender_user_id === currentUserId && m.recipient_user_id === composeTo.id
   );
@@ -456,7 +403,12 @@ function ComposeBar({ composeTo, onSent, currentUserId, existingMessages }) {
 
 function MessagesPreview({ messages, currentUserId }) {
   if (messages.length === 0) {
-    return <p className="text-sm text-slate-600">No messages yet.</p>;
+    return (
+      <div className="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600">
+        <p>No messages yet.</p>
+        <p className="mt-1">Connect with tutors to start messaging.</p>
+      </div>
+    );
   }
 
   const lastThree = messages
@@ -529,46 +481,5 @@ function MessagesList({ messages, currentUserId }) {
         );
       })}
     </ul>
-  );
-}
-
-function NotesModal({ session, onClose }) {
-  return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
-      role="dialog"
-      aria-modal="true"
-    >
-      <div className="w-[min(640px,92vw)] rounded-xl bg-white shadow-lg">
-        <div className="flex items-center justify-between border-b border-slate-200 p-4">
-          <div className="font-semibold text-slate-800 text-sm">
-            Session Notes — {session.title}
-          </div>
-          <button
-            className="rounded-md border border-slate-300 px-2 py-1 text-xs hover:bg-slate-100"
-            onClick={onClose}
-            aria-label="Close"
-          >
-            Close
-          </button>
-        </div>
-        <div className="p-4">
-          <div className="text-xs text-slate-600 mb-2">
-            {session.course} · {fmtDateTime(session.when)} · {session.durationMin} min
-          </div>
-          <pre className="whitespace-pre-wrap text-sm text-slate-800 bg-slate-50 p-3 rounded-md border border-slate-200">
-{session.notes || "No notes available for this session (demo)."}
-          </pre>
-          <div className="mt-4 flex justify-end gap-2">
-            <button className="rounded-md border border-slate-300 px-3 py-1 text-xs hover:bg-slate-100">
-              Download (.txt)
-            </button>
-            <button className="rounded-md bg-blue-600 text-white px-3 py-1 text-xs hover:bg-blue-700">
-              Share
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
   );
 }
