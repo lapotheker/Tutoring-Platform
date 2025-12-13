@@ -146,7 +146,7 @@ export default function SearchResults() {
           </div>
           
           <h1 className="text-xl md:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
-            SFSU TUTORING PLATFORM
+            ScholarlyGator
           </h1>
 
           <div className="mt-6 flex justify-center">

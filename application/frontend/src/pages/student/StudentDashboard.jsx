@@ -185,7 +185,7 @@ export default function StudentDashboard() {
           </div>
 
           <h1 className="mt-6 text-center text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
-            SCHOLARLYGATOR
+            ScholarlyGator
           </h1>
 
           <div className="mt-6">
