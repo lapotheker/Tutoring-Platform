@@ -1,7 +1,7 @@
 // src/App.jsx
 import Navbar from "./components/NavBar.jsx";
 import BannerNotice from "./components/BannerNotice.jsx";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 
 // Public pages
 import Home from "./pages/public/Home.jsx";
@@ -9,8 +9,8 @@ import About from "./pages/public/About.jsx";
 import Login from "./pages/public/Login.jsx";
 import RegisterPage from "./pages/public/Register.jsx";
 
-//admin page
-import AdminPage from "./pages/admin/AdminDashboard.jsx";
+// Admin page
+import AdminDashboard from "./pages/admin/AdminDashboard.jsx";
 
 // Search results
 import SearchResults from "./pages/search/SearchResults.jsx";
@@ -22,12 +22,8 @@ import MessageSent from "./pages/student/MessageSent.jsx";
 
 // Tutor pages
 import TutorDashboard from "./pages/tutor/TutorDashboard.jsx";
-import TutorDashboardApproved from "./pages/tutor/TutorDashboardApproved.jsx";
-import TutorPolicy from "./pages/tutor/TutorPolicy.jsx";
 import TutorProfile from "./pages/tutor/TutorProfile.jsx";
-import TutorProfileSubmitted from "./pages/tutor/TutorProfileSubmitted.jsx";
 import Posting from "./pages/tutor/Posting.jsx";
-import AdminDashboard from "./pages/admin/AdminDashboard";
 import EditTutorProfile from "./pages/tutor/EditTutorProfile.jsx";
 
 // Team member pages
@@ -39,6 +35,29 @@ import MeghaPage from "./pages/team/MeghaPage.jsx";
 import RoxanaPage from "./pages/team/RoxanaPage.jsx";
 import YuhangPage from "./pages/team/YuhangPage.jsx";
 
+function getCurrentUser() {
+  try {
+    return (
+      JSON.parse(localStorage.getItem("demoUser")) || JSON.parse(sessionStorage.getItem("demoUser"))
+    );
+  } catch {
+    return null;
+  }
+}
+
+function ProtectedRoute({ allowedRoles, element }) {
+  const location = useLocation();
+  const user = getCurrentUser();
+  if (!user) {
+    const next = encodeURIComponent(location.pathname + location.search);
+    return <Navigate to={`/login?next=${next}`} replace />;
+  }
+  if (!allowedRoles.includes(user.role)) {
+    return <Navigate to="/" replace />;
+  }
+  return element;
+}
+
 export default function App() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white text-slate-800">
@@ -46,28 +65,51 @@ export default function App() {
       <Navbar />
       <main className="mx-auto max-w-6xl px-4 py-8">
         <Routes>
+          {/* Public */}
           <Route path="/" element={<Home />} />
           <Route path="/about" element={<About />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<RegisterPage />} />
-
-          <Route path="/admin" element={<AdminPage />} />
-
-          {/* Student and Tutor Modules */}
-          <Route path="/dashboard" element={<StudentDashboard />} />
-          <Route path="/tutor/policy" element={<TutorPolicy />} />
-          <Route path="/tutor/request/:id" element={<RequestSession />} />
           <Route path="/results" element={<SearchResults />} />
           <Route path="/tutors/:id" element={<TutorProfile />} />
-          <Route path="/message-sent" element={<MessageSent />} />
-          <Route path="/tutor/dashboard" element={<TutorDashboard />} />
-          <Route path="/tutor/profile-submitted" element={<TutorProfileSubmitted />} />
-          <Route path="/tutor/dashboard-approved" element={<TutorDashboardApproved />} />
-          <Route path="/tutor/posting" element={<Posting />} />
-          <Route path="/tutor/profile/edit" element={<EditTutorProfile />} />
-          <Route path="/admin/dashboard" element={<AdminDashboard />} />
 
-          {/* Team member pages */}
+          {/* Student dashboard (roles 1=Student, 2=Tutor) */}
+          <Route
+            path="/dashboard"
+            element={<ProtectedRoute allowedRoles={[1, 2]} element={<StudentDashboard />} />}
+          />
+
+          {/* Tutor dashboards (role 2) */}
+          <Route
+            path="/tutor/dashboard"
+            element={<ProtectedRoute allowedRoles={[2]} element={<TutorDashboard />} />}
+          />
+
+          <Route
+            path="/tutor/posting"
+            element={<ProtectedRoute allowedRoles={[2]} element={<Posting />} />}
+          />
+          <Route
+            path="/tutor/profile/edit"
+            element={<ProtectedRoute allowedRoles={[2]} element={<EditTutorProfile />} />}
+          />
+
+          <Route
+            path="/tutor/request/:id"
+            element={<ProtectedRoute allowedRoles={[1, 2]} element={<RequestSession />} />}
+          />
+          <Route
+            path="/message-sent"
+            element={<ProtectedRoute allowedRoles={[1, 2]} element={<MessageSent />} />}
+          />
+
+          {/* Admin dashboard (role 3) */}
+          <Route
+            path="/admin"
+            element={<ProtectedRoute allowedRoles={[3]} element={<AdminDashboard />} />}
+          />
+
+          {/* Team pages (public) */}
           <Route path="/member/yuhang-wei" element={<YuhangPage />} />
           <Route path="/member/leigh-apotheker" element={<LeighPage />} />
           <Route path="/member/darien-sngoeun" element={<DarienPage />} />

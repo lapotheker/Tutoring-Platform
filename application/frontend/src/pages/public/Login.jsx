@@ -1,30 +1,80 @@
 import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
+import { API_BASE_URL } from "../../services/api";
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [pwd, setPwd] = useState("");
   const [remember, setRemember] = useState(false);
   const [err, setErr] = useState("");
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
   const params = new URLSearchParams(location.search);
   const next = params.get("next") || "/";
 
-  function onSubmit(e) {
+  async function onSubmit(e) {
     e.preventDefault();
     setErr("");
 
-    const ok = /^[^@\s]+@sfsu\.edu$/i.test(email.trim());
-    if (!ok) {
-      setErr("Please use your @sfsu.edu email to sign in (demo).");
+    const emailTrimmed = email.trim().toLowerCase();
+
+    // Basic validation
+    if (!/^[^@\s]+@sfsu\.edu$/i.test(emailTrimmed)) {
+      setErr("Please use your @sfsu.edu email to sign in.");
       return;
     }
 
-    const payload = JSON.stringify({ email: email.trim(), at: Date.now() });
-    (remember ? localStorage : sessionStorage).setItem("demoUser", payload);
-    navigate(next, { replace: true });
+    if (!pwd) {
+      setErr("Password is required.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          sfsu_email: emailTrimmed,
+          password: pwd,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Store complete user data including user_id
+        const userData = {
+          user_id: data.user.user_id,
+          email: data.user.sfsu_email,
+          full_name: data.user.full_name,
+          role: data.user.role,
+          at: Date.now(),
+        };
+
+        const storage = remember ? localStorage : sessionStorage;
+        storage.setItem("demoUser", JSON.stringify(userData));
+
+        // Navigate based on role
+        if (data.user.role === 3) {
+          navigate("/admin", { replace: true });
+        } else if (data.user.role === 2) {
+          navigate("/tutor/dashboard", { replace: true });
+        } else {
+          navigate(next, { replace: true });
+        }
+      } else {
+        setErr(data.error || "Login failed");
+      }
+    } catch (error) {
+      console.error("Login error:", error);
+      setErr("Network error. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   const inputStyle =
@@ -32,7 +82,6 @@ export default function Login() {
 
   return (
     <div className="mx-auto max-w-xl">
-      {/* Back button now outside the box */}
       <Link
         to="/"
         className="inline-block mb-3 text-slate-600 text-sm font-medium hover:text-blue-600"
@@ -90,22 +139,23 @@ export default function Login() {
           </div>
 
           {err && (
-            <div className="rounded-xl border border-amber-300 bg-amber-50 text-amber-900 text-sm px-3 py-2">
+            <div className="rounded-xl border border-red-300 bg-red-50 text-red-900 text-sm px-3 py-2">
               {err}
             </div>
           )}
 
           <button
             type="submit"
-            className="rounded-xl bg-slate-900 px-4 py-2 text-white font-semibold hover:bg-black"
+            disabled={loading}
+            className="rounded-xl bg-slate-900 px-4 py-2 text-white font-semibold hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            LOGIN
+            {loading ? "Logging in..." : "LOGIN"}
           </button>
 
           <p className="text-sm text-slate-700 text-center">
-            Don&apos;t have an account?{" "}
-            <Link to="/register" className="underline text-blue-600 hover:no-underline">
-              Sign up!
+            Don't have an account?{" "}
+            <Link to="/register" className="font-medium text-blue-600 hover:underline">
+              Sign up here
             </Link>
           </p>
         </form>

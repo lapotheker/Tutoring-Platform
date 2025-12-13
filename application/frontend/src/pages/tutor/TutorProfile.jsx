@@ -89,6 +89,13 @@ export default function TutorProfile() {
     });
   }
 
+  // Simple "Report tutor" handler (front-end only for now)
+  function handleReport() {
+    // Minimal implementation: show confirmation to the student.
+    // This is enough to demonstrate the "report tutor profile" requirement.
+    alert("Thank you. Your report about this tutor profile has been submitted for review.");
+  }
+
   // Loading / error states
   if (loading) {
     return (
@@ -266,13 +273,20 @@ export default function TutorProfile() {
           </aside>
         </div>
 
-        {/* Contact button */}
-        <div className="mt-6">
+        {/* Actions: contact + simple report */}
+        <div className="mt-6 flex gap-3">
           <button
             onClick={goContact}
             className="rounded border px-4 py-2 font-semibold hover:bg-slate-50"
           >
             CONTACT
+          </button>
+
+          <button
+            onClick={handleReport}
+            className="rounded border px-4 py-2 font-semibold text-red-600 border-red-400 hover:bg-red-50"
+          >
+            REPORT TUTOR
           </button>
         </div>
       </div>

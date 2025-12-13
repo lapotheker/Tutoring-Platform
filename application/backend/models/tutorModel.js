@@ -228,7 +228,28 @@ const tutorModel = {
     return rows;
   },
 
-  // ... keep getAllCourses, getAllSubjectTags, getAllLanguages methods unchanged ...
+  /**
+   * Get tutor profile by tutor_user_id (any status)
+   */
+  async getTutorProfileByUserId(tutorUserId) {
+    const [rows] = await pool.query(
+      `SELECT 
+         tp.tutor_profile_id,
+         tp.tutor_user_id,
+         tp.display_name,
+         tp.hourly_rate,
+         tp.approval_status,
+         tp.visibility,
+         tp.created_at,
+         tp.updated_at
+       FROM tutor_profile tp
+       WHERE tp.tutor_user_id = ?
+       ORDER BY tp.created_at DESC
+       LIMIT 1`,
+      [tutorUserId]
+    );
+    return rows[0] || null;
+  },
 
   /**
    * Create new tutor profile
@@ -289,6 +310,23 @@ const tutorModel = {
             await connection.execute(
               "INSERT INTO tutor_profile_subject_tag (tutor_profile_id, tag_id) VALUES (?, ?)",
               [tutorProfileId, subjectRows[0].tag_id]
+            );
+          }
+        }
+      }
+
+      // Handle languages
+      if (profileData.languages && profileData.languages.length > 0) {
+        for (const languageName of profileData.languages) {
+          const [langRows] = await connection.execute(
+            "SELECT language_id FROM language WHERE language_name LIKE ?",
+            [`%${languageName.trim()}%`]
+          );
+
+          if (langRows.length > 0) {
+            await connection.execute(
+              "INSERT INTO tutor_profile_language (tutor_profile_id, language_id) VALUES (?, ?)",
+              [tutorProfileId, langRows[0].language_id]
             );
           }
         }

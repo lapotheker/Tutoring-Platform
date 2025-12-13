@@ -1,7 +1,6 @@
-//src/pages/tutor/EditTutorProfile.jsx
+// src/pages/tutor/EditTutorProfile.jsx
 import { useState } from "react";
 import { Link } from "react-router-dom";
-
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const TIMES = ["Morning", "Afternoon", "Evening"];
@@ -44,24 +43,25 @@ export default function EditTutorProfile() {
     if (!form.subjectTags.trim()) e.subjectTags = "Please list at least one subject.";
     if (!form.languages.trim()) e.languages = "Please list at least one language.";
     if (!form.hourlyRate) e.hourlyRate = "Hourly rate is required.";
-    else if (Number(form.hourlyRate) <= 0)
-      e.hourlyRate = "Hourly rate.";
+    else if (Number(form.hourlyRate) <= 0) e.hourlyRate = "Hourly rate.";
 
-    const anySlotSelected = DAYS.some((day) =>
-      TIMES.some((t) => form.availability[day][t])
-    );
+    const anySlotSelected = DAYS.some((day) => TIMES.some((t) => form.availability[day][t]));
     if (!anySlotSelected) e.availability = "Select at least one availability slot.";
 
     setErrors(e);
     return Object.keys(e).length === 0;
   }
 
-  function handleSubmit(e) {
+  // Submit handler: validate form, build payload, and re-submit profile to backend
+  async function handleSubmit(e) {
     e.preventDefault();
     setSavedMsg("");
 
+    // Front-end validation only
     if (!validate()) return;
 
+    // Build a simple availability payload for the backend
+    // Each selected slot becomes { day, slot } (e.g. { day: "Monday", slot: "Morning" })
     const availabilityPayload = [];
     for (const day of DAYS) {
       for (const slot of TIMES) {
@@ -71,67 +71,77 @@ export default function EditTutorProfile() {
       }
     }
 
+    // Minimal payload that matches the existing createTutorProfile controller
+    // fullName, hourlyRate, courses, subjects, availability, bio, mode
     const payload = {
-      courses: form.courses.trim(),
-      subjectTags: form.subjectTags.trim(),
-      languages: form.languages.trim(),
+      // A simple placeholder name for demo; can be replaced with real tutor name if available
+      fullName: "Updated Tutor Profile",
       hourlyRate: Number(form.hourlyRate),
+      courses: form.courses.trim(),
+      subjects: form.subjectTags.trim(),
       availability: availabilityPayload,
+      bio: "",
+      mode: "Online",
     };
 
-    console.log("Tutor profile (front-end only payload):", payload);
-    setSavedMsg("Your tutor profile has been saved successfully.");
+    try {
+      // Call the existing POST /api/tutors/profile endpoint
+      // This counts as "editing the profile and resubmitting for admin review"
+      const res = await fetch(`${API_BASE_URL}/tutors/profile`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        // Show a clear message that the updated profile was re-submitted for review
+        setSavedMsg("Your updated tutor profile has been resubmitted for admin review.");
+      } else {
+        alert(data.error || "Failed to submit profile. Please try again.");
+      }
+    } catch (err) {
+      console.error("Error submitting tutor profile:", err);
+      alert("Network error – please try again.");
+    }
   }
 
   return (
     <section className="rounded-2xl border border-slate-300 bg-white p-6 md:p-8 shadow-sm max-w-3xl mx-auto">
+      {/* Back to dashboard */}
+      <Link
+        to="/tutor/dashboard"
+        className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline mb-4"
+      >
+        ← Back to Dashboard
+      </Link>
 
-    {/* back to dashboard */}
-<Link
-  to="/tutor/dashboard"
-  className="inline-flex items-center gap-1 text-sm font-medium text-blue-600 hover:underline mb-4"
->
-  ← Back to Dashboard
-</Link>
- 
-      <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide mb-2">
-        Edit Tutor Profile
-      </h1>
+      <h1 className="text-2xl md:text-3xl font-extrabold tracking-wide mb-2">Edit Tutor Profile</h1>
       <p className="text-sm text-slate-600 mb-6">
-        Add the courses you tutor, your subjects, hourly rate, languages, and when you&apos;re available.
+        Add the courses you tutor, your subjects, hourly rate, languages, and when you&apos;re
+        available.
       </p>
 
-      {savedMsg && (
-        <p className="mb-4 text-sm text-emerald-600">
-          {savedMsg}
-        </p>
-      )}
+      {savedMsg && <p className="mb-4 text-sm text-emerald-600">{savedMsg}</p>}
 
       <form onSubmit={handleSubmit} className="space-y-6 text-left">
-        {/* courses */}
+        {/* Courses */}
         <div>
-          <label className="block text-sm font-medium text-slate-800 mb-1">
-            Courses you tutor
-          </label>
-          <p className="text-xs text-slate-500 mb-1">
-            Example: CSC 210, CSC 220, MATH 227
-          </p>
+          <label className="block text-sm font-medium text-slate-800 mb-1">Courses you tutor</label>
+          <p className="text-xs text-slate-500 mb-1">Example: CSC 210, CSC 220, MATH 227</p>
           <textarea
             rows={2}
             value={form.courses}
             onChange={(e) => update("courses", e.target.value)}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />
-          {errors.courses && (
-            <p className="mt-1 text-xs text-red-600">{errors.courses}</p>
-          )}
+          {errors.courses && <p className="mt-1 text-xs text-red-600">{errors.courses}</p>}
         </div>
 
         {/* Subjects */}
         <div>
-          <label className="block text-sm font-medium text-slate-800 mb-1">
-            Subjects / topics
-          </label>
+          <label className="block text-sm font-medium text-slate-800 mb-1">Subjects / topics</label>
           <p className="text-xs text-slate-500 mb-1">
             Example: Web development, Data structures, Calculus
           </p>
@@ -141,9 +151,7 @@ export default function EditTutorProfile() {
             onChange={(e) => update("subjectTags", e.target.value)}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />
-          {errors.subjectTags && (
-            <p className="mt-1 text-xs text-red-600">{errors.subjectTags}</p>
-          )}
+          {errors.subjectTags && <p className="mt-1 text-xs text-red-600">{errors.subjectTags}</p>}
         </div>
 
         {/* Languages */}
@@ -151,25 +159,19 @@ export default function EditTutorProfile() {
           <label className="block text-sm font-medium text-slate-800 mb-1">
             Languages you speak
           </label>
-          <p className="text-xs text-slate-500 mb-1">
-            Example: English, Spanish, Mandarin
-          </p>
+          <p className="text-xs text-slate-500 mb-1">Example: English, Spanish, Mandarin</p>
           <input
             type="text"
             value={form.languages}
             onChange={(e) => update("languages", e.target.value)}
             className="w-full rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />
-          {errors.languages && (
-            <p className="mt-1 text-xs text-red-600">{errors.languages}</p>
-          )}
+          {errors.languages && <p className="mt-1 text-xs text-red-600">{errors.languages}</p>}
         </div>
 
-        {/* hourly rate */}
+        {/* Hourly rate */}
         <div>
-          <label className="block text-sm font-medium text-slate-800 mb-1">
-            Hourly rate (USD)
-          </label>
+          <label className="block text-sm font-medium text-slate-800 mb-1">Hourly rate (USD)</label>
           <input
             type="number"
             min="0"
@@ -178,12 +180,10 @@ export default function EditTutorProfile() {
             onChange={(e) => update("hourlyRate", e.target.value)}
             className="w-40 rounded-lg border border-slate-300 px-3 py-2 text-sm"
           />
-          {errors.hourlyRate && (
-            <p className="mt-1 text-xs text-red-600">{errors.hourlyRate}</p>
-          )}
+          {errors.hourlyRate && <p className="mt-1 text-xs text-red-600">{errors.hourlyRate}</p>}
         </div>
 
-        {/* availability */}
+        {/* Availability */}
         <div>
           <label className="block text-sm font-medium text-slate-800 mb-2">
             Weekly availability

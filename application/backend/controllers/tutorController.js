@@ -3,7 +3,6 @@ const tutorModel = require("../models/tutorModel");
 const tutorController = {
   /**
    * Search tutors with optional filters
-   * GET /api/tutors?course=CSC&search=John&subject=Math&language=English&minRate=0&maxRate=50&days=Mon,Tue&times=Morning
    */
   async searchTutors(req, res) {
     try {
@@ -36,7 +35,6 @@ const tutorController = {
 
   /**
    * Get single tutor by ID
-   * GET /api/tutors/:id
    */
   async getTutorById(req, res) {
     try {
@@ -63,7 +61,36 @@ const tutorController = {
     }
   },
 
-    /**
+  /**
+   * Get tutor profile by user id (any status)
+   * GET /api/tutors/profile/by-user/:userId
+   */
+  async getTutorProfileByUser(req, res) {
+    try {
+      const userId = req.params.userId;
+      const profile = await tutorModel.getTutorProfileByUserId(userId);
+
+      if (!profile) {
+        return res.status(404).json({
+          success: false,
+          error: "Tutor profile not found",
+        });
+      }
+
+      res.json({
+        success: true,
+        data: profile,
+      });
+    } catch (error) {
+      console.error("Error in getTutorProfileByUser controller:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to get tutor profile",
+      });
+    }
+  },
+
+  /**
    * Create new tutor profile
    * POST /api/tutors/profile
    */
@@ -72,18 +99,29 @@ const tutorController = {
       const profileData = {
         displayName: req.body.fullName, // Map from frontend's fullName to display_name
         hourlyRate: req.body.hourlyRate,
-        availabilitySummary: req.body.availability,
-        courses: req.body.courses ? req.body.courses.split(',').map(c => c.trim()) : [],
-        subjects: req.body.subjects ? req.body.subjects.split(',').map(s => s.trim()) : [],
+        availabilitySummary: req.body.availability, // (kept for legacy)
+        courses: req.body.courses
+          ? req.body.courses.split(",").map((c) => c.trim())
+          : [],
+        subjects: req.body.subjects
+          ? req.body.subjects.split(",").map((s) => s.trim())
+          : [],
+        languages: req.body.languages
+          ? req.body.languages.split(",").map((l) => l.trim())
+          : [],
         bio: req.body.bio,
-        mode: req.body.mode
+        mode: req.body.mode,
       };
 
       // Validate required fields
-      if (!profileData.displayName || !profileData.hourlyRate || !profileData.availabilitySummary) {
+      if (
+        !profileData.displayName ||
+        !profileData.hourlyRate ||
+        !profileData.availabilitySummary
+      ) {
         return res.status(400).json({
           success: false,
-          error: "Missing required fields: fullName, hourlyRate, availability"
+          error: "Missing required fields: fullName, hourlyRate, availability",
         });
       }
 
@@ -92,14 +130,13 @@ const tutorController = {
       res.json({
         success: true,
         message: "Tutor profile submitted for admin approval",
-        tutorProfileId: result.tutorProfileId
+        tutorProfileId: result.tutorProfileId,
       });
-
     } catch (error) {
       console.error("Error in createTutorProfile controller:", error);
       res.status(500).json({
         success: false,
-        error: "Failed to create tutor profile"
+        error: "Failed to create tutor profile",
       });
     }
   },

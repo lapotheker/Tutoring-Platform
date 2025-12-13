@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { API_BASE_URL } from "../../services/api";
 
 export default function Posting() {
   const [form, setForm] = useState({
@@ -7,6 +8,7 @@ export default function Posting() {
     bio: "",
     subjects: "",
     courses: "",
+    languages: "", // NEW
     hourlyRate: "",
     mode: "online",
     availabilityDays: [],
@@ -31,6 +33,7 @@ export default function Posting() {
     if (!form.bio.trim()) e.bio = "Bio is required";
     if (!form.subjects.trim()) e.subjects = "Enter at least one subject";
     if (!form.courses.trim()) e.courses = "Enter at least one course";
+    if (!form.languages.trim()) e.languages = "Enter at least one language";
     if (!form.hourlyRate || Number(form.hourlyRate) <= 0)
       e.hourlyRate = "Enter a valid hourly rate";
     if (form.availabilityDays.length === 0) e.availabilityDays = "Select at least one day";
@@ -46,8 +49,7 @@ export default function Posting() {
     setMessage("Submitting profile...");
 
     try {
-      // Use absolute URL to your backend
-      const response = await fetch("http://localhost:3000/api/tutors/profile", {
+      const response = await fetch(`${API_BASE_URL}/tutors/profile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -55,6 +57,7 @@ export default function Posting() {
           bio: form.bio,
           subjects: form.subjects,
           courses: form.courses,
+          languages: form.languages, // NEW
           hourlyRate: form.hourlyRate,
           mode: form.mode,
           availabilityDays: form.availabilityDays,
@@ -67,12 +70,12 @@ export default function Posting() {
 
       if (data.success) {
         setMessage("Profile submitted successfully! Awaiting admin approval.");
-        // Clear form
         setForm({
           fullName: "",
           bio: "",
           subjects: "",
           courses: "",
+          languages: "", // reset
           hourlyRate: "",
           mode: "online",
           availabilityDays: [],
@@ -150,6 +153,17 @@ export default function Posting() {
               placeholder="e.g., CSC 210, CSC 648"
             />
             {errors.courses && <p className={errClass}>{errors.courses}</p>}
+          </div>
+
+          <div>
+            <label className={labelClass}>Languages (comma-separated) *</label>
+            <input
+              className={inputClass}
+              value={form.languages}
+              onChange={(e) => update("languages", e.target.value)}
+              placeholder="e.g., English, Spanish, Mandarin"
+            />
+            {errors.languages && <p className={errClass}>{errors.languages}</p>}
           </div>
 
           <div>
@@ -254,6 +268,7 @@ export default function Posting() {
                   bio: "",
                   subjects: "",
                   courses: "",
+                  languages: "",
                   hourlyRate: "",
                   mode: "online",
                   availabilityDays: [],

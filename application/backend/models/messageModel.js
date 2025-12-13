@@ -1,173 +1,157 @@
 const pool = require("../db/pool");
 
 /**
- * Data access for the in_site_message + reported_item tables.
+ * Data access for in_site_message + reported_item tables.
+ * Returns sender/recipient names where appropriate.
  */
 const messageModel = {
   /**
-   * Create a one-round in-site message from a student to a tutor
-   * Enforces one row per (sender_user_id, recipient_user_id)
-   *
-   * Input:
-   *   senderUserId: number (must exist in user table)
-   *   recipientUserId: number (must exist in user table)
-   *   messageText: string (non-empty)
-   *
-   * Returns:
-   *   { alreadyExists: true, existingMessage: row }  if a row already exists
-   *   { message: row }                              if a new row is created
+   * Create a one-round in-site message (enforces one per sender→recipient).
+   * Returns the inserted row with names.
    */
   async createMessage({ senderUserId, recipientUserId, messageText }) {
-    // Check if there is already a message between this sender and recipient
-    const [existingRows] = await pool.execute(
-      `
-      SELECT
-        message_id,
-        sender_user_id,
-        recipient_user_id,
-        message,
-        created_at,
-        message_status,
-        linked_report_id
-      FROM in_site_message
-      WHERE sender_user_id = ?
-        AND recipient_user_id = ?
-      `,
+    // Check existing
+    const [existing] = await pool.query(
+      `SELECT message_id FROM in_site_message
+       WHERE sender_user_id = ? AND recipient_user_id = ?
+       LIMIT 1`,
       [senderUserId, recipientUserId]
     );
-
-    if (existingRows.length > 0) {
-      return {
-        alreadyExists: true,
-        existingMessage: existingRows[0],
-      };
+    if (existing.length > 0) {
+      return { alreadyExists: true };
     }
 
-    // Insert new message
-    const [insertResult] = await pool.execute(
-      `
-      INSERT INTO in_site_message
-        (sender_user_id, recipient_user_id, message)
-      VALUES (?, ?, ?)
-      `,
-      [senderUserId, recipientUserId, messageText]
+    // Validate users
+    const [sender] = await pool.query(
+      "SELECT user_id, full_name FROM user WHERE user_id = ?",
+      [senderUserId]
+    );
+    const [recipient] = await pool.query(
+      "SELECT user_id, full_name FROM user WHERE user_id = ?",
+      [recipientUserId]
+    );
+    if (sender.length === 0) throw new Error("Sender not found");
+    if (recipient.length === 0) throw new Error("Recipient not found");
+
+    // Insert
+    const [result] = await pool.query(
+      `INSERT INTO in_site_message
+         (sender_user_id, recipient_user_id, message, message_status, created_at)
+       VALUES (?, ?, ?, 'Sent', NOW())`,
+      [senderUserId, recipientUserId, messageText.trim()]
     );
 
-    const newId = insertResult.insertId;
-
-    // Fetch the inserted row so we return consistent data
-    const [rows] = await pool.execute(
-      `
-      SELECT
-        message_id,
-        sender_user_id,
-        recipient_user_id,
-        message,
-        created_at,
-        message_status,
-        linked_report_id
-      FROM in_site_message
-      WHERE message_id = ?
-      `,
-      [newId]
+    // Return with names
+    const [rows] = await pool.query(
+      `SELECT 
+         m.message_id,
+         m.sender_user_id,
+         m.recipient_user_id,
+         m.message,
+         m.message_status,
+         m.created_at,
+         s.full_name AS sender_name,
+         r.full_name AS recipient_name
+       FROM in_site_message m
+       JOIN user s ON m.sender_user_id = s.user_id
+       JOIN user r ON m.recipient_user_id = r.user_id
+       WHERE m.message_id = ?`,
+      [result.insertId]
     );
 
     return { message: rows[0] };
   },
 
   /**
-   * Get all messages where the user is either sender or recipient.
+   * Get all messages (sent or received) for a user, with names.
+   * Excludes Removed.
    */
   async getMessagesForUser(userId) {
-    const [rows] = await pool.execute(
-      `
-      SELECT
-        message_id,
-        sender_user_id,
-        recipient_user_id,
-        message,
-        created_at,
-        message_status,
-        linked_report_id
-      FROM in_site_message
-      WHERE sender_user_id = ?
-         OR recipient_user_id = ?
-      ORDER BY created_at DESC
-      `,
+    const [rows] = await pool.query(
+      `SELECT 
+         m.message_id,
+         m.sender_user_id,
+         m.recipient_user_id,
+         m.message,
+         m.message_status,
+         m.created_at,
+         s.full_name AS sender_name,
+         r.full_name AS recipient_name
+       FROM in_site_message m
+       JOIN user s ON m.sender_user_id = s.user_id
+       JOIN user r ON m.recipient_user_id = r.user_id
+       WHERE (m.sender_user_id = ? OR m.recipient_user_id = ?)
+         AND m.message_status != 'Removed'
+       ORDER BY m.created_at DESC`,
       [userId, userId]
     );
-
     return rows;
   },
 
   /**
-   * Get a single message by ID.
+   * Report a message; inserts into reported_item and marks message as Reported.
    */
-  async getMessageById(messageId) {
-    const [rows] = await pool.execute(
-      `
-      SELECT
-        message_id,
-        sender_user_id,
-        recipient_user_id,
-        message,
-        created_at,
-        message_status,
-        linked_report_id
-      FROM in_site_message
-      WHERE message_id = ?
-      `,
-      [messageId]
-    );
+  async reportMessage({ messageId, reporterUserId, reason, details }) {
+    const validReasons = [
+      "Harassment/Abuse",
+      "Inappropriate Content",
+      "Spam/Solicitation",
+      "Privacy/Safety",
+      "Other",
+    ];
+    if (!validReasons.includes(reason)) {
+      const err = new Error("Invalid reason");
+      err.code = "INVALID_REASON";
+      throw err;
+    }
 
-    return rows[0] || null;
-  },
-
-  /**
-   * Report a message.
-   *   1. Inserts into reported_item with target_type 'In-Site Message'
-   *   2. Updates in_site_message.message_status to 'Reported'
-   *      and sets linked_report_id.
-   *
-   * Input:
-   *   messageId: number
-   *   reportReason: one of the ENUM values in schema.sql:
-   *       'Harassment/Abuse', 'Inappropriate Content',
-   *       'Spam/Solicitation', 'Privacy/Safety', 'Other'
-   *   details: string | null
-   *   createdBy: user_id of reporter
-   */
-  async reportMessage({ messageId, reportReason, details, createdBy }) {
     const conn = await pool.getConnection();
     try {
       await conn.beginTransaction();
 
-      // 1. Insert into reported_item
-      const [reportResult] = await conn.execute(
-        `
-        INSERT INTO reported_item
-          (target_type, target_id, report_reason, details, status, created_by)
-        VALUES ('In-Site Message', ?, ?, ?, 'New', ?)
-        `,
-        [messageId, reportReason, details || null, createdBy]
+      // Ensure message exists
+      const [exists] = await conn.query(
+        "SELECT message_id FROM in_site_message WHERE message_id = ?",
+        [messageId]
+      );
+      if (exists.length === 0) {
+        const err = new Error("Message not found");
+        err.code = "NOT_FOUND";
+        throw err;
+      }
+
+      // Already reported by this user?
+      const [already] = await conn.query(
+        `SELECT report_id FROM reported_item 
+         WHERE target_type = 'In-Site Message' 
+           AND target_id = ? 
+           AND created_by = ?`,
+        [messageId, reporterUserId]
+      );
+      if (already.length > 0) {
+        const err = new Error("Already reported");
+        err.code = "ALREADY_REPORTED";
+        throw err;
+      }
+
+      // Insert report
+      const [reportResult] = await conn.query(
+        `INSERT INTO reported_item
+           (target_type, target_id, report_reason, details, status, created_by, created_at)
+         VALUES ('In-Site Message', ?, ?, ?, 'New', ?, NOW())`,
+        [messageId, reason, details || null, reporterUserId]
       );
 
-      const reportId = reportResult.insertId;
-
-      // 2. Update in_site_message with status + linked_report_id
-      await conn.execute(
-        `
-        UPDATE in_site_message
-        SET message_status = 'Reported',
-            linked_report_id = ?
-        WHERE message_id = ?
-        `,
-        [reportId, messageId]
+      // Update message status
+      await conn.query(
+        `UPDATE in_site_message
+         SET message_status = 'Reported', linked_report_id = ?
+         WHERE message_id = ?`,
+        [reportResult.insertId, messageId]
       );
 
       await conn.commit();
-
-      return { reportId };
+      return { reportId: reportResult.insertId };
     } catch (err) {
       await conn.rollback();
       throw err;
