@@ -34,8 +34,8 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-indigo-50 via-slate-50 to-amber-50 px-4 py-12 md:py-16">
-      <section className="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white/95 p-8 md:p-10 text-center shadow-2xl">
+    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12 md:py-16">
+      <section className="mx-auto max-w-4xl rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 md:p-10 text-center shadow-2xl shadow-purple-200/50">
         {/* gator logo */}
         <div className="mb-6 flex items-center justify-center gap-4">
           <motion.div
@@ -43,16 +43,18 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             whileHover={{ scale: 1.08, rotate: -2 }}
-            className="flex h-16 w-16 items-center justify-center rounded-3xl bg-emerald-600 shadow-2xl ring-4 ring-emerald-100"
+            className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-2xl ring-4 ring-amber-400"
           >
-            <span role="img" aria-label="gator mascot" className="text-3xl leading-none">
+            <span role="img" aria-label="gator mascot" className="text-4xl leading-none">
               🐊
             </span>
           </motion.div>
 
           <div className="text-left">
-            <p className="text-sm font-semibold tracking-wide text-slate-800">ScholarlyGator</p>
-            <p className="text-xs text-slate-500">Your friendly SFSU study companion</p>
+            <p className="text-lg font-bold tracking-wide bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
+              ScholarlyGator
+            </p>
+            <p className="text-sm text-purple-600">Your SFSU study companion</p>
           </div>
         </div>
 
@@ -61,7 +63,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="text-3xl md:text-4xl font-extrabold tracking-wide text-slate-900"
+          className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 via-purple-600 to-purple-800 bg-clip-text text-transparent"
         >
           Welcome to SFSU Tutoring! Let&apos;s Find Your Perfect Tutor
         </motion.h1>
@@ -71,7 +73,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.05 }}
-          className="mt-3 text-base md:text-lg text-slate-600 max-w-2xl mx-auto"
+          className="mt-3 text-base md:text-lg text-slate-700 max-w-2xl mx-auto"
         >
           We&apos;re here to help you feel more confident in your classes. Connect with fellow SFSU
           students and tutors who understand your professors and your courses.
@@ -81,7 +83,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.1 }}
-          className="mt-2 text-sm text-slate-500 max-w-xl mx-auto"
+          className="mt-2 text-sm text-purple-600 max-w-xl mx-auto font-medium"
         >
           Not sure where to start? Try searching the class you need help with.
         </motion.p>
@@ -89,18 +91,7 @@ export default function Home() {
         {/* updated search bar */}
         <div className="mt-8 flex items-center justify-center">
           <form onSubmit={onSearch} className="w-full max-w-xl">
-            <div
-              className="
-                flex items-center gap-3 rounded-full border border-slate-200 
-                bg-white/95 px-5 py-2.5 md:py-3 
-                shadow-md md:shadow-lg 
-                transition-shadow 
-                hover:shadow-xl 
-                focus-within:shadow-xl 
-                focus-within:border-indigo-200 
-                focus-within:ring-2 focus-within:ring-indigo-200
-              "
-            >
+            <div className="flex items-center gap-3 rounded-full border-2 border-purple-300 bg-white px-5 py-3 shadow-lg shadow-purple-100 transition-all hover:shadow-xl hover:border-purple-400 focus-within:shadow-xl focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-200">
               <input
                 type="text"
                 value={query}
@@ -111,10 +102,10 @@ export default function Home() {
               />
               <button
                 type="submit"
-                className="grid h-10 w-10 place-items-center rounded-full bg-slate-900 text-white text-lg hover:bg-slate-800 transition shadow"
+                className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-r from-purple-600 to-purple-700 text-white text-lg hover:from-purple-700 hover:to-purple-800 transition-all shadow-md hover:shadow-lg"
                 aria-label="Search"
               >
-                <span>&#128269;</span>
+                <span>🔍</span>
               </button>
             </div>
           </form>
@@ -125,27 +116,39 @@ export default function Home() {
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/register"
-              className="w-full sm:w-auto rounded-full bg-slate-900 px-7 py-3 text-white font-medium shadow-lg hover:bg-black transition text-sm sm:text-base text-center"
+              className="w-full sm:w-auto rounded-full bg-gradient-to-r from-purple-600 to-purple-700 px-7 py-3 text-white font-semibold shadow-lg shadow-purple-200 hover:from-purple-700 hover:to-purple-800 hover:shadow-xl transition-all text-sm sm:text-base text-center"
             >
               I&apos;m new here – Get started
             </Link>
-            <span className="text-slate-500 font-semibold hidden sm:inline">or</span>
+            <span className="text-purple-400 font-semibold hidden sm:inline">or</span>
             <Link
               to="/login"
-              className="w-full sm:w-auto rounded-full bg-blue-600 px-7 py-3 text-white font-medium shadow-lg hover:bg-blue-700 transition text-sm sm:text-base text-center"
+              className="w-full sm:w-auto rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-7 py-3 text-purple-900 font-semibold shadow-lg shadow-amber-200 hover:from-amber-500 hover:to-amber-600 hover:shadow-xl transition-all text-sm sm:text-base text-center"
             >
               Already have an account? Log in
             </Link>
           </div>
         )}
 
-        <div className="mt-8 text-left mx-auto max-w-xl">
-          <h2 className="text-lg font-extrabold text-slate-900">Why students use SFSU Tutoring</h2>
-          <ul className="mt-2 list-disc pl-6 space-y-1 text-slate-700 text-sm md:text-base">
-            <li>All tutors are verified SFSU students or faculty.</li>
-            <li>Find help by course, subject, or the exact class you&apos;re taking.</li>
-            <li>Message tutors through the platform—no need to share personal contact info.</li>
-            <li>Schedule sessions that work around your life, not the other way around.</li>
+        <div className="mt-8 text-left mx-auto max-w-xl bg-gradient-to-br from-purple-50 to-amber-50 rounded-2xl p-6 border border-purple-100">
+          <h2 className="text-lg font-extrabold text-purple-900">Why students use SFSU Tutoring</h2>
+          <ul className="mt-3 space-y-2 text-slate-700 text-sm md:text-base">
+            <li className="flex items-start gap-2">
+              <span className="text-amber-500 font-bold">✓</span>
+              <span>All tutors are verified SFSU students or faculty.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-amber-500 font-bold">✓</span>
+              <span>Find help by course, subject, or the exact class you&apos;re taking.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-amber-500 font-bold">✓</span>
+              <span>Message tutors through the platform—no need to share personal contact info.</span>
+            </li>
+            <li className="flex items-start gap-2">
+              <span className="text-amber-500 font-bold">✓</span>
+              <span>Schedule sessions that work around your life, not the other way around.</span>
+            </li>
           </ul>
         </div>
       </section>
