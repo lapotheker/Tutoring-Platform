@@ -137,7 +137,7 @@ export default function TutorProfile() {
                   }}
                 />
               ) : (
-                "👤"
+                "&#128100;"
               )}
             </div>
 
@@ -159,7 +159,7 @@ export default function TutorProfile() {
             <div className="space-y-5">
               <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
                 <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
-                  <span className="text-lg">📚</span>
+                  <span className="text-lg">&#128218;</span>
                   Courses Covered
                 </div>
                 <div className="text-sm text-slate-700">{data.courses || "N/A"}</div>
@@ -167,7 +167,7 @@ export default function TutorProfile() {
 
               <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
                 <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
-                  <span className="text-lg">🎯</span>
+                  <span className="text-lg">&#127919;</span>
                   Subject Tags
                 </div>
                 <div className="text-sm text-slate-700">{data.subject_tags || "N/A"}</div>
@@ -175,7 +175,7 @@ export default function TutorProfile() {
 
               <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
                 <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
-                  <span className="text-lg">🌐</span>
+                  <span className="text-lg">&#127760;</span>
                   Languages Spoken
                 </div>
                 <div className="text-sm text-slate-700">{data.languages || "N/A"}</div>
@@ -185,7 +185,7 @@ export default function TutorProfile() {
               {data.availability_summary && (
                 <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
                   <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
-                    <span className="text-lg">📅</span>
+                    <span className="text-lg">&#128197;</span>
                     Availability Summary
                   </div>
                   <div className="text-sm text-slate-700 whitespace-pre-wrap">{data.availability_summary}</div>
@@ -196,7 +196,7 @@ export default function TutorProfile() {
             {/* Right column: structured Weekly Availability */}
             <aside className="rounded-3xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-amber-50 p-6 shadow-lg h-fit sticky top-6">
               <h2 className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
-                <span className="text-xl">🗓️</span>
+                <span className="text-xl">&#128197;</span>
                 Weekly Availability
               </h2>
 

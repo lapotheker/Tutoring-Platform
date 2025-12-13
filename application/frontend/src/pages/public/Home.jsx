@@ -12,6 +12,37 @@ function getCurrentUser() {
   }
 }
 
+// Student testimonials about tutors
+const TESTIMONIALS = [
+  {
+    id: 1,
+    student: "Emily Chen",
+    major: "Computer Science",
+    text: "Alice helped me ace CSC 340! Her explanations of data structures made everything click. I went from struggling to getting an A on my final project.",
+    tutor: "Alice Nguyen",
+    course: "CSC 340",
+    rating: 5,
+  },
+  {
+    id: 2,
+    student: "Marcus Johnson",
+    major: "Math",
+    text: "Priya's patience and teaching style are incredible. She breaks down complex calculus problems into simple steps. Highly recommend!",
+    tutor: "Priya Patel",
+    course: "MATH 227",
+    rating: 5,
+  },
+  {
+    id: 3,
+    student: "Sarah Rodriguez",
+    major: "Software Engineering",
+    text: "David is amazing! He helped our team understand Agile methodology and we finished our CSC 648 project ahead of schedule.",
+    tutor: "David Kim",
+    course: "CSC 648",
+    rating: 5,
+  },
+];
+
 export default function Home() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -34,8 +65,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12 md:py-16">
-      <section className="mx-auto max-w-4xl rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 md:p-10 text-center shadow-2xl shadow-purple-200/50">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12 md:py-16">
+      {/* Hero Section */}
+      <section className="mx-auto max-w-4xl text-center mb-16">
         {/* gator logo */}
         <div className="mb-6 flex items-center justify-center gap-4">
           <motion.div
@@ -46,7 +78,7 @@ export default function Home() {
             className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-2xl ring-4 ring-amber-400"
           >
             <span role="img" aria-label="gator mascot" className="text-4xl leading-none">
-              🐊
+              &#128010;
             </span>
           </motion.div>
 
@@ -63,9 +95,11 @@ export default function Home() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 via-purple-600 to-purple-800 bg-clip-text text-transparent"
+          className="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 via-purple-600 to-purple-800 bg-clip-text text-transparent"
         >
-          Welcome to ScholarlyGator! Let&apos;s Find Your Perfect Tutor
+          Welcome to ScholarlyGator!
+          <br />
+          Let&apos;s Find Your Perfect Tutor
         </motion.h1>
 
         {/* tag */}
@@ -73,7 +107,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.05 }}
-          className="mt-3 text-base md:text-lg text-slate-700 max-w-2xl mx-auto"
+          className="mt-4 text-lg md:text-xl text-slate-700 max-w-2xl mx-auto"
         >
           We&apos;re here to help you feel more confident in your classes. Connect with fellow SFSU
           students and tutors who understand your professors and your courses.
@@ -83,15 +117,15 @@ export default function Home() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.1 }}
-          className="mt-2 text-sm text-purple-600 max-w-xl mx-auto font-medium"
+          className="mt-2 text-base text-purple-600 max-w-xl mx-auto font-medium"
         >
           Not sure where to start? Try searching the class you need help with.
         </motion.p>
 
-        {/* updated search bar */}
-        <div className="mt-8 flex items-center justify-center">
+        {/* Search bar */}
+        <div className="mt-10 flex items-center justify-center">
           <form onSubmit={onSearch} className="w-full max-w-xl">
-            <div className="flex items-center gap-3 rounded-full border-2 border-purple-300 bg-white px-5 py-3 shadow-lg shadow-purple-100 transition-all hover:shadow-xl hover:border-purple-400 focus-within:shadow-xl focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-200">
+            <div className="flex items-center gap-3 rounded-full border-2 border-purple-300 bg-white px-5 py-3 shadow-2xl shadow-purple-200/50 transition-all hover:shadow-2xl hover:border-purple-400 focus-within:shadow-2xl focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-200">
               <input
                 type="text"
                 value={query}
@@ -129,27 +163,104 @@ export default function Home() {
             </Link>
           </div>
         )}
+      </section>
 
-        <div className="mt-8 text-left mx-auto max-w-xl bg-gradient-to-br from-purple-50 to-amber-50 rounded-2xl p-6 border border-purple-100">
-          <h2 className="text-lg font-extrabold text-purple-900">Why students use ScholarlyGator</h2>
-          <ul className="mt-3 space-y-2 text-slate-700 text-sm md:text-base">
-            <li className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold">✓</span>
-              <span>All tutors are verified SFSU students or faculty.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold">✓</span>
-              <span>Find help by course, subject, or the exact class you&apos;re taking.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold">✓</span>
-              <span>Message tutors through the platform—no need to share personal contact info.</span>
-            </li>
-            <li className="flex items-start gap-2">
-              <span className="text-amber-500 font-bold">✓</span>
-              <span>Schedule sessions that work around your life, not the other way around.</span>
-            </li>
-          </ul>
+      {/* Why ScholarlyGator Section */}
+      <section className="mx-auto max-w-5xl mb-16">
+        <div className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-xl shadow-purple-100">
+          <h2 className="text-2xl font-extrabold text-purple-900 text-center mb-6">
+            Why students use ScholarlyGator
+          </h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100">
+              <span className="text-2xl">✓</span>
+              <div>
+                <div className="font-bold text-purple-900">Verified Tutors</div>
+                <div className="text-sm text-slate-700 mt-1">All tutors are verified SFSU students or faculty.</div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100">
+              <span className="text-2xl">🎯</span>
+              <div>
+                <div className="font-bold text-purple-900">Course-Specific Help</div>
+                <div className="text-sm text-slate-700 mt-1">Find help by course, subject, or the exact class you&apos;re taking.</div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100">
+              <span className="text-2xl">💬</span>
+              <div>
+                <div className="font-bold text-purple-900">Secure Messaging</div>
+                <div className="text-sm text-slate-700 mt-1">Message tutors through the platform—no need to share personal contact info.</div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100">
+              <span className="text-2xl">📅</span>
+              <div>
+                <div className="font-bold text-purple-900">Flexible Scheduling</div>
+                <div className="text-sm text-slate-700 mt-1">Schedule sessions that work around your life, not the other way around.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="mx-auto max-w-6xl">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent mb-3">
+            What Students Say
+          </h2>
+          <p className="text-slate-600 text-lg">Real feedback from SFSU students who found their perfect tutor</p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {TESTIMONIALS.map((testimonial) => (
+            <motion.div
+              key={testimonial.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: testimonial.id * 0.1 }}
+              className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-xl shadow-purple-100 hover:shadow-2xl hover:shadow-purple-200/50 hover:border-purple-300 transition-all"
+            >
+              {/* Rating Stars */}
+              <div className="flex gap-1 mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <span key={i} className="text-amber-400 text-xl">★</span>
+                ))}
+              </div>
+
+              {/* Testimonial Text */}
+              <p className="text-slate-700 text-sm leading-relaxed mb-4 italic">
+                &ldquo;{testimonial.text}&rdquo;
+              </p>
+
+              {/* Student Info */}
+              <div className="border-t-2 border-purple-100 pt-4">
+                <div className="font-bold text-purple-900">{testimonial.student}</div>
+                <div className="text-xs text-purple-600 mt-1">{testimonial.major}</div>
+                <div className="mt-3 inline-flex items-center gap-2 text-xs">
+                  <span className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-100 to-amber-100 text-purple-800 font-semibold border border-purple-200">
+                    Tutor: {testimonial.tutor}
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 font-semibold border border-purple-200">
+                    {testimonial.course}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* CTA at bottom */}
+        <div className="mt-12 text-center">
+          <p className="text-slate-600 mb-4">Ready to get the help you need?</p>
+          <Link
+            to="/results"
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-700 px-8 py-4 text-white font-bold shadow-lg shadow-purple-200 hover:from-purple-700 hover:to-purple-800 hover:shadow-xl transition-all"
+          >
+            Browse All Tutors →
+          </Link>
         </div>
       </section>
     </div>
