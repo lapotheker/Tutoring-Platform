@@ -139,7 +139,18 @@ export default function Home() {
                 className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-r from-purple-600 to-purple-700 text-white text-lg hover:from-purple-700 hover:to-purple-800 transition-all shadow-md hover:shadow-lg"
                 aria-label="Search"
               >
-                <span>&#128269;</span>
+                <span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className="h-5 w-5"
+                  >
+                    <circle cx="11" cy="11" r="7" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </span>
               </button>
             </div>
           </form>

@@ -1,29 +1,21 @@
-// src/pages/TutorDashboardApproved.jsx
-import { useMemo } from "react";
-import { Link, useLocation } from "react-router-dom";
+// src/pages/tutor/TutorDashboard.jsx
+import { useEffect, useMemo } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function TutorDashboardApproved() {
-  const { search } = useLocation();
-  
-  const user = useMemo(() => {
-    try {
-      return JSON.parse(
-        localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser") || "null"
-      );
-    } catch {
-      return null;
-    }
-  }, []);
+export default function TutorDashboard() {
+  const navigate = useNavigate();
+
+  // Hardcoded demo user for testing
+  const user = {
+    email: "demo_tutor@sfsu.edu",
+    role: "tutor",
+  };
 
   const displayName = useMemo(() => {
-    if (!user?.email) return "Sarah";
+    if (!user?.email) return "Tutor";
     const beforeAt = user.email.split("@")[0] || "Tutor";
     return beforeAt.charAt(0).toUpperCase() + beforeAt.slice(1);
   }, [user]);
-
-  const params = new URLSearchParams(search);
-  const tutorId = params.get("id") || "1";
-  const approved = params.get("approved") || new Date().toISOString().slice(0, 10);
 
   const card = "rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-xl shadow-purple-100";
 
@@ -93,61 +85,79 @@ export default function TutorDashboardApproved() {
     },
   ];
 
+  useEffect(() => {
+    if (!user) {
+      const next = encodeURIComponent("/tutor/dashboard");
+      navigate(`/login?next=${next}`, { replace: true });
+    }
+  }, [user, navigate]);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-8">
       <section className="max-w-5xl mx-auto space-y-6">
-        {/* ===== Header ===== */}
+        {/* ===== Header Section ===== */}
         <div className={card}>
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white text-2xl shadow-lg ring-4 ring-amber-400">
-                👤
+                &#9787;
               </div>
-              <div className="text-xl font-extrabold text-purple-900">Welcome, {displayName}!</div>
+              <div>
+                <div className="text-xl font-extrabold text-purple-900">
+                  Welcome, {displayName}!
+                </div>
+              </div>
             </div>
-            
-            {/* Icons with mail badge (1) */}
-            <div className="relative flex items-center gap-4 text-2xl">
-              <Link to="/inbox" title="Messages" className="relative hover:opacity-80 transition-opacity">
-                ✉️
-                <span className="absolute -top-2 -right-3 grid h-5 w-5 place-items-center rounded-full bg-amber-500 text-white text-xs font-bold ring-2 ring-amber-200">
-                  1
-                </span>
+
+            <div className="flex items-center gap-4 text-2xl">
+              <Link to="/inbox" title="Messages" className="hover:opacity-80 transition-opacity">
+                &#9993;
               </Link>
               <Link to="/" title="Home" className="hover:opacity-80 transition-opacity">
-                🏠
+                &#8962;
               </Link>
             </div>
           </div>
-          
+
           <h1 className="mt-6 text-center text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
-            ScholarlyGator
+            SCHOLARLYGATOR
           </h1>
         </div>
 
-        {/* ===== Profile Status (ACTIVE) ===== */}
+        {/* ===== Profile Status Section ===== */}
         <div className={card}>
           <h2 className="text-lg md:text-xl font-extrabold text-purple-900 mb-4">PROFILE STATUS</h2>
-          <div className="rounded-2xl border-2 border-green-300 bg-gradient-to-br from-green-50 to-emerald-50 p-6">
-            <p className="font-extrabold text-green-900 text-lg mb-2">✓ STATUS: ACTIVE</p>
-            <p className="text-slate-800 mb-2">Your profile is now visible in search results!</p>
-            <p className="text-slate-800 mb-4">
-              Approved on:{" "}
-              <span className="font-bold text-purple-700">
-                {new Date(approved).toLocaleDateString(undefined, {
-                  year: "numeric",
-                  month: "short",
-                  day: "2-digit",
-                })}
-              </span>
+
+          <div className="rounded-2xl border-2 border-amber-300 bg-gradient-to-br from-amber-50 to-yellow-50 p-6">
+            <div className="text-lg md:text-xl font-extrabold text-amber-900 mb-3">
+              YOU DON&apos;T HAVE A TUTOR PROFILE YET
+            </div>
+
+            <p className="text-slate-800 mb-2">
+              Create your profile to start offering tutoring services.
             </p>
-            <div>
+
+            <p className="text-slate-800 mb-4">
+              <span className="underline underline-offset-2 font-semibold">
+                Your profile will be reviewed by administrators
+              </span>{" "}
+              before appearing in search results.
+            </p>
+
+            <div className="flex flex-wrap gap-3">
               <Link
-                to={`/tutors/${tutorId}`}
+                to="/tutor/profile/edit"
+                className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-green-500 to-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-green-200 hover:from-green-600 hover:to-green-700 hover:shadow-xl transition-all"
+              >
+                Edit Profile
+              </Link>
+
+              <button
+                onClick={() => navigate("/tutor/posting")}
                 className="inline-flex items-center justify-center rounded-xl border-2 border-purple-300 bg-white px-5 py-2.5 text-sm font-bold text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-all shadow-sm"
               >
-                VIEW PUBLIC PROFILE
-              </Link>
+                CREATE PROFILE
+              </button>
             </div>
           </div>
         </div>

@@ -167,7 +167,7 @@ export default function StudentDashboard() {
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
               <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white text-2xl shadow-lg ring-4 ring-amber-400">
-                👤
+                &#9787;
               </div>
               <div>
                 <div className="text-xl font-extrabold text-purple-900">Welcome, {displayName}!</div>
@@ -185,7 +185,7 @@ export default function StudentDashboard() {
           </div>
 
           <h1 className="mt-6 text-center text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
-            ScholarlyGator
+            SCHOLARLYGATOR
           </h1>
 
           <div className="mt-6">
@@ -205,7 +205,18 @@ export default function StudentDashboard() {
                   className="grid place-items-center h-10 w-10 rounded-full bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 transition-all shadow-md"
                   aria-label="Search"
                 >
-                  <span>🔍</span>
+                  <span>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      className="h-5 w-5"
+                    >
+                      <circle cx="11" cy="11" r="7" />
+                      <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                    </svg>
+                  </span>
                 </button>
               </div>
             </form>
@@ -373,7 +384,7 @@ function ComposeBar({ composeTo, onSent, currentUserId, existingMessages }) {
     return (
       <div className="mb-4 rounded-xl border-2 border-amber-300 bg-amber-50 p-3">
         <div className="text-sm text-amber-800">
-          ⚠️ You have already sent a message to <span className="font-semibold">{composeTo.name}</span>.
+                      &#9888; You have already sent a message to <span className="font-semibold">{composeTo.name}</span>.
           Only one message per tutor is allowed to prevent spam.
         </div>
       </div>
