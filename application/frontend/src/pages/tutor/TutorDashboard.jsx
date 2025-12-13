@@ -1,30 +1,32 @@
-// src/pages/tutor/TutorDashboard.jsx
-import { useEffect, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+// src/pages/TutorDashboardApproved.jsx
+import { useMemo } from "react";
+import { Link, useLocation } from "react-router-dom";
 
-export default function TutorDashboard() {
-  const navigate = useNavigate();
+export default function TutorDashboardApproved() {
+  const { search } = useLocation();
+  
+  const user = useMemo(() => {
+    try {
+      return JSON.parse(
+        localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser") || "null"
+      );
+    } catch {
+      return null;
+    }
+  }, []);
 
-  // Hardcoded demo user for testing and to view edit tutor profile page feature
-  const user = {
-    email: "demo_tutor@sfsu.edu",
-    role: "tutor",
-  };
-
-  // Extract a display name from the email (before the @ symbol)
   const displayName = useMemo(() => {
-    if (!user?.email) return "Tutor";
+    if (!user?.email) return "Sarah";
     const beforeAt = user.email.split("@")[0] || "Tutor";
     return beforeAt.charAt(0).toUpperCase() + beforeAt.slice(1);
   }, [user]);
 
-  const card = "rounded-2xl border border-slate-300 bg-white p-6 shadow-sm";
-  const bigTitle = "text-2xl md:text-3xl font-extrabold tracking-wide";
+  const params = new URLSearchParams(search);
+  const tutorId = params.get("id") || "1";
+  const approved = params.get("approved") || new Date().toISOString().slice(0, 10);
 
-  // ===== Demo Data Below (Frontend only for milestone UI) =====
-  // These will later be replaced by real API data when backend is implemented.
+  const card = "rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-xl shadow-purple-100";
 
-  // Upcoming tutoring sessions assigned to this tutor
   const upcomingSessions = [
     {
       id: 1,
@@ -46,7 +48,6 @@ export default function TutorDashboard() {
     },
   ];
 
-  // Completed tutoring sessions
   const completedSessions = [
     {
       id: 3,
@@ -68,7 +69,6 @@ export default function TutorDashboard() {
     },
   ];
 
-  // Messages received from students (demo data)
   const messages = [
     {
       id: 1,
@@ -93,219 +93,186 @@ export default function TutorDashboard() {
     },
   ];
 
-  // Redirect user to login page if no session is found
-  useEffect(() => {
-    if (!user) {
-      const next = encodeURIComponent("/tutor/dashboard");
-      navigate(`/login?next=${next}`, { replace: true });
-    }
-  }, [user, navigate]);
-
   return (
-    <section className="space-y-6">
-      {/* ===== Header Section ===== */}
-      <div className={card}>
-        <div className="flex items-start justify-between">
-          {/* User greeting and avatar */}
-          <div className="flex items-center gap-3">
-            <div className="grid h-14 w-14 place-items-center rounded-full bg-slate-200 text-3xl text-slate-600">
-              👤
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-8">
+      <section className="max-w-5xl mx-auto space-y-6">
+        {/* ===== Header ===== */}
+        <div className={card}>
+          <div className="flex items-start justify-between">
+            <div className="flex items-center gap-3">
+              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center text-white text-2xl shadow-lg ring-4 ring-amber-400">
+                👤
+              </div>
+              <div className="text-xl font-extrabold text-purple-900">Welcome, {displayName}!</div>
             </div>
+            
+            {/* Icons with mail badge (1) */}
+            <div className="relative flex items-center gap-4 text-2xl">
+              <Link to="/inbox" title="Messages" className="relative hover:opacity-80 transition-opacity">
+                ✉️
+                <span className="absolute -top-2 -right-3 grid h-5 w-5 place-items-center rounded-full bg-amber-500 text-white text-xs font-bold ring-2 ring-amber-200">
+                  1
+                </span>
+              </Link>
+              <Link to="/" title="Home" className="hover:opacity-80 transition-opacity">
+                🏠
+              </Link>
+            </div>
+          </div>
+          
+          <h1 className="mt-6 text-center text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
+            SCHOLARLYGATOR
+          </h1>
+        </div>
+
+        {/* ===== Profile Status (ACTIVE) ===== */}
+        <div className={card}>
+          <h2 className="text-lg md:text-xl font-extrabold text-purple-900 mb-4">PROFILE STATUS</h2>
+          <div className="rounded-2xl border-2 border-green-300 bg-gradient-to-br from-green-50 to-emerald-50 p-6">
+            <p className="font-extrabold text-green-900 text-lg mb-2">✓ STATUS: ACTIVE</p>
+            <p className="text-slate-800 mb-2">Your profile is now visible in search results!</p>
+            <p className="text-slate-800 mb-4">
+              Approved on:{" "}
+              <span className="font-bold text-purple-700">
+                {new Date(approved).toLocaleDateString(undefined, {
+                  year: "numeric",
+                  month: "short",
+                  day: "2-digit",
+                })}
+              </span>
+            </p>
             <div>
-              <div className="text-2xl font-extrabold">
-                Welcome, {displayName}!
-              </div>
+              <Link
+                to={`/tutors/${tutorId}`}
+                className="inline-flex items-center justify-center rounded-xl border-2 border-purple-300 bg-white px-5 py-2.5 text-sm font-bold text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-all shadow-sm"
+              >
+                VIEW PUBLIC PROFILE
+              </Link>
             </div>
-          </div>
-
-          {/* Quick access icons */}
-          <div className="flex items-center gap-4 text-2xl">
-            <Link to="/inbox" title="Messages" className="hover:opacity-80">
-              ✉️
-            </Link>
-            <Link to="/" title="Home" className="hover:opacity-80">
-              🏠
-            </Link>
           </div>
         </div>
 
-        <h1 className={`mt-4 text-center ${bigTitle}`}>
-          SFSU TUTORING PLATFORM
-        </h1>
-      </div>
-
-      {/* ===== Profile Status Section (Required: must not be removed) ===== */}
-      <div className={card}>
-        <h2 className="text-lg md:text-xl font-extrabold">PROFILE STATUS</h2>
-
-        <div className="mt-4 rounded-xl border border-slate-300 bg-slate-50 p-4">
-          <div className="text-lg md:text-xl font-extrabold">
-            YOU DON&apos;T HAVE A TUTOR PROFILE YET
+        {/* ===== Upcoming Sessions Section ===== */}
+        <div className={card}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg md:text-xl font-extrabold text-purple-900">
+              UPCOMING SESSIONS
+            </h2>
+            <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
+              {upcomingSessions.length} scheduled
+            </span>
           </div>
 
-          <p className="mt-2 text-slate-800">
-            Create your profile to start offering tutoring services.
+          <div className="space-y-3">
+            {upcomingSessions.map((s) => (
+              <div
+                key={s.id}
+                className="rounded-2xl border-2 border-purple-200 bg-white p-4 hover:border-purple-300 hover:shadow-md transition-all"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-purple-900">
+                    {s.student}
+                  </span>
+                  <span className="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-blue-700 border border-blue-300">
+                    {s.status}
+                  </span>
+                </div>
+
+                <div className="mt-2 text-sm text-slate-700">
+                  {s.date} · {s.course}
+                </div>
+
+                <div className="mt-1 text-sm text-slate-600">
+                  {s.time} · {s.mode}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== Recent Activity Section (Completed Sessions) ===== */}
+        <div className={card}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg md:text-xl font-extrabold text-purple-900">
+              RECENT ACTIVITY
+            </h2>
+            <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
+              Last {completedSessions.length} sessions
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {completedSessions.map((s) => (
+              <div
+                key={s.id}
+                className="rounded-2xl border-2 border-purple-200 bg-white p-4 hover:border-purple-300 hover:shadow-md transition-all"
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-purple-900">
+                    {s.student}
+                  </span>
+                  <span className="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold uppercase tracking-wide text-emerald-700 border border-emerald-300">
+                    {s.status}
+                  </span>
+                </div>
+
+                <div className="mt-2 text-sm text-slate-700">
+                  {s.date} · {s.course}
+                </div>
+
+                <div className="mt-1 text-sm text-slate-600">
+                  {s.time} · {s.mode}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* ===== Messages Section ===== */}
+        <div className={card}>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg md:text-xl font-extrabold text-purple-900">MESSAGES</h2>
+            <span className="text-xs font-semibold text-amber-600 bg-amber-100 px-3 py-1 rounded-full">
+              {messages.filter((m) => m.unread).length} unread
+            </span>
+          </div>
+
+          <div className="space-y-3">
+            {messages.map((msg) => (
+              <button
+                key={msg.id}
+                type="button"
+                className={`w-full rounded-2xl border-2 p-4 text-left transition-all hover:shadow-md ${
+                  msg.unread
+                    ? "border-blue-300 bg-blue-50 hover:border-blue-400"
+                    : "border-purple-200 bg-white hover:border-purple-300"
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-purple-900">
+                    {msg.student}
+                  </span>
+                  <span className="text-xs text-purple-600">{msg.time}</span>
+                </div>
+
+                <p className="mt-2 line-clamp-2 text-sm text-slate-700">
+                  {msg.snippet}
+                </p>
+
+                {msg.unread && (
+                  <span className="mt-3 inline-flex rounded-full bg-blue-600 px-3 py-1 text-xs font-bold uppercase tracking-wide text-white border border-blue-700">
+                    NEW
+                  </span>
+                )}
+              </button>
+            ))}
+          </div>
+
+          <p className="mt-4 text-xs text-purple-500 italic">
+            * These are demo messages to be replaced with backend data later.
           </p>
-
-          <p className="mt-1 text-slate-800">
-            <span className="underline underline-offset-2">
-              Your profile will be reviewed by administrators
-            </span>{" "}
-            before appearing in search results.
-          </p>
-
-          <div className="mt-4">
-            {/* Edit Profile Link */}
-            <Link
-              to="/tutor/profile/edit"
-              className="inline-flex items-center justify-center rounded-2xl bg-green-600 px-4 py-2 text-sm font-semibold text-white shadow hover:bg-green-700 transition"
-            >
-              Edit Profile
-            </Link>
-          </div>
-
-          <div className="mt-5">
-            <button
-              onClick={() => navigate("/tutor/posting")}
-              className="rounded-md border px-5 py-2 font-semibold hover:bg-white"
-            >
-              CREATE PROFILE
-            </button>
-          </div>
         </div>
-      </div>
-
-      {/* ===== Upcoming Sessions Section ===== */}
-      <div className={card}>
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg md:text-xl font-extrabold">
-            UPCOMING SESSIONS
-          </h2>
-          <span className="text-xs text-slate-500">
-            {upcomingSessions.length} scheduled
-          </span>
-        </div>
-
-        <div className="mt-4 space-y-3">
-          {upcomingSessions.map((s) => (
-            <div
-              key={s.id}
-              className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm"
-            >
-              {/* Session header */}
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-slate-900">
-                  {s.student}
-                </span>
-                <span className="rounded-full bg-blue-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-blue-700">
-                  {s.status}
-                </span>
-              </div>
-
-              {/* Date & course */}
-              <div className="mt-1 text-xs text-slate-700">
-                {s.date} · {s.course}
-              </div>
-
-              {/* Time & mode */}
-              <div className="mt-1 text-xs text-slate-600">
-                {s.time} · {s.mode}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ===== Recent Activity Section (Completed Sessions) ===== */}
-      <div className={card}>
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg md:text-xl font-extrabold">
-            RECENT ACTIVITY
-          </h2>
-          <span className="text-xs text-slate-500">
-            Last {completedSessions.length} sessions
-          </span>
-        </div>
-
-        <div className="mt-4 space-y-3">
-          {completedSessions.map((s) => (
-            <div
-              key={s.id}
-              className="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm"
-            >
-              {/* Session header */}
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-slate-900">
-                  {s.student}
-                </span>
-                <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-emerald-700">
-                  {s.status}
-                </span>
-              </div>
-
-              {/* Date & course */}
-              <div className="mt-1 text-xs text-slate-700">
-                {s.date} · {s.course}
-              </div>
-
-              {/* Time & mode */}
-              <div className="mt-1 text-xs text-slate-600">
-                {s.time} · {s.mode}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* ===== Messages Section (Messages received from students) ===== */}
-      <div className={card}>
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg md:text-xl font-extrabold">MESSAGES</h2>
-
-          {/* Show unread count */}
-          <span className="text-xs text-slate-500">
-            {messages.filter((m) => m.unread).length} unread
-          </span>
-        </div>
-
-        <div className="mt-4 space-y-3">
-          {messages.map((msg) => (
-            <button
-              key={msg.id}
-              type="button"
-              className={`w-full rounded-xl border p-3 text-left text-sm transition hover:bg-slate-50 ${
-                msg.unread
-                  ? "border-blue-300 bg-blue-50"
-                  : "border-slate-200 bg-white"
-              }`}
-            >
-              {/* Message header */}
-              <div className="flex items-center justify-between">
-                <span className="font-semibold text-slate-900">
-                  {msg.student}
-                </span>
-                <span className="text-xs text-slate-600">{msg.time}</span>
-              </div>
-
-              {/* Message snippet */}
-              <p className="mt-1 line-clamp-2 text-xs text-slate-700">
-                {msg.snippet}
-              </p>
-
-              {/* Unread badge */}
-              {msg.unread && (
-                <span className="mt-2 inline-flex rounded-full bg-blue-600 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white">
-                  NEW
-                </span>
-              )}
-            </button>
-          ))}
-        </div>
-
-        <p className="mt-3 text-[11px] text-slate-500">
-          * These are demo messages to be replaced with backend data later.
-        </p>
-      </div>
-    </section>
+      </section>
+    </div>
   );
 }

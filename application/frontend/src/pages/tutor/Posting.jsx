@@ -8,7 +8,7 @@ export default function Posting() {
     bio: "",
     subjects: "",
     courses: "",
-    languages: "", // NEW
+    languages: "",
     hourlyRate: "",
     mode: "online",
     availabilityDays: [],
@@ -19,9 +19,9 @@ export default function Posting() {
   const [message, setMessage] = useState("");
 
   const inputClass =
-    "w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500";
-  const labelClass = "block text-sm font-medium text-slate-700";
-  const errClass = "mt-1 text-xs text-red-600";
+    "w-full rounded-xl border-2 border-purple-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all";
+  const labelClass = "block text-sm font-bold text-purple-900 mb-2";
+  const errClass = "mt-1.5 text-xs text-red-600 font-medium";
 
   function update(k, v) {
     setForm((f) => ({ ...f, [k]: v }));
@@ -57,7 +57,7 @@ export default function Posting() {
           bio: form.bio,
           subjects: form.subjects,
           courses: form.courses,
-          languages: form.languages, // NEW
+          languages: form.languages,
           hourlyRate: form.hourlyRate,
           mode: form.mode,
           availabilityDays: form.availabilityDays,
@@ -75,7 +75,7 @@ export default function Posting() {
           bio: "",
           subjects: "",
           courses: "",
-          languages: "", // reset
+          languages: "",
           hourlyRate: "",
           mode: "online",
           availabilityDays: [],
@@ -92,209 +92,217 @@ export default function Posting() {
   }
 
   return (
-    <div className="mx-auto max-w-3xl">
-      <Link
-        to="/tutor/dashboard"
-        className="inline-block mb-3 text-slate-600 text-sm font-medium hover:text-blue-600"
-      >
-        ← Back to Dashboard
-      </Link>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12">
+      <div className="mx-auto max-w-3xl">
+        <Link
+          to="/tutor/dashboard"
+          className="inline-flex items-center gap-1 mb-4 text-purple-600 text-sm font-semibold hover:text-purple-800 transition-colors"
+        >
+          ← Back to Dashboard
+        </Link>
 
-      <section className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm space-y-6">
-        <div className="text-center">
-          <h1 className="text-xl font-extrabold tracking-wide">BECOME A TUTOR / UPDATE PROFILE</h1>
-          <p className="text-sm text-slate-600 mt-1">
-            Provide your teaching information so students can find you
-          </p>
-        </div>
-
-        <form onSubmit={onSubmit} className="space-y-5">
-          {/* Basic Info */}
-          <div>
-            <label className={labelClass}>Full Name *</label>
-            <input
-              className={inputClass}
-              value={form.fullName}
-              onChange={(e) => update("fullName", e.target.value)}
-              placeholder="e.g., John Doe"
-            />
-            {errors.fullName && <p className={errClass}>{errors.fullName}</p>}
-          </div>
-
-          <div>
-            <label className={labelClass}>Short Bio *</label>
-            <textarea
-              className={inputClass + " min-h-24"}
-              value={form.bio}
-              onChange={(e) => update("bio", e.target.value)}
-              placeholder="Describe your background, experience, and teaching approach..."
-            />
-            {errors.bio && <p className={errClass}>{errors.bio}</p>}
-          </div>
-
-          {/* Teaching Info */}
-          <div>
-            <label className={labelClass}>Subjects (comma-separated) *</label>
-            <input
-              className={inputClass}
-              value={form.subjects}
-              onChange={(e) => update("subjects", e.target.value)}
-              placeholder="e.g., Math, Physics, Computer Science"
-            />
-            {errors.subjects && <p className={errClass}>{errors.subjects}</p>}
-          </div>
-
-          <div>
-            <label className={labelClass}>Courses Taught (comma-separated) *</label>
-            <input
-              className={inputClass}
-              value={form.courses}
-              onChange={(e) => update("courses", e.target.value)}
-              placeholder="e.g., CSC 210, CSC 648"
-            />
-            {errors.courses && <p className={errClass}>{errors.courses}</p>}
-          </div>
-
-          <div>
-            <label className={labelClass}>Languages (comma-separated) *</label>
-            <input
-              className={inputClass}
-              value={form.languages}
-              onChange={(e) => update("languages", e.target.value)}
-              placeholder="e.g., English, Spanish, Mandarin"
-            />
-            {errors.languages && <p className={errClass}>{errors.languages}</p>}
-          </div>
-
-          <div>
-            <label className={labelClass}>Hourly Rate (USD) *</label>
-            <input
-              type="number"
-              className={inputClass}
-              value={form.hourlyRate}
-              onChange={(e) => update("hourlyRate", e.target.value)}
-              placeholder="e.g., 35"
-            />
-            {errors.hourlyRate && <p className={errClass}>{errors.hourlyRate}</p>}
-          </div>
-
-          <div>
-            <label className={labelClass}>Preference</label>
-            <select
-              className={inputClass}
-              value={form.mode}
-              onChange={(e) => update("mode", e.target.value)}
-            >
-              <option value="online">Online</option>
-              <option value="in-person">In-person</option>
-              <option value="hybrid">Hybrid</option>
-            </select>
-          </div>
-
-          {/* Availability */}
-          <div>
-            <label className={labelClass}>Available Days *</label>
-            <div className="flex flex-wrap gap-2 mt-2">
-              {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
-                <button
-                  key={day}
-                  type="button"
-                  onClick={() => {
-                    const days = form.availabilityDays.includes(day)
-                      ? form.availabilityDays.filter((d) => d !== day)
-                      : [...form.availabilityDays, day];
-                    update("availabilityDays", days);
-                  }}
-                  className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-                    form.availabilityDays.includes(day)
-                      ? "bg-slate-900 text-white"
-                      : "bg-slate-100 text-slate-700 hover:bg-slate-200"
-                  }`}
-                >
-                  {day}
-                </button>
-              ))}
+        <section className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 space-y-6">
+          <div className="text-center">
+            <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-4 ring-amber-400 mb-4">
+              <span className="text-3xl">🎓</span>
             </div>
-            {errors.availabilityDays && <p className={errClass}>{errors.availabilityDays}</p>}
+            <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
+              BECOME A TUTOR / UPDATE PROFILE
+            </h1>
+            <p className="text-sm text-purple-600 font-medium mt-2">
+              Provide your teaching information so students can find you
+            </p>
           </div>
 
-          <div>
-            <label className={labelClass}>Available Times *</label>
-            <div className="space-y-2 mt-2">
-              {[
-                { value: "morning", label: "Morning (8am–12pm)" },
-                { value: "afternoon", label: "Afternoon (12pm–5pm)" },
-                { value: "evening", label: "Evening (5pm–10pm)" },
-              ].map((time) => (
-                <label key={time.value} className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={form.availabilityTimes.includes(time.value)}
-                    onChange={(e) => {
-                      const times = e.target.checked
-                        ? [...form.availabilityTimes, time.value]
-                        : form.availabilityTimes.filter((t) => t !== time.value);
-                      update("availabilityTimes", times);
+          <form onSubmit={onSubmit} className="space-y-5">
+            {/* Basic Info */}
+            <div>
+              <label className={labelClass}>Full Name *</label>
+              <input
+                className={inputClass}
+                value={form.fullName}
+                onChange={(e) => update("fullName", e.target.value)}
+                placeholder="e.g., John Doe"
+              />
+              {errors.fullName && <p className={errClass}>{errors.fullName}</p>}
+            </div>
+
+            <div>
+              <label className={labelClass}>Short Bio *</label>
+              <textarea
+                className={inputClass + " min-h-24"}
+                value={form.bio}
+                onChange={(e) => update("bio", e.target.value)}
+                placeholder="Describe your background, experience, and teaching approach..."
+              />
+              {errors.bio && <p className={errClass}>{errors.bio}</p>}
+            </div>
+
+            {/* Teaching Info */}
+            <div>
+              <label className={labelClass}>Subjects (comma-separated) *</label>
+              <input
+                className={inputClass}
+                value={form.subjects}
+                onChange={(e) => update("subjects", e.target.value)}
+                placeholder="e.g., Math, Physics, Computer Science"
+              />
+              {errors.subjects && <p className={errClass}>{errors.subjects}</p>}
+            </div>
+
+            <div>
+              <label className={labelClass}>Courses Taught (comma-separated) *</label>
+              <input
+                className={inputClass}
+                value={form.courses}
+                onChange={(e) => update("courses", e.target.value)}
+                placeholder="e.g., CSC 210, CSC 648"
+              />
+              {errors.courses && <p className={errClass}>{errors.courses}</p>}
+            </div>
+
+            <div>
+              <label className={labelClass}>Languages (comma-separated) *</label>
+              <input
+                className={inputClass}
+                value={form.languages}
+                onChange={(e) => update("languages", e.target.value)}
+                placeholder="e.g., English, Spanish, Mandarin"
+              />
+              {errors.languages && <p className={errClass}>{errors.languages}</p>}
+            </div>
+
+            <div>
+              <label className={labelClass}>Hourly Rate (USD) *</label>
+              <input
+                type="number"
+                className={inputClass}
+                value={form.hourlyRate}
+                onChange={(e) => update("hourlyRate", e.target.value)}
+                placeholder="e.g., 35"
+              />
+              {errors.hourlyRate && <p className={errClass}>{errors.hourlyRate}</p>}
+            </div>
+
+            <div>
+              <label className={labelClass}>Preference</label>
+              <select
+                className={inputClass}
+                value={form.mode}
+                onChange={(e) => update("mode", e.target.value)}
+              >
+                <option value="online">Online</option>
+                <option value="in-person">In-person</option>
+                <option value="hybrid">Hybrid</option>
+              </select>
+            </div>
+
+            {/* Availability */}
+            <div>
+              <label className={labelClass}>Available Days *</label>
+              <div className="flex flex-wrap gap-2 mt-2">
+                {["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"].map((day) => (
+                  <button
+                    key={day}
+                    type="button"
+                    onClick={() => {
+                      const days = form.availabilityDays.includes(day)
+                        ? form.availabilityDays.filter((d) => d !== day)
+                        : [...form.availabilityDays, day];
+                      update("availabilityDays", days);
                     }}
-                    className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-slate-700">{time.label}</span>
-                </label>
-              ))}
+                    className={`rounded-full px-5 py-2.5 text-sm font-bold transition-all shadow-sm border-2 ${
+                      form.availabilityDays.includes(day)
+                        ? "bg-gradient-to-r from-purple-600 to-purple-700 text-white border-purple-700 shadow-md"
+                        : "bg-white text-purple-700 border-purple-300 hover:bg-purple-50 hover:border-purple-400"
+                    }`}
+                  >
+                    {day}
+                  </button>
+                ))}
+              </div>
+              {errors.availabilityDays && <p className={errClass}>{errors.availabilityDays}</p>}
             </div>
-            {errors.availabilityTimes && <p className={errClass}>{errors.availabilityTimes}</p>}
-          </div>
 
-          {/* Contact Method */}
-          <div>
-            <label className={labelClass}>Preferred Contact</label>
-            <select
-              className={inputClass}
-              value={form.contactMethod}
-              onChange={(e) => update("contactMethod", e.target.value)}
-            >
-              <option value="platform">Platform Messaging</option>
-              <option value="email_mask">Email (masked)</option>
-            </select>
-          </div>
-
-          {/* Buttons */}
-          <div className="flex gap-3 justify-end pt-2">
-            <button
-              type="button"
-              onClick={() =>
-                setForm({
-                  fullName: "",
-                  bio: "",
-                  subjects: "",
-                  courses: "",
-                  languages: "",
-                  hourlyRate: "",
-                  mode: "online",
-                  availabilityDays: [],
-                  availabilityTimes: [],
-                  contactMethod: "platform",
-                })
-              }
-              className="rounded-xl border border-slate-300 bg-white px-4 py-2 text-sm font-medium hover:bg-slate-100"
-            >
-              Reset
-            </button>
-            <button
-              type="submit"
-              className="rounded-xl bg-blue-600 px-4 py-2 text-white font-semibold hover:bg-blue-700"
-            >
-              Save Profile
-            </button>
-          </div>
-
-          {message && (
-            <div className="rounded-xl border border-green-300 bg-green-50 text-green-800 text-sm px-3 py-2">
-              {message}
+            <div>
+              <label className={labelClass}>Available Times *</label>
+              <div className="space-y-2 mt-2 bg-gradient-to-br from-purple-50 to-amber-50 rounded-xl p-4 border-2 border-purple-200">
+                {[
+                  { value: "morning", label: "Morning (8am–12pm)" },
+                  { value: "afternoon", label: "Afternoon (12pm–5pm)" },
+                  { value: "evening", label: "Evening (5pm–10pm)" },
+                ].map((time) => (
+                  <label key={time.value} className="flex items-center gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={form.availabilityTimes.includes(time.value)}
+                      onChange={(e) => {
+                        const times = e.target.checked
+                          ? [...form.availabilityTimes, time.value]
+                          : form.availabilityTimes.filter((t) => t !== time.value);
+                        update("availabilityTimes", times);
+                      }}
+                      className="h-5 w-5 rounded border-purple-300 text-purple-600 focus:ring-2 focus:ring-purple-500"
+                    />
+                    <span className="text-sm font-semibold text-purple-900">{time.label}</span>
+                  </label>
+                ))}
+              </div>
+              {errors.availabilityTimes && <p className={errClass}>{errors.availabilityTimes}</p>}
             </div>
-          )}
-        </form>
-      </section>
+
+            {/* Contact Method */}
+            <div>
+              <label className={labelClass}>Preferred Contact</label>
+              <select
+                className={inputClass}
+                value={form.contactMethod}
+                onChange={(e) => update("contactMethod", e.target.value)}
+              >
+                <option value="platform">Platform Messaging</option>
+                <option value="email_mask">Email (masked)</option>
+              </select>
+            </div>
+
+            {/* Buttons */}
+            <div className="flex gap-3 justify-end pt-2">
+              <button
+                type="button"
+                onClick={() =>
+                  setForm({
+                    fullName: "",
+                    bio: "",
+                    subjects: "",
+                    courses: "",
+                    languages: "",
+                    hourlyRate: "",
+                    mode: "online",
+                    availabilityDays: [],
+                    availabilityTimes: [],
+                    contactMethod: "platform",
+                  })
+                }
+                className="rounded-xl border-2 border-purple-300 bg-white px-6 py-2.5 text-purple-700 font-bold hover:bg-purple-50 hover:border-purple-400 transition-all shadow-sm"
+              >
+                Reset
+              </button>
+              <button
+                type="submit"
+                className="rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-6 py-2.5 text-purple-900 font-bold shadow-lg shadow-amber-200 hover:from-amber-500 hover:to-amber-600 hover:shadow-xl transition-all"
+              >
+                Save Profile
+              </button>
+            </div>
+
+            {message && (
+              <div className="rounded-xl border-2 border-green-300 bg-green-50 text-green-900 text-sm px-4 py-3 flex items-start gap-2">
+                <span className="text-lg">✓</span>
+                <span className="font-medium">{message}</span>
+              </div>
+            )}
+          </form>
+        </section>
+      </div>
     </div>
   );
 }

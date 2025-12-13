@@ -65,7 +65,7 @@ export default function Home() {
           transition={{ duration: 0.4 }}
           className="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 via-purple-600 to-purple-800 bg-clip-text text-transparent"
         >
-          Welcome to SFSU Tutoring! Let&apos;s Find Your Perfect Tutor
+          Welcome to ScholarlyGator! Let&apos;s Find Your Perfect Tutor
         </motion.h1>
 
         {/* tag */}
@@ -131,7 +131,7 @@ export default function Home() {
         )}
 
         <div className="mt-8 text-left mx-auto max-w-xl bg-gradient-to-br from-purple-50 to-amber-50 rounded-2xl p-6 border border-purple-100">
-          <h2 className="text-lg font-extrabold text-purple-900">Why students use SFSU Tutoring</h2>
+          <h2 className="text-lg font-extrabold text-purple-900">Why students use ScholarlyGator</h2>
           <ul className="mt-3 space-y-2 text-slate-700 text-sm md:text-base">
             <li className="flex items-start gap-2">
               <span className="text-amber-500 font-bold">✓</span>
