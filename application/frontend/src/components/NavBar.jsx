@@ -101,7 +101,7 @@ export default function Navbar() {
             {/* Admin Dashboard (role 3) */}
             {showAdminDash && (
               <Link
-                to="/admin/dashboard"
+                to="/admin"
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive("/admin/dashboard")
                     ? "bg-purple-500 text-white shadow-sm"

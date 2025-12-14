@@ -1,4 +1,5 @@
 import { Mail } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const TEAM = {
   name: "CSC648 Section04 Team04",
@@ -99,29 +100,34 @@ export default function About() {
           <h3 className="text-2xl font-bold text-purple-900 mb-6">Team Members</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {MEMBERS.map((m, index) => (
-              <article
+              <Link
                 key={m.name}
-                className="rounded-2xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-lg shadow-purple-100 hover:shadow-2xl hover:shadow-purple-200/50 hover:border-purple-300 transition-all transform hover:-translate-y-1 duration-300"
-                style={{ animationDelay: `${index * 50}ms` }}
+                to={`/member/${m.slug}`}
+                className="block"
               >
-                <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 text-white grid place-items-center font-bold text-xl mb-4 shadow-lg ring-2 ring-amber-400">
-                  {m.name
-                    .split(" ")
-                    .map((p) => p[0])
-                    .join("")}
-                </div>
+                <article
+                  className="rounded-2xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-lg shadow-purple-100 hover:shadow-2xl hover:shadow-purple-200/50 hover:border-purple-300 transition-all transform hover:-translate-y-1 duration-300 cursor-pointer h-full"
+                  style={{ animationDelay: `${index * 50}ms` }}
+                >
+                  <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 text-white grid place-items-center font-bold text-xl mb-4 shadow-lg ring-2 ring-amber-400">
+                    {m.name
+                      .split(" ")
+                      .map((p) => p[0])
+                      .join("")}
+                  </div>
 
-                <div className="font-bold leading-tight text-lg">
-                  <span className="text-purple-900">{m.name}</span>
-                </div>
-                <div className="text-sm font-semibold text-amber-600 mt-1">{m.role}</div>
-                <p className="text-sm mt-3 text-slate-700">{m.bio}</p>
-                <div className="mt-5 flex items-center gap-2 text-sm">
-                  <LinkPill href={`mailto:${m.email}`} icon={<Mail className="h-4 w-4" />}>
-                    Email
-                  </LinkPill>
-                </div>
-              </article>
+                  <div className="font-bold leading-tight text-lg">
+                    <span className="text-purple-900">{m.name}</span>
+                  </div>
+                  <div className="text-sm font-semibold text-amber-600 mt-1">{m.role}</div>
+                  <p className="text-sm mt-3 text-slate-700">{m.bio}</p>
+                  <div className="mt-5 flex items-center gap-2 text-sm">
+                    <LinkPill href={`mailto:${m.email}`} icon={<Mail className="h-4 w-4" />}>
+                      Email
+                    </LinkPill>
+                  </div>
+                </article>
+              </Link>
             ))}
           </div>
         </div>
@@ -144,6 +150,7 @@ function LinkPill({ href, icon, children }) {
     <a
       href={href}
       className="inline-flex items-center gap-1.5 rounded-full border-2 border-purple-300 bg-purple-50 px-4 py-1.5 text-sm font-semibold text-purple-700 hover:bg-purple-100 hover:border-purple-400 transition-all shadow-sm hover:shadow-md"
+      onClick={(e) => e.stopPropagation()}
     >
       {icon}
       <span>{children}</span>

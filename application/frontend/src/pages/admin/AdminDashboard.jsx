@@ -150,7 +150,6 @@ export default function AdminDashboard() {
   }, [user]);
 
   const card = "rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-xl shadow-purple-100";
-  const bigTitle = "text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent";
 
   const StatusBadge = ({ value, type }) => {
     const color =
@@ -177,27 +176,34 @@ export default function AdminDashboard() {
         <div className={card}>
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-lg ring-4 ring-amber-400">
-                <span className="text-2xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
-                  SG
-                </span>
+              <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-lg ring-4 ring-amber-400 overflow-hidden">
+                <svg viewBox="0 0 24 24" fill="white" className="w-10 h-10">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                </svg>
               </div>
               <div>
                 <div className="text-xl font-extrabold text-purple-900">Welcome, {displayName}!</div>
                 <div className="text-sm text-purple-600 font-medium">Administrator</div>
               </div>
             </div>
-            <div className="flex items-center gap-3">
-              <Link 
-                to="/dashboard" 
-                className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-700 transition-all"
-                title="Dashboard"
-              >
-                🏠
+            <div className="flex items-center gap-4">
+              <Link to="/" title="Home" className="text-2xl hover:opacity-80 transition-opacity flex items-center justify-center w-8 h-8">
+                &#8962;
               </Link>
             </div>
           </div>
-          <h1 className={`mt-6 text-center ${bigTitle}`}>ADMIN DASHBOARD</h1>
+
+          <div className="flex flex-col items-center mt-6">
+            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-2 ring-amber-400 mb-2">
+              <span className="text-xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+                SG
+              </span>
+            </div>
+            
+            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
+              ADMIN DASHBOARD
+            </h1>
+          </div>
         </div>
 
         {/* ===== Tutor Profile Queue ===== */}
