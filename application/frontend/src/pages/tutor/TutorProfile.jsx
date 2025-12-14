@@ -291,5 +291,5 @@ export default function TutorProfile() {
         </div>
       </div>
     </section>
-  );
+  ) ;
 }
