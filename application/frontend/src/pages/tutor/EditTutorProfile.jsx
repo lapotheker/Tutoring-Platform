@@ -111,20 +111,19 @@ export default function EditTutorProfile() {
           ← Back to Dashboard
         </Link>
 
-        <div className="flex items-center gap-3 mb-6">
-          <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-lg ring-2 ring-amber-400">
+        <div className="flex flex-col items-center mb-8">
+          <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-2 ring-amber-400 mb-3">
             <span className="text-2xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
               SG
             </span>
           </div>
-          <div>
-            <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
-              Edit Tutor Profile
-            </h1>
-            <p className="text-sm text-purple-600 font-medium">
-              Update your tutoring information
-            </p>
-          </div>
+          
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent text-center">
+            Edit Tutor Profile
+          </h1>
+          <p className="text-sm text-purple-600 font-medium mt-1">
+            Update your tutoring information
+          </p>
         </div>
 
         {savedMsg && (

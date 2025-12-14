@@ -193,7 +193,7 @@ export default function AdminDashboard() {
                 className="inline-flex items-center justify-center h-10 w-10 rounded-xl bg-purple-100 hover:bg-purple-200 text-purple-700 transition-all"
                 title="Dashboard"
               >
-                🏠
+                &#8962;
               </Link>
             </div>
           </div>
