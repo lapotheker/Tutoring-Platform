@@ -165,11 +165,14 @@ export default function SearchResults() {
             <input
               type="text"
               value={q}
+              maxLength={40}
               onChange={(e) => setQ(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && submitHeaderSearch()}
               placeholder="Search by keyword or course"
               className="flex-1 outline-none text-sm"
             />
+           
+
             <button
               type="button"
               onClick={submitHeaderSearch}
