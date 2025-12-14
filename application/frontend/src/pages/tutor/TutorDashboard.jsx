@@ -147,7 +147,7 @@ export default function TutorDashboard() {
             <div className="flex flex-wrap gap-3">
               <Link
                 to="/tutor/profile/edit"
-                className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-green-500 to-green-600 px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-green-200 hover:from-green-600 hover:to-green-700 hover:shadow-xl transition-all"
+                className="inline-flex items-center justify-center rounded-xl border-2 border-purple-300 bg-white px-5 py-2.5 text-sm font-bold text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-all shadow-sm"
               >
                 Edit Profile
               </Link>

@@ -1,6 +1,4 @@
-import { motion } from "framer-motion";
 import { Mail } from "lucide-react";
-import { Link } from "react-router-dom";
 
 const TEAM = {
   name: "CSC648 Section04 Team04",
@@ -67,16 +65,12 @@ export default function About() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12">
       <section className="space-y-8 max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50"
-        >
+        <div className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 transform hover:shadow-3xl transition-shadow duration-300">
           <div className="flex items-center gap-3 mb-4">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-lg">
-              <span className="text-2xl">🐊</span>
+            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-lg ring-2 ring-amber-400">
+              <span className="text-xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+                SG
+              </span>
             </div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
               About Us
@@ -89,7 +83,7 @@ export default function About() {
             We meet weekly to plan, pair‑program, and review progress.
           </p>
 
-          <dl className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 mt-6">
+          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 mt-6">
             <Item label="Team">{TEAM.name}</Item>
             <Item label="Term">{TEAM.term}</Item>
             <Item label="Location">{TEAM.location}</Item>
@@ -98,25 +92,17 @@ export default function About() {
                 View Repository →
               </a>
             </Item>
-          </dl>
-        </motion.div>
+          </div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5, delay: 0.05 }}
-        >
+        <div>
           <h3 className="text-2xl font-bold text-purple-900 mb-6">Team Members</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {MEMBERS.map((m) => (
-              <motion.article
+            {MEMBERS.map((m, index) => (
+              <article
                 key={m.name}
-                initial={{ opacity: 0, y: 12 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.35 }}
-                className="rounded-2xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-lg shadow-purple-100 hover:shadow-2xl hover:shadow-purple-200/50 hover:border-purple-300 transition-all"
+                className="rounded-2xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-lg shadow-purple-100 hover:shadow-2xl hover:shadow-purple-200/50 hover:border-purple-300 transition-all transform hover:-translate-y-1 duration-300"
+                style={{ animationDelay: `${index * 50}ms` }}
               >
                 <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 text-white grid place-items-center font-bold text-xl mb-4 shadow-lg ring-2 ring-amber-400">
                   {m.name
@@ -126,19 +112,7 @@ export default function About() {
                 </div>
 
                 <div className="font-bold leading-tight text-lg">
-                  {m.slug === "yuhang-wei" ||
-                  m.slug === "leigh-apotheker" ||
-                  m.slug === "darien-sngoeun" ||
-                  m.slug === "megha-rai" ||
-                  m.slug === "iliana-morales" ||
-                  m.slug === "roxana-del-toro" ||
-                  m.slug === "jonathan-tsang" ? (
-                    <Link to={`/member/${m.slug}`} className="text-purple-700 hover:text-purple-900 hover:underline">
-                      {m.name}
-                    </Link>
-                  ) : (
-                    <span className="text-purple-900">{m.name}</span>
-                  )}
+                  <span className="text-purple-900">{m.name}</span>
                 </div>
                 <div className="text-sm font-semibold text-amber-600 mt-1">{m.role}</div>
                 <p className="text-sm mt-3 text-slate-700">{m.bio}</p>
@@ -147,10 +121,10 @@ export default function About() {
                     Email
                   </LinkPill>
                 </div>
-              </motion.article>
+              </article>
             ))}
           </div>
-        </motion.div>
+        </div>
       </section>
     </div>
   );
@@ -158,7 +132,7 @@ export default function About() {
 
 function Item({ label, children }) {
   return (
-    <div className="rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-white p-4 shadow-sm">
+    <div className="rounded-xl border border-purple-200 bg-gradient-to-br from-purple-50 to-white p-4 shadow-sm hover:shadow-md transition-shadow duration-200">
       <div className="text-xs uppercase tracking-wider font-bold text-purple-600">{label}</div>
       <div className="mt-1.5 text-sm text-slate-800 font-medium">{children}</div>
     </div>

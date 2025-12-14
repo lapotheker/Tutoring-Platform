@@ -174,12 +174,13 @@ export default function StudentDashboard() {
               </div>
             </div>
 
-            <div className="flex items-center gap-3 text-2xl">
-              <Link to="/dashboard?tab=messages" title="Messages" className="hover:opacity-80 transition-opacity">
-                ✉️
+
+            <div className="flex items-center gap-4 text-2xl">
+              <Link to="/inbox" title="Messages" className="hover:opacity-80 transition-opacity">
+                &#9993;
               </Link>
               <Link to="/" title="Home" className="hover:opacity-80 transition-opacity">
-                🏠
+                &#8962;
               </Link>
             </div>
           </div>

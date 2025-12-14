@@ -1,9 +1,6 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { API_BASE_URL } from "../../services/api";
 
 export default function Register() {
-  const navigate = useNavigate();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -15,6 +12,8 @@ export default function Register() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [serverMsg, setServerMsg] = useState("");
+  const [showHome, setShowHome] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
 
   function update(key, value) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -38,56 +37,95 @@ export default function Register() {
     return Object.keys(e).length === 0;
   }
 
-  async function onSubmit(e) {
+  function onSubmit(e) {
     e.preventDefault();
     setServerMsg("");
     if (!validate()) return;
 
     setSubmitting(true);
-    try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          full_name: `${form.firstName} ${form.lastName}`,
-          sfsu_email: form.email.toLowerCase(),
-          password: form.password,
-          role: 1,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (data.success) {
-        setServerMsg("✓ Account created successfully! Redirecting to login...");
-        setTimeout(() => navigate("/login"), 2000);
-      } else {
-        setServerMsg(data.error || "Registration failed");
-      }
-    } catch (err) {
-      setServerMsg(err.message || "Network error. Please try again.");
-    } finally {
+    
+    // Simulate successful registration
+    setTimeout(() => {
+      setServerMsg("✓ Account created successfully! Redirecting to login...");
       setSubmitting(false);
-    }
+      setTimeout(() => setShowLogin(true), 2000);
+    }, 1500);
   }
 
   const inputStyle =
     "w-full rounded-xl border-2 border-purple-200 px-4 py-2.5 focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all";
 
+  if (showLogin) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-2xl ring-4 ring-amber-400 mb-6">
+            <span className="text-4xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+              SG
+            </span>
+          </div>
+          <h2 className="text-2xl font-bold text-purple-900 mb-4">Welcome to ScholarlyGator!</h2>
+          <p className="text-slate-700 mb-6">Your account has been created successfully.</p>
+          <button
+            onClick={() => setShowLogin(false)}
+            className="rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 px-8 py-3 text-white font-bold shadow-lg hover:from-purple-700 hover:to-purple-800 transition-all"
+          >
+            Back to Register
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (showHome) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12 md:py-16">
+        <section className="mx-auto max-w-4xl text-center">
+          <div className="mb-6 flex items-center justify-center gap-4">
+            <div className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-2xl ring-4 ring-amber-400">
+              <span className="text-4xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+                SG
+              </span>
+            </div>
+            <div className="text-left">
+              <p className="text-lg font-bold tracking-wide bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
+                ScholarlyGator
+              </p>
+              <p className="text-sm text-purple-600">Your SFSU study companion</p>
+            </div>
+          </div>
+
+          <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 via-purple-600 to-purple-800 bg-clip-text text-transparent">
+            Welcome to ScholarlyGator!
+          </h1>
+
+          <button
+            onClick={() => setShowHome(false)}
+            className="mt-8 rounded-full bg-gradient-to-r from-purple-600 to-purple-700 px-8 py-3 text-white font-semibold shadow-lg hover:from-purple-700 hover:to-purple-800 transition-all"
+          >
+            Back to Register
+          </button>
+        </section>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12">
       <div className="mx-auto max-w-xl">
-        <Link
-          to="/"
+        <button
+          onClick={() => setShowHome(true)}
           className="inline-flex items-center gap-1 mb-4 text-purple-600 text-sm font-semibold hover:text-purple-800 transition-colors"
         >
           ← Back to Home
-        </Link>
+        </button>
 
         <section className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 space-y-6">
           <div className="text-center">
             <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-4 ring-amber-400 mb-4">
-              <span className="text-3xl">🐊</span>
+              <span className="text-2xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+                SG
+              </span>
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
               SCHOLARLYGATOR
@@ -95,7 +133,7 @@ export default function Register() {
             <h2 className="mt-2 text-xl font-bold text-purple-800">CREATE ACCOUNT</h2>
           </div>
 
-          <form onSubmit={onSubmit} className="grid gap-5">
+          <div className="grid gap-5">
             <label className="block">
               <div className="text-sm font-semibold text-purple-900 mb-2">Email:</div>
               <input
@@ -174,13 +212,13 @@ export default function Register() {
               />
               <span>
                 I agree to the{" "}
-                <Link to="/terms" className="font-semibold text-purple-600 hover:text-purple-800 hover:underline">
+                <span className="font-semibold text-purple-600 hover:text-purple-800 hover:underline cursor-pointer">
                   Terms of Service
-                </Link>{" "}
+                </span>{" "}
                 and{" "}
-                <Link to="/privacy" className="font-semibold text-purple-600 hover:text-purple-800 hover:underline">
+                <span className="font-semibold text-purple-600 hover:text-purple-800 hover:underline cursor-pointer">
                   Privacy Policy
-                </Link>
+                </span>
               </span>
             </label>
             {errors.acceptTos && <p className="text-xs text-red-600">{errors.acceptTos}</p>}
@@ -199,7 +237,7 @@ export default function Register() {
             )}
 
             <button
-              type="submit"
+              onClick={onSubmit}
               disabled={submitting}
               className="rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3 text-white font-bold shadow-lg shadow-purple-200 hover:from-purple-700 hover:to-purple-800 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
             >
@@ -208,11 +246,14 @@ export default function Register() {
 
             <p className="text-sm text-slate-700 text-center">
               Already have an account?{" "}
-              <Link to="/login" className="font-bold text-purple-600 hover:text-purple-800 hover:underline">
+              <button 
+                onClick={() => setShowLogin(true)}
+                className="font-bold text-purple-600 hover:text-purple-800 hover:underline"
+              >
                 Login here
-              </Link>
+              </button>
             </p>
-          </form>
+          </div>
         </section>
       </div>
     </div>

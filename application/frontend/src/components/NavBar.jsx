@@ -74,11 +74,11 @@ export default function Navbar() {
                 to="/dashboard"
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive("/dashboard")
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
+                     ? "bg-purple-500 text-white shadow-sm"
+                    : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
                 }`}
               >
-                <MessageSquare className="w-4 h-4" />
+                <span className="font-bold text-lg"></span>
                 <span>Student Dashboard</span>
               </Link>
             )}
@@ -89,11 +89,11 @@ export default function Navbar() {
                 to="/tutor/dashboard"
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive("/tutor/dashboard")
-                    ? "bg-green-600 text-white shadow-sm"
-                    : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+                    ? "bg-purple-500 text-white shadow-sm"
+                    : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
                 }`}
               >
-                <span className="font-bold text-lg">🎓</span>
+                <span className="font-bold text-lg"></span>
                 <span>Tutor Dashboard</span>
               </Link>
             )}
@@ -108,7 +108,7 @@ export default function Navbar() {
                     : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
                 }`}
               >
-                <span className="font-bold text-lg">🛠️</span>
+                <span className="font-bold text-lg"></span>
                 <span>Admin Dashboard</span>
               </Link>
             )}
