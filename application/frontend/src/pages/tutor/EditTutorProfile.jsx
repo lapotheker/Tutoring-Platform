@@ -113,7 +113,9 @@ export default function EditTutorProfile() {
 
         <div className="flex items-center gap-3 mb-6">
           <div className="h-14 w-14 rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-lg ring-2 ring-amber-400">
-            <span className="text-3xl">✏️</span>
+            <span className="text-2xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+              SG
+            </span>
           </div>
           <div>
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">

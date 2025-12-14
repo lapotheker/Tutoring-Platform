@@ -144,7 +144,7 @@ export default function TutorDashboard() {
               before appearing in search results.
             </p>
 
-            <div className="flex flex-wrap gap-3">
+            <div className="grid grid-cols-2 gap-3">
               <Link
                 to="/tutor/profile/edit"
                 className="inline-flex items-center justify-center rounded-xl border-2 border-purple-300 bg-white px-5 py-2.5 text-sm font-bold text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-all shadow-sm"

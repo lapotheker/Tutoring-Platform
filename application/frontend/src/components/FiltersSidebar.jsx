@@ -74,7 +74,6 @@ export default function FiltersSidebar({ filters, onFiltersChange }) {
   return (
     <aside className={card}>
       <div className="flex items-center gap-2 mb-2">
-        <span className="text-xl">&#128736;</span>
         <h3 className="text-lg font-extrabold text-purple-900">Filters</h3>
       </div>
       <p className="text-xs text-purple-600 font-medium">
