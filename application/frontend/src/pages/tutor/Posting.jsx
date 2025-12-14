@@ -109,7 +109,7 @@ export default function Posting() {
               </span>
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
-              BECOME A TUTOR / UPDATE PROFILE
+              BECOME A TUTOR 
             </h1>
             <p className="text-sm text-purple-600 font-medium mt-2">
               Provide your teaching information so students can find you
