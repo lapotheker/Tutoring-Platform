@@ -48,10 +48,6 @@ export default function Navbar() {
     <nav className="border-b border-slate-200 bg-white shadow-sm">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo/Brand */}
-          <Link to="/" className="text-xl font-bold text-slate-900 hover:text-blue-600 transition">
-            SFSU Tutoring
-          </Link>
 
           {/* Navigation Links */}
           <div className="flex items-center gap-4">

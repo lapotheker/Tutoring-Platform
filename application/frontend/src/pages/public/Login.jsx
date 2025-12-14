@@ -20,7 +20,6 @@ export default function Login() {
 
     const emailTrimmed = email.trim().toLowerCase();
 
-    // Basic validation
     if (!/^[^@\s]+@sfsu\.edu$/i.test(emailTrimmed)) {
       setErr("Please use your @sfsu.edu email to sign in.");
       return;
@@ -46,7 +45,6 @@ export default function Login() {
       const data = await response.json();
 
       if (data.success) {
-        // Store complete user data including user_id
         const userData = {
           user_id: data.user.user_id,
           email: data.user.sfsu_email,
@@ -58,7 +56,6 @@ export default function Login() {
         const storage = remember ? localStorage : sessionStorage;
         storage.setItem("demoUser", JSON.stringify(userData));
 
-        // Navigate based on role
         if (data.user.role === 3) {
           navigate("/admin", { replace: true });
         } else if (data.user.role === 2) {
@@ -78,88 +75,97 @@ export default function Login() {
   }
 
   const inputStyle =
-    "w-full rounded-xl border border-slate-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500";
+    "w-full rounded-xl border-2 border-purple-200 px-4 py-2.5 focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all";
 
   return (
-    <div className="mx-auto max-w-xl">
-      <Link
-        to="/"
-        className="inline-block mb-3 text-slate-600 text-sm font-medium hover:text-blue-600"
-      >
-        ← Back to Home
-      </Link>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12">
+      <div className="mx-auto max-w-xl">
+        <Link
+          to="/"
+          className="inline-flex items-center gap-1 mb-4 text-purple-600 text-sm font-semibold hover:text-purple-800 transition-colors"
+        >
+          ← Back to Home
+        </Link>
 
-      <section className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm space-y-6">
-        <div className="text-center">
-          <h1 className="text-xl font-extrabold tracking-wide">SFSU TUTORING PLATFORM</h1>
-          <h2 className="mt-2 text-lg font-bold">LOGIN</h2>
-        </div>
-
-        <form onSubmit={onSubmit} className="grid gap-4">
-          <label className="block">
-            <div className="text-sm text-slate-700 mb-1">Email:</div>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="you@sfsu.edu"
-              className={inputStyle}
-              required
-              autoComplete="email"
-            />
-            <p className="text-xs text-slate-500 mt-1">(Must use @sfsu.edu email)</p>
-          </label>
-
-          <label className="block">
-            <div className="text-sm text-slate-700 mb-1">Password:</div>
-            <input
-              type="password"
-              value={pwd}
-              onChange={(e) => setPwd(e.target.value)}
-              placeholder="••••••••"
-              className={inputStyle}
-              required
-              autoComplete="current-password"
-            />
-          </label>
-
-          <div className="flex items-center justify-between">
-            <label className="inline-flex items-center gap-2 text-sm text-slate-700">
-              <input
-                type="checkbox"
-                checked={remember}
-                onChange={(e) => setRemember(e.target.checked)}
-              />
-              <span>Remember me</span>
-            </label>
-
-            <Link to="/forgot" className="text-sm font-medium text-blue-600 hover:underline">
-              Forgot Password?
-            </Link>
+        <section className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 space-y-6">
+          <div className="text-center">
+            <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-4 ring-amber-400 mb-4">
+              <span className="text-3xl">🐊</span>
+            </div>
+            <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
+              SCHOLARLYGATOR
+            </h1>
+            <h2 className="mt-2 text-xl font-bold text-purple-800">LOGIN</h2>
           </div>
 
-          {err && (
-            <div className="rounded-xl border border-red-300 bg-red-50 text-red-900 text-sm px-3 py-2">
-              {err}
+          <form onSubmit={onSubmit} className="grid gap-5">
+            <label className="block">
+              <div className="text-sm font-semibold text-purple-900 mb-2">Email:</div>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="you@sfsu.edu"
+                className={inputStyle}
+                required
+                autoComplete="email"
+              />
+              <p className="text-xs text-purple-600 mt-1.5">(Must use @sfsu.edu email)</p>
+            </label>
+
+            <label className="block">
+              <div className="text-sm font-semibold text-purple-900 mb-2">Password:</div>
+              <input
+                type="password"
+                value={pwd}
+                onChange={(e) => setPwd(e.target.value)}
+                placeholder="••••••••"
+                className={inputStyle}
+                required
+                autoComplete="current-password"
+              />
+            </label>
+
+            <div className="flex items-center justify-between">
+              <label className="inline-flex items-center gap-2 text-sm text-slate-700 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={remember}
+                  onChange={(e) => setRemember(e.target.checked)}
+                  className="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-2 focus:ring-purple-500"
+                />
+                <span>Remember me</span>
+              </label>
+
+              <Link to="/forgot" className="text-sm font-semibold text-purple-600 hover:text-purple-800 hover:underline">
+                Forgot Password?
+              </Link>
             </div>
-          )}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="rounded-xl bg-slate-900 px-4 py-2 text-white font-semibold hover:bg-black disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {loading ? "Logging in..." : "LOGIN"}
-          </button>
+            {err && (
+              <div className="rounded-xl border-2 border-red-300 bg-red-50 text-red-900 text-sm px-4 py-3 flex items-start gap-2">
+                <span className="text-lg">⚠️</span>
+                <span>{err}</span>
+              </div>
+            )}
 
-          <p className="text-sm text-slate-700 text-center">
-            Don't have an account?{" "}
-            <Link to="/register" className="font-medium text-blue-600 hover:underline">
-              Sign up here
-            </Link>
-          </p>
-        </form>
-      </section>
+            <button
+              type="submit"
+              disabled={loading}
+              className="rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3 text-white font-bold shadow-lg shadow-purple-200 hover:from-purple-700 hover:to-purple-800 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            >
+              {loading ? "Logging in..." : "LOGIN"}
+            </button>
+
+            <p className="text-sm text-slate-700 text-center">
+              Don't have an account?{" "}
+              <Link to="/register" className="font-bold text-purple-600 hover:text-purple-800 hover:underline">
+                Sign up here
+              </Link>
+            </p>
+          </form>
+        </section>
+      </div>
     </div>
   );
 }

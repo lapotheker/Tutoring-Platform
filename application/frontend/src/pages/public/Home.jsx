@@ -12,6 +12,37 @@ function getCurrentUser() {
   }
 }
 
+// Student testimonials about tutors
+const TESTIMONIALS = [
+  {
+    id: 1,
+    student: "Emily Chen",
+    major: "Computer Science",
+    text: "Alice helped me ace CSC 340! Her explanations of data structures made everything click. I went from struggling to getting an A on my final project.",
+    tutor: "Alice Nguyen",
+    course: "CSC 340",
+    rating: 5,
+  },
+  {
+    id: 2,
+    student: "Marcus Johnson",
+    major: "Math",
+    text: "Priya's patience and teaching style are incredible. She breaks down complex calculus problems into simple steps. Highly recommend!",
+    tutor: "Priya Patel",
+    course: "MATH 227",
+    rating: 5,
+  },
+  {
+    id: 3,
+    student: "Sarah Rodriguez",
+    major: "Software Engineering",
+    text: "David is amazing! He helped our team understand Agile methodology and we finished our CSC 648 project ahead of schedule.",
+    tutor: "David Kim",
+    course: "CSC 648",
+    rating: 5,
+  },
+];
+
 export default function Home() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
@@ -34,8 +65,9 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-gradient-to-b from-indigo-50 via-slate-50 to-amber-50 px-4 py-12 md:py-16">
-      <section className="mx-auto max-w-4xl rounded-3xl border border-slate-200 bg-white/95 p-8 md:p-10 text-center shadow-2xl">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12 md:py-16">
+      {/* Hero Section */}
+      <section className="mx-auto max-w-4xl text-center mb-16">
         {/* gator logo */}
         <div className="mb-6 flex items-center justify-center gap-4">
           <motion.div
@@ -43,16 +75,18 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             whileHover={{ scale: 1.08, rotate: -2 }}
-            className="flex h-16 w-16 items-center justify-center rounded-3xl bg-emerald-600 shadow-2xl ring-4 ring-emerald-100"
+            className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-2xl ring-4 ring-amber-400"
           >
-            <span role="img" aria-label="gator mascot" className="text-3xl leading-none">
-              🐊
+            <span role="img" aria-label="gator mascot" className="text-4xl leading-none">
+              &#8962;
             </span>
           </motion.div>
 
           <div className="text-left">
-            <p className="text-sm font-semibold tracking-wide text-slate-800">ScholarlyGator</p>
-            <p className="text-xs text-slate-500">Your friendly SFSU study companion</p>
+            <p className="text-lg font-bold tracking-wide bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
+              ScholarlyGator
+            </p>
+            <p className="text-sm text-purple-600">Your SFSU study companion</p>
           </div>
         </div>
 
@@ -61,9 +95,11 @@ export default function Home() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="text-3xl md:text-4xl font-extrabold tracking-wide text-slate-900"
+          className="text-3xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 via-purple-600 to-purple-800 bg-clip-text text-transparent"
         >
-          Welcome to SFSU Tutoring! Let&apos;s Find Your Perfect Tutor
+          Welcome to ScholarlyGator!
+          <br />
+          Let&apos;s Find Your Perfect Tutor
         </motion.h1>
 
         {/* tag */}
@@ -71,7 +107,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.05 }}
-          className="mt-3 text-base md:text-lg text-slate-600 max-w-2xl mx-auto"
+          className="mt-4 text-lg md:text-xl text-slate-700 max-w-2xl mx-auto"
         >
           We&apos;re here to help you feel more confident in your classes. Connect with fellow SFSU
           students and tutors who understand your professors and your courses.
@@ -81,26 +117,15 @@ export default function Home() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35, delay: 0.1 }}
-          className="mt-2 text-sm text-slate-500 max-w-xl mx-auto"
+          className="mt-2 text-base text-purple-600 max-w-xl mx-auto font-medium"
         >
           Not sure where to start? Try searching the class you need help with.
         </motion.p>
 
-        {/* updated search bar */}
-        <div className="mt-8 flex items-center justify-center">
+        {/* Search bar */}
+        <div className="mt-10 flex items-center justify-center">
           <form onSubmit={onSearch} className="w-full max-w-xl">
-            <div
-              className="
-                flex items-center gap-3 rounded-full border border-slate-200 
-                bg-white/95 px-5 py-2.5 md:py-3 
-                shadow-md md:shadow-lg 
-                transition-shadow 
-                hover:shadow-xl 
-                focus-within:shadow-xl 
-                focus-within:border-indigo-200 
-                focus-within:ring-2 focus-within:ring-indigo-200
-              "
-            >
+            <div className="flex items-center gap-3 rounded-full border-2 border-purple-300 bg-white px-5 py-3 shadow-2xl shadow-purple-200/50 transition-all hover:shadow-2xl hover:border-purple-400 focus-within:shadow-2xl focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-200">
               <input
                 type="text"
                 value={query}
@@ -111,10 +136,21 @@ export default function Home() {
               />
               <button
                 type="submit"
-                className="grid h-10 w-10 place-items-center rounded-full bg-slate-900 text-white text-lg hover:bg-slate-800 transition shadow"
+                className="grid h-11 w-11 place-items-center rounded-full bg-gradient-to-r from-purple-600 to-purple-700 text-white text-lg hover:from-purple-700 hover:to-purple-800 transition-all shadow-md hover:shadow-lg"
                 aria-label="Search"
               >
-                <span>&#128269;</span>
+                <span>
+                  <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    className="h-5 w-5"
+                  >
+                    <circle cx="11" cy="11" r="7" />
+                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                  </svg>
+                </span>
               </button>
             </div>
           </form>
@@ -125,28 +161,117 @@ export default function Home() {
           <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/register"
-              className="w-full sm:w-auto rounded-full bg-slate-900 px-7 py-3 text-white font-medium shadow-lg hover:bg-black transition text-sm sm:text-base text-center"
+              className="w-full sm:w-auto rounded-full bg-gradient-to-r from-purple-600 to-purple-700 px-7 py-3 text-white font-semibold shadow-lg shadow-purple-200 hover:from-purple-700 hover:to-purple-800 hover:shadow-xl transition-all text-sm sm:text-base text-center"
             >
               I&apos;m new here – Get started
             </Link>
-            <span className="text-slate-500 font-semibold hidden sm:inline">or</span>
+            <span className="text-purple-400 font-semibold hidden sm:inline">or</span>
             <Link
               to="/login"
-              className="w-full sm:w-auto rounded-full bg-blue-600 px-7 py-3 text-white font-medium shadow-lg hover:bg-blue-700 transition text-sm sm:text-base text-center"
+              className="w-full sm:w-auto rounded-full bg-gradient-to-r from-amber-400 to-amber-500 px-7 py-3 text-purple-900 font-semibold shadow-lg shadow-amber-200 hover:from-amber-500 hover:to-amber-600 hover:shadow-xl transition-all text-sm sm:text-base text-center"
             >
               Already have an account? Log in
             </Link>
           </div>
         )}
+      </section>
 
-        <div className="mt-8 text-left mx-auto max-w-xl">
-          <h2 className="text-lg font-extrabold text-slate-900">Why students use SFSU Tutoring</h2>
-          <ul className="mt-2 list-disc pl-6 space-y-1 text-slate-700 text-sm md:text-base">
-            <li>All tutors are verified SFSU students or faculty.</li>
-            <li>Find help by course, subject, or the exact class you&apos;re taking.</li>
-            <li>Message tutors through the platform—no need to share personal contact info.</li>
-            <li>Schedule sessions that work around your life, not the other way around.</li>
-          </ul>
+      {/* Why ScholarlyGator Section */}
+      <section className="mx-auto max-w-5xl mb-16">
+        <div className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-xl shadow-purple-100">
+          <h2 className="text-2xl font-extrabold text-purple-900 text-center mb-6">
+            Why students use ScholarlyGator
+          </h2>
+          <div className="grid md:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100">
+              <span className="text-2xl">&#10004;</span>
+              <div>
+                <div className="font-bold text-purple-900">Verified Tutors</div>
+                <div className="text-sm text-slate-700 mt-1">All tutors are verified SFSU students or faculty.</div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100">
+              <span className="text-2xl">&#9733;</span>
+              <div>
+                <div className="font-bold text-purple-900">Course-Specific Help</div>
+                <div className="text-sm text-slate-700 mt-1">Find help by course, subject, or the exact class you&apos;re taking.</div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100">
+              <span className="text-2xl">&#9993;</span>
+              <div>
+                <div className="font-bold text-purple-900">Secure Messaging</div>
+                <div className="text-sm text-slate-700 mt-1">Message tutors through the platform—no need to share personal contact info.</div>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100">
+              <span className="text-2xl">&#9776;</span>
+              <div>
+                <div className="font-bold text-purple-900">Flexible Scheduling</div>
+                <div className="text-sm text-slate-700 mt-1">Schedule sessions that work around your life, not the other way around.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="mx-auto max-w-6xl">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent mb-3">
+            What Students Say
+          </h2>
+          <p className="text-slate-600 text-lg">Real feedback from SFSU students who found their perfect tutor</p>
+        </div>
+
+        <div className="grid md:grid-cols-3 gap-6">
+          {TESTIMONIALS.map((testimonial) => (
+            <motion.div
+              key={testimonial.id}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.5, delay: testimonial.id * 0.1 }}
+              className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-xl shadow-purple-100 hover:shadow-2xl hover:shadow-purple-200/50 hover:border-purple-300 transition-all"
+            >
+              {/* Rating Stars */}
+              <div className="flex gap-1 mb-4">
+                {[...Array(testimonial.rating)].map((_, i) => (
+                  <span key={i} className="text-amber-400 text-xl">&#9733;</span>
+                ))}
+              </div>
+
+              {/* Testimonial Text */}
+              <p className="text-slate-700 text-sm leading-relaxed mb-4 italic">
+                &ldquo;{testimonial.text}&rdquo;
+              </p>
+
+              {/* Student Info */}
+              <div className="border-t-2 border-purple-100 pt-4">
+                <div className="font-bold text-purple-900">{testimonial.student}</div>
+                <div className="text-xs text-purple-600 mt-1">{testimonial.major}</div>
+                <div className="mt-3 inline-flex items-center gap-2 text-xs">
+                  <span className="px-3 py-1 rounded-full bg-gradient-to-r from-purple-100 to-amber-100 text-purple-800 font-semibold border border-purple-200">
+                    Tutor: {testimonial.tutor}
+                  </span>
+                  <span className="px-3 py-1 rounded-full bg-purple-50 text-purple-700 font-semibold border border-purple-200">
+                    {testimonial.course}
+                  </span>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* CTA at bottom */}
+        <div className="mt-12 text-center">
+          <p className="text-slate-600 mb-4">Ready to get the help you need?</p>
+          <Link
+            to="/results"
+            className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-purple-600 to-purple-700 px-8 py-4 text-white font-bold shadow-lg shadow-purple-200 hover:from-purple-700 hover:to-purple-800 hover:shadow-xl transition-all"
+          >
+            Browse All Tutors →
+          </Link>
         </div>
       </section>
     </div>

@@ -4,15 +4,14 @@ import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { tutorAPI } from "../../services/api";
 
 export default function TutorProfile() {
-  const { id } = useParams(); // route: /tutors/:id
+  const { id } = useParams();
   const navigate = useNavigate();
   const { search } = useLocation();
 
-  const [data, setData] = useState(null); // full tutor record from backend
+  const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Format time
   function formatTime(timeStr) {
     if (!timeStr) return "";
     const [hStr, mStr] = timeStr.split(":");
@@ -24,7 +23,6 @@ export default function TutorProfile() {
     return `${h}:${minutes}${period}`;
   }
 
-  // Group availability slots by day of the week
   const availabilityByDay = useMemo(() => {
     if (!data?.availability || !Array.isArray(data.availability)) return {};
 
@@ -35,7 +33,6 @@ export default function TutorProfile() {
       grouped[day].push(slot);
     }
 
-    // Sort each day's slots by start time
     Object.keys(grouped).forEach((day) => {
       grouped[day].sort((a, b) => {
         const aTime = a.time_start || "";
@@ -47,7 +44,6 @@ export default function TutorProfile() {
     return grouped;
   }, [data]);
 
-  // Fetch tutor data when component mounts or id changes
   useEffect(() => {
     async function fetchTutor() {
       setLoading(true);
@@ -74,10 +70,8 @@ export default function TutorProfile() {
     }
   }, [id]);
 
-  // Preserve original search params so "Back to Results" restores previous filters
   const backHref = useMemo(() => ({ pathname: "/results", search }), [search]);
 
-  // Navigate to contact/request page for this tutor
   function goContact() {
     const params = new URLSearchParams(search);
     if (data?.display_name) {
@@ -89,207 +83,226 @@ export default function TutorProfile() {
     });
   }
 
-  // Simple "Report tutor" handler (front-end only for now)
   function handleReport() {
-    // Minimal implementation: show confirmation to the student.
-    // This is enough to demonstrate the "report tutor profile" requirement.
     alert("Thank you. Your report about this tutor profile has been submitted for review.");
   }
 
-  // Loading / error states
   if (loading) {
     return (
-      <section className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
-        <div className="text-sm text-slate-600">Loading tutor profile...</div>
-      </section>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12">
+        <section className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 max-w-5xl mx-auto">
+          <div className="text-sm text-purple-600 font-medium flex items-center gap-2">
+            <div className="animate-spin h-5 w-5 border-2 border-purple-600 border-t-transparent rounded-full"></div>
+            Loading tutor profile...
+          </div>
+        </section>
+      </div>
     );
   }
 
   if (error || !data) {
     return (
-      <section className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
-        <div className="text-sm text-slate-600">{error || "Tutor not found."}</div>
-        <div className="mt-3">
-          <Link to={backHref} className="text-blue-600 hover:underline">
-            Back to Results
-          </Link>
-        </div>
-      </section>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12">
+        <section className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 max-w-5xl mx-auto">
+          <div className="text-sm text-red-600 font-medium">{error || "Tutor not found."}</div>
+          <div className="mt-4">
+            <Link to={backHref} className="text-purple-600 font-semibold hover:text-purple-800 hover:underline">
+              Back to Results
+            </Link>
+          </div>
+        </section>
+      </div>
     );
   }
 
   return (
-    <section className="space-y-6">
-      <div className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm">
-        {/* Back to result list */}
-        <Link to={backHref} className="text-sm font-medium text-blue-600 hover:underline">
-          &lt; BACK TO RESULTS
-        </Link>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12">
+      <section className="space-y-6 max-w-5xl mx-auto">
+        <div className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50">
+          {/* Back to result list */}
+          <Link to={backHref} className="inline-flex items-center gap-1 text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors mb-6">
+            ← BACK TO RESULTS
+          </Link>
 
-        {/* Header row: avatar + names */}
-        <div className="mt-4 flex items-start gap-4">
-          <div className="h-20 w-20 md:h-24 md:w-24 rounded-full bg-slate-200 grid place-items-center text-slate-600 text-3xl overflow-hidden">
-            {data.profile_photo && (
-              <img
-                src={data.profile_photo}
-                alt={data.display_name}
-                className="h-full w-full object-cover"
-                onError={(e) => {
-                  // If image URL is broken, hide img and show fallback icon
-                  e.currentTarget.style.display = "none";
-                }}
-              />
-            )}
-            {!data.profile_photo && "👤"}
-          </div>
-
-          <div>
-            <h1 className="text-xl font-extrabold tracking-wide">
-              {data.display_name?.toUpperCase()}
-            </h1>
-            <div className="text-sm text-slate-700">{data.full_name}</div>
-          </div>
-        </div>
-
-        {/* Body: left info + right availability */}
-        <div className="mt-6 grid gap-6 md:grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)]">
-          {/* Left column: core info */}
-          <div className="space-y-4 max-w-2xl">
-            <div>
-              <div className="font-semibold">Hourly Rate</div>
-              <div>${data.hourly_rate}/hour</div>
+          {/* Header row: avatar + names */}
+          <div className="flex items-start gap-5 mb-8">
+            <div className="h-24 w-24 md:h-28 md:w-28 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 grid place-items-center text-white text-4xl overflow-hidden shadow-lg ring-4 ring-amber-400 flex-shrink-0">
+              {data.profile_photo ? (
+                <img
+                  src={data.profile_photo}
+                  alt={data.display_name}
+                  className="h-full w-full object-cover"
+                  onError={(e) => {
+                    e.currentTarget.style.display = "none";
+                  }}
+                />
+              ) : (
+                "&#128100;"
+              )}
             </div>
 
-            <div>
-              <div className="font-semibold">Courses Covered</div>
-              <div className="text-sm">{data.courses || "N/A"}</div>
-            </div>
-
-            <div>
-              <div className="font-semibold">Subject Tags</div>
-              <div className="text-sm">{data.subject_tags || "N/A"}</div>
-            </div>
-
-            <div>
-              <div className="font-semibold">Languages Spoken</div>
-              <div className="text-sm">{data.languages || "N/A"}</div>
-            </div>
-
-            {/* Text-based summary from GROUP_CONCAT for backward compatibility */}
-            {data.availability_summary && (
-              <div>
-                <div className="font-semibold">Availability Summary</div>
-                <div className="text-sm whitespace-pre-wrap">{data.availability_summary}</div>
+            <div className="flex-1">
+              <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
+                {data.display_name?.toUpperCase()}
+              </h1>
+              <div className="text-lg text-slate-700 font-medium mt-1">{data.full_name}</div>
+              <div className="mt-3 inline-flex items-center gap-2 text-2xl font-bold text-amber-600">
+                ${data.hourly_rate}
+                <span className="text-base font-medium text-slate-600">/hour</span>
               </div>
-            )}
+            </div>
           </div>
 
-          {/* Right column: structured Weekly Availability */}
-          <aside className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-            <h2 className="text-sm font-semibold text-slate-900 mb-3">Weekly Availability</h2>
-
-            {Object.keys(availabilityByDay).length === 0 ? (
-              <p className="text-sm text-slate-500">
-                This tutor has not added detailed availability yet.
-              </p>
-            ) : (
-              <div className="flex flex-col gap-3 max-h-[320px] overflow-y-auto pr-1">
-                {/* Standard Monday–Sunday order */}
-                {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
-                  .filter((day) => availabilityByDay[day])
-                  .map((day) => {
-                    const slots = availabilityByDay[day];
-                    if (!slots || slots.length === 0) return null;
-
-                    return (
-                      <div key={day} className="flex gap-3 text-sm">
-                        <div className="w-20 shrink-0 font-medium text-slate-700">{day}</div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {slots.map((slot) => {
-                            const start = slot.time_start;
-                            const end = slot.time_end;
-                            const hasRange = start && end;
-                            const label = slot.time_slot;
-
-                            return (
-                              <span
-                                key={slot.availability_id}
-                                className="inline-flex items-center rounded-full border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-800"
-                              >
-                                {hasRange
-                                  ? `${formatTime(start)} – ${formatTime(end)}`
-                                  : label || "Time not specified"}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
-
-                {/* Any non-standard day strings, e.g. abbreviations */}
-                {Object.keys(availabilityByDay)
-                  .filter(
-                    (day) =>
-                      ![
-                        "Monday",
-                        "Tuesday",
-                        "Wednesday",
-                        "Thursday",
-                        "Friday",
-                        "Saturday",
-                        "Sunday",
-                      ].includes(day)
-                  )
-                  .map((day) => {
-                    const slots = availabilityByDay[day];
-                    return (
-                      <div key={day} className="flex gap-3 text-sm">
-                        <div className="w-24 shrink-0 font-medium text-slate-700">{day}</div>
-                        <div className="flex flex-wrap gap-1.5">
-                          {slots.map((slot) => {
-                            const start = slot.time_start;
-                            const end = slot.time_end;
-                            const hasRange = start && end;
-                            const label = slot.time_slot;
-
-                            return (
-                              <span
-                                key={slot.availability_id}
-                                className="inline-flex items-center rounded-full border border-slate-300 bg-white px-2.5 py-1 text-xs text-slate-800"
-                              >
-                                {hasRange
-                                  ? `${formatTime(start)} – ${formatTime(end)}`
-                                  : label || "Time not specified"}
-                              </span>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    );
-                  })}
+          {/* Body: left info + right availability */}
+          <div className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,1.4fr)]">
+            {/* Left column: core info */}
+            <div className="space-y-5">
+              <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
+                <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
+                  <span className="text-lg">&#128218;</span>
+                  Courses Covered
+                </div>
+                <div className="text-sm text-slate-700">{data.courses || "N/A"}</div>
               </div>
-            )}
-          </aside>
-        </div>
 
-        {/* Actions: contact + simple report */}
-        <div className="mt-6 flex gap-3">
-          <button
-            onClick={goContact}
-            className="rounded border px-4 py-2 font-semibold hover:bg-slate-50"
-          >
-            CONTACT
-          </button>
+              <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
+                <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
+                  <span className="text-lg">&#127919;</span>
+                  Subject Tags
+                </div>
+                <div className="text-sm text-slate-700">{data.subject_tags || "N/A"}</div>
+              </div>
 
-          <button
-            onClick={handleReport}
-            className="rounded border px-4 py-2 font-semibold text-red-600 border-red-400 hover:bg-red-50"
-          >
-            REPORT TUTOR
-          </button>
+              <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
+                <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
+                  <span className="text-lg">&#127760;</span>
+                  Languages Spoken
+                </div>
+                <div className="text-sm text-slate-700">{data.languages || "N/A"}</div>
+              </div>
+
+              {/* Text-based summary for backward compatibility */}
+              {data.availability_summary && (
+                <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
+                  <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
+                    <span className="text-lg">&#128197;</span>
+                    Availability Summary
+                  </div>
+                  <div className="text-sm text-slate-700 whitespace-pre-wrap">{data.availability_summary}</div>
+                </div>
+              )}
+            </div>
+
+            {/* Right column: structured Weekly Availability */}
+            <aside className="rounded-3xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-amber-50 p-6 shadow-lg h-fit sticky top-6">
+              <h2 className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
+                <span className="text-xl">&#128197;</span>
+                Weekly Availability
+              </h2>
+
+              {Object.keys(availabilityByDay).length === 0 ? (
+                <p className="text-sm text-purple-600">
+                  This tutor has not added detailed availability yet.
+                </p>
+              ) : (
+                <div className="flex flex-col gap-4 max-h-[400px] overflow-y-auto pr-2">
+                  {/* Standard Monday–Sunday order */}
+                  {["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
+                    .filter((day) => availabilityByDay[day])
+                    .map((day) => {
+                      const slots = availabilityByDay[day];
+                      if (!slots || slots.length === 0) return null;
+
+                      return (
+                        <div key={day} className="bg-white rounded-xl p-3 border border-purple-200 shadow-sm">
+                          <div className="font-bold text-purple-900 mb-2 text-sm">{day}</div>
+                          <div className="flex flex-wrap gap-2">
+                            {slots.map((slot) => {
+                              const start = slot.time_start;
+                              const end = slot.time_end;
+                              const hasRange = start && end;
+                              const label = slot.time_slot;
+
+                              return (
+                                <span
+                                  key={slot.availability_id}
+                                  className="inline-flex items-center rounded-full bg-purple-100 border border-purple-300 px-3 py-1 text-xs font-semibold text-purple-800"
+                                >
+                                  {hasRange
+                                    ? `${formatTime(start)} – ${formatTime(end)}`
+                                    : label || "Time not specified"}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+
+                  {/* Any non-standard day strings */}
+                  {Object.keys(availabilityByDay)
+                    .filter(
+                      (day) =>
+                        ![
+                          "Monday",
+                          "Tuesday",
+                          "Wednesday",
+                          "Thursday",
+                          "Friday",
+                          "Saturday",
+                          "Sunday",
+                        ].includes(day)
+                    )
+                    .map((day) => {
+                      const slots = availabilityByDay[day];
+                      return (
+                        <div key={day} className="bg-white rounded-xl p-3 border border-purple-200 shadow-sm">
+                          <div className="font-bold text-purple-900 mb-2 text-sm">{day}</div>
+                          <div className="flex flex-wrap gap-2">
+                            {slots.map((slot) => {
+                              const start = slot.time_start;
+                              const end = slot.time_end;
+                              const hasRange = start && end;
+                              const label = slot.time_slot;
+
+                              return (
+                                <span
+                                  key={slot.availability_id}
+                                  className="inline-flex items-center rounded-full bg-purple-100 border border-purple-300 px-3 py-1 text-xs font-semibold text-purple-800"
+                                >
+                                  {hasRange
+                                    ? `${formatTime(start)} – ${formatTime(end)}`
+                                    : label || "Time not specified"}
+                                </span>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+            </aside>
+          </div>
+
+          {/* Actions: contact + simple report */}
+          <div className="mt-8 flex flex-wrap gap-4">
+            <button
+              onClick={goContact}
+              className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3 font-bold text-white shadow-lg shadow-purple-200 hover:from-purple-700 hover:to-purple-800 hover:shadow-xl transition-all"
+            >
+              CONTACT TUTOR
+            </button>
+
+            <button
+              onClick={handleReport}
+              className="inline-flex items-center justify-center rounded-xl border-2 border-red-300 bg-white px-6 py-3 font-bold text-red-600 hover:bg-red-50 hover:border-red-400 transition-all shadow-sm"
+            >
+              REPORT TUTOR
+            </button>
+          </div>
         </div>
-      </div>
-    </section>
-  ) ;
+      </section>
+    </div>
+  );
 }
