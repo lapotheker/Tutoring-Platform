@@ -402,6 +402,47 @@ const tutorModel = {
       connection.release();
     }
   },
+
+  /**
+   * Get all courses from database
+   */
+  async getAllCourses() {
+    const query = `
+      SELECT course_id, code, title, department
+      FROM course_number
+      ORDER BY code ASC
+    `;
+    const [rows] = await pool.execute(query);
+    return rows;
+  },
+
+  /**
+   * Get all subject tags from database
+   */
+  async getAllSubjectTags() {
+    const query = `
+      SELECT tag_id, tag_name, description
+      FROM subject_tag
+      WHERE status = 'Active'
+      ORDER BY tag_name ASC
+    `;
+    const [rows] = await pool.execute(query);
+    return rows;
+  },
+
+  /**
+   * Get all languages from database
+   */
+  async getAllLanguages() {
+    const query = `
+      SELECT language_id, language_name
+      FROM language
+      WHERE status = 'Active'
+      ORDER BY language_name ASC
+    `;
+    const [rows] = await pool.execute(query);
+    return rows;
+  },
 };
 
 module.exports = tutorModel;

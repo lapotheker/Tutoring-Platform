@@ -35,6 +35,7 @@ export default function SearchResults() {
 
   // Filters object for sidebar
   const filters = {
+    course,
     subject,
     language,
     minRate,
@@ -47,6 +48,7 @@ export default function SearchResults() {
   function updateFilters(next) {
     const p = new URLSearchParams(search);
 
+    next.course ? p.set("course", next.course) : p.delete("course");
     next.subject ? p.set("subject", next.subject) : p.delete("subject");
     next.language ? p.set("language", next.language) : p.delete("language");
     next.minRate ? p.set("minRate", next.minRate) : p.delete("minRate");
@@ -142,11 +144,14 @@ export default function SearchResults() {
           </Link>
 
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-2 ring-amber-400 mb-3">
-            <span className="text-xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+            <span
+              className="text-xl font-bold text-white leading-none tracking-tighter"
+              style={{ fontFamily: "Georgia, serif", fontStyle: "italic" }}
+            >
               SG
             </span>
           </div>
-          
+
           <h1 className="text-xl md:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
             ScholarlyGator
           </h1>
@@ -192,7 +197,9 @@ export default function SearchResults() {
               <div className="text-sm text-purple-600 font-semibold">{showingLabel}</div>
             </div>
 
-            {loading && <div className="mt-8 text-center text-purple-600 font-medium">Loading tutors...</div>}
+            {loading && (
+              <div className="mt-8 text-center text-purple-600 font-medium">Loading tutors...</div>
+            )}
 
             {error && <div className="mt-8 text-center text-red-600 font-medium">{error}</div>}
 
@@ -231,15 +238,32 @@ export default function SearchResults() {
                             <h3 className="font-extrabold tracking-wide text-purple-900 text-lg">
                               {t.display_name.toUpperCase()}
                             </h3>
-                            <div className="font-bold text-amber-600 text-lg">${t.hourly_rate}/hr</div>
+                            <div className="font-bold text-amber-600 text-lg">
+                              ${t.hourly_rate}/hr
+                            </div>
                           </div>
 
                           <div className="text-sm mt-2 space-y-1 text-slate-700">
-                            <div><span className="font-semibold text-purple-700">Name:</span> {t.full_name}</div>
-                            <div><span className="font-semibold text-purple-700">Courses:</span> {t.courses || "N/A"}</div>
-                            <div><span className="font-semibold text-purple-700">Subjects:</span> {t.subject_tags || "N/A"}</div>
-                            <div><span className="font-semibold text-purple-700">Languages:</span> {t.languages || "N/A"}</div>
-                            <div><span className="font-semibold text-purple-700">Availability:</span> {t.availability_summary}</div>
+                            <div>
+                              <span className="font-semibold text-purple-700">Name:</span>{" "}
+                              {t.full_name}
+                            </div>
+                            <div>
+                              <span className="font-semibold text-purple-700">Courses:</span>{" "}
+                              {t.courses || "N/A"}
+                            </div>
+                            <div>
+                              <span className="font-semibold text-purple-700">Subjects:</span>{" "}
+                              {t.subject_tags || "N/A"}
+                            </div>
+                            <div>
+                              <span className="font-semibold text-purple-700">Languages:</span>{" "}
+                              {t.languages || "N/A"}
+                            </div>
+                            <div>
+                              <span className="font-semibold text-purple-700">Availability:</span>{" "}
+                              {t.availability_summary}
+                            </div>
                           </div>
 
                           <div className="mt-4 flex gap-3">

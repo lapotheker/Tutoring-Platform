@@ -12,6 +12,17 @@ export default function TutorProfile() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Check if user is logged in
+  const demoUser = useMemo(() => {
+    try {
+      return JSON.parse(
+        localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser") || "null"
+      );
+    } catch {
+      return null;
+    }
+  }, []);
+
   function formatTime(timeStr) {
     if (!timeStr) return "";
     const [hStr, mStr] = timeStr.split(":");
@@ -84,6 +95,15 @@ export default function TutorProfile() {
   }
 
   function handleReport() {
+    // Check if user is logged in
+    if (!demoUser) {
+      // Redirect to login page with return URL
+      const currentPath = `/tutor/${id}${search}`;
+      const next = encodeURIComponent(currentPath);
+      navigate(`/login?next=${next}`);
+      return;
+    }
+
     alert("Thank you. Your report about this tutor profile has been submitted for review.");
   }
 
@@ -106,7 +126,10 @@ export default function TutorProfile() {
         <section className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 max-w-5xl mx-auto">
           <div className="text-sm text-red-600 font-medium">{error || "Tutor not found."}</div>
           <div className="mt-4">
-            <Link to={backHref} className="text-purple-600 font-semibold hover:text-purple-800 hover:underline">
+            <Link
+              to={backHref}
+              className="text-purple-600 font-semibold hover:text-purple-800 hover:underline"
+            >
               Back to Results
             </Link>
           </div>
@@ -120,7 +143,10 @@ export default function TutorProfile() {
       <section className="space-y-6 max-w-5xl mx-auto">
         <div className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50">
           {/* Back to result list */}
-          <Link to={backHref} className="inline-flex items-center gap-1 text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors mb-6">
+          <Link
+            to={backHref}
+            className="inline-flex items-center gap-1 text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors mb-6"
+          >
             ← BACK TO RESULTS
           </Link>
 
@@ -188,7 +214,9 @@ export default function TutorProfile() {
                     <span className="text-lg">&#128197;</span>
                     Availability Summary
                   </div>
-                  <div className="text-sm text-slate-700 whitespace-pre-wrap">{data.availability_summary}</div>
+                  <div className="text-sm text-slate-700 whitespace-pre-wrap">
+                    {data.availability_summary}
+                  </div>
                 </div>
               )}
             </div>
@@ -214,7 +242,10 @@ export default function TutorProfile() {
                       if (!slots || slots.length === 0) return null;
 
                       return (
-                        <div key={day} className="bg-white rounded-xl p-3 border border-purple-200 shadow-sm">
+                        <div
+                          key={day}
+                          className="bg-white rounded-xl p-3 border border-purple-200 shadow-sm"
+                        >
                           <div className="font-bold text-purple-900 mb-2 text-sm">{day}</div>
                           <div className="flex flex-wrap gap-2">
                             {slots.map((slot) => {
@@ -256,7 +287,10 @@ export default function TutorProfile() {
                     .map((day) => {
                       const slots = availabilityByDay[day];
                       return (
-                        <div key={day} className="bg-white rounded-xl p-3 border border-purple-200 shadow-sm">
+                        <div
+                          key={day}
+                          className="bg-white rounded-xl p-3 border border-purple-200 shadow-sm"
+                        >
                           <div className="font-bold text-purple-900 mb-2 text-sm">{day}</div>
                           <div className="flex flex-wrap gap-2">
                             {slots.map((slot) => {
