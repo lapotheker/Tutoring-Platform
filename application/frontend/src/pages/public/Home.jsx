@@ -75,11 +75,13 @@ export default function Home() {
             animate={{ opacity: 1, scale: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             whileHover={{ scale: 1.08, rotate: -2 }}
-            className="flex h-20 w-20 items-center justify-center rounded-3xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-2xl ring-4 ring-amber-400"
+            className="flex h-20 w-20 items-center justify-center"
           >
-            <span className="text-4xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
-              SG
-            </span>
+            <img
+              src="/src/assets/logo.svg"
+              alt="ScholarlyGator Logo"
+              className="h-full w-full object-contain drop-shadow-2xl"
+            />
           </motion.div>
 
           <div className="text-left">
@@ -187,28 +189,36 @@ export default function Home() {
               <span className="text-2xl">&#10004;</span>
               <div>
                 <div className="font-bold text-purple-900">Verified Tutors</div>
-                <div className="text-sm text-slate-700 mt-1">All tutors are verified SFSU students or faculty.</div>
+                <div className="text-sm text-slate-700 mt-1">
+                  All tutors are verified SFSU students or faculty.
+                </div>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100">
               <span className="text-2xl">&#9733;</span>
               <div>
                 <div className="font-bold text-purple-900">Course-Specific Help</div>
-                <div className="text-sm text-slate-700 mt-1">Find help by course, subject, or the exact class you&apos;re taking.</div>
+                <div className="text-sm text-slate-700 mt-1">
+                  Find help by course, subject, or the exact class you&apos;re taking.
+                </div>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100">
               <span className="text-2xl">&#9993;</span>
               <div>
                 <div className="font-bold text-purple-900">Secure Messaging</div>
-                <div className="text-sm text-slate-700 mt-1">Message tutors through the platform—no need to share personal contact info.</div>
+                <div className="text-sm text-slate-700 mt-1">
+                  Message tutors through the platform—no need to share personal contact info.
+                </div>
               </div>
             </div>
             <div className="flex items-start gap-3 p-4 rounded-xl bg-gradient-to-br from-purple-50 to-white border border-purple-100">
               <span className="text-2xl">&#9776;</span>
               <div>
                 <div className="font-bold text-purple-900">Flexible Scheduling</div>
-                <div className="text-sm text-slate-700 mt-1">Schedule sessions that work around your life, not the other way around.</div>
+                <div className="text-sm text-slate-700 mt-1">
+                  Schedule sessions that work around your life, not the other way around.
+                </div>
               </div>
             </div>
           </div>
@@ -221,7 +231,9 @@ export default function Home() {
           <h2 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent mb-3">
             What Students Say
           </h2>
-          <p className="text-slate-600 text-lg">Real feedback from SFSU students who found their perfect tutor</p>
+          <p className="text-slate-600 text-lg">
+            Real feedback from SFSU students who found their perfect tutor
+          </p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -237,7 +249,9 @@ export default function Home() {
               {/* Rating Stars */}
               <div className="flex gap-1 mb-4">
                 {[...Array(testimonial.rating)].map((_, i) => (
-                  <span key={i} className="text-amber-400 text-xl">&#9733;</span>
+                  <span key={i} className="text-amber-400 text-xl">
+                    &#9733;
+                  </span>
                 ))}
               </div>
 

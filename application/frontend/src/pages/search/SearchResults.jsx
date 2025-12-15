@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { tutorAPI } from "../../services/api";
 import FiltersSidebar from "../../components/FiltersSidebar";
 import defaultProfileImage from "../../assets/default-profile.jpg";
+import logo from "../../assets/logo.svg";
 
 export default function SearchResults() {
   const { search } = useLocation();
@@ -143,13 +144,8 @@ export default function SearchResults() {
             ← Back to Home
           </Link>
 
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-2 ring-amber-400 mb-3">
-            <span
-              className="text-xl font-bold text-white leading-none tracking-tighter"
-              style={{ fontFamily: "Georgia, serif", fontStyle: "italic" }}
-            >
-              SG
-            </span>
+          <div className="inline-flex h-20 w-20 items-center justify-center mb-3">
+            <img src={logo} alt="ScholarlyGator Logo" className="h-full w-full object-contain" />
           </div>
 
           <h1 className="text-xl md:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">

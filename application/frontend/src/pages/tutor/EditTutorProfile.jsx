@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../services/api";
+import logo from "../../assets/logo.svg";
 
 const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 const DAY_NAMES = {
@@ -213,13 +214,8 @@ export default function EditTutorProfile() {
         </Link>
 
         <div className="flex flex-col items-center mb-8">
-          <div className="inline-flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-2 ring-amber-400 mb-3">
-            <span
-              className="text-2xl font-bold text-white leading-none tracking-tighter"
-              style={{ fontFamily: "Georgia, serif", fontStyle: "italic" }}
-            >
-              SG
-            </span>
+          <div className="inline-flex h-20 w-20 items-center justify-center mb-4">
+            <img src={logo} alt="ScholarlyGator Logo" className="h-full w-full object-contain" />
           </div>
 
           <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent text-center">

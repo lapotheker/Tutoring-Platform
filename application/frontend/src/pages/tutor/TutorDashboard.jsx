@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import logo from "../../assets/logo.svg";
 
 export default function TutorDashboard() {
   const navigate = useNavigate();
@@ -301,13 +302,8 @@ export default function TutorDashboard() {
           </div>
 
           <div className="flex flex-col items-center mt-6">
-            <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-2 ring-amber-400 mb-2">
-              <span
-                className="text-xl font-bold text-white leading-none tracking-tighter"
-                style={{ fontFamily: "Georgia, serif", fontStyle: "italic" }}
-              >
-                SG
-              </span>
+            <div className="inline-flex h-20 w-20 items-center justify-center mb-2">
+              <img src={logo} alt="ScholarlyGator Logo" className="h-full w-full object-contain" />
             </div>
 
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">

@@ -1,5 +1,6 @@
 import { Mail } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from "../../assets/logo.svg";
 
 const TEAM = {
   name: "CSC648 Section04 Team04",
@@ -68,20 +69,22 @@ export default function About() {
       <section className="space-y-8 max-w-7xl mx-auto">
         <div className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 transform hover:shadow-3xl transition-shadow duration-300">
           <div className="flex items-center gap-3 mb-4">
-            <div className="h-12 w-12 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-lg ring-2 ring-amber-400">
-              <span className="text-xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
-                SG
-              </span>
+            <div className="h-20 w-20 flex items-center justify-center">
+              <img
+                src={logo}
+                alt="ScholarlyGator Logo"
+                className="h-full w-full object-contain drop-shadow-lg"
+              />
             </div>
             <h2 className="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
               About Us
             </h2>
           </div>
-          
+
           <p className="text-slate-700 mt-4 text-lg">
             We are a collaborative learning group at SFSU focused on full‑stack web development. Our
-            workflow emphasizes clear communication, short sprint cycles, and measurable deliverables.
-            We meet weekly to plan, pair‑program, and review progress.
+            workflow emphasizes clear communication, short sprint cycles, and measurable
+            deliverables. We meet weekly to plan, pair‑program, and review progress.
           </p>
 
           <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 mt-6">
@@ -89,7 +92,12 @@ export default function About() {
             <Item label="Term">{TEAM.term}</Item>
             <Item label="Location">{TEAM.location}</Item>
             <Item label="GitHub">
-              <a className="text-purple-600 hover:text-purple-800 hover:underline font-medium" href={TEAM.github} target="_blank" rel="noopener noreferrer">
+              <a
+                className="text-purple-600 hover:text-purple-800 hover:underline font-medium"
+                href={TEAM.github}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 View Repository →
               </a>
             </Item>
@@ -100,11 +108,7 @@ export default function About() {
           <h3 className="text-2xl font-bold text-purple-900 mb-6">Team Members</h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {MEMBERS.map((m, index) => (
-              <Link
-                key={m.name}
-                to={`/member/${m.slug}`}
-                className="block"
-              >
+              <Link key={m.name} to={`/member/${m.slug}`} className="block">
                 <article
                   className="rounded-2xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-lg shadow-purple-100 hover:shadow-2xl hover:shadow-purple-200/50 hover:border-purple-300 transition-all transform hover:-translate-y-1 duration-300 cursor-pointer h-full"
                   style={{ animationDelay: `${index * 50}ms` }}
@@ -146,14 +150,26 @@ function Item({ label, children }) {
 }
 
 function LinkPill({ href, icon, children }) {
+  const handleClick = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    window.location.href = href;
+  };
+
   return (
-    <a
-      href={href}
-      className="inline-flex items-center gap-1.5 rounded-full border-2 border-purple-300 bg-purple-50 px-4 py-1.5 text-sm font-semibold text-purple-700 hover:bg-purple-100 hover:border-purple-400 transition-all shadow-sm hover:shadow-md"
-      onClick={(e) => e.stopPropagation()}
+    <span
+      role="link"
+      tabIndex={0}
+      onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          handleClick(e);
+        }
+      }}
+      className="inline-flex items-center gap-1.5 rounded-full border-2 border-purple-300 bg-purple-50 px-4 py-1.5 text-sm font-semibold text-purple-700 hover:bg-purple-100 hover:border-purple-400 transition-all shadow-sm hover:shadow-md cursor-pointer"
     >
       {icon}
       <span>{children}</span>
-    </a>
+    </span>
   );
 }

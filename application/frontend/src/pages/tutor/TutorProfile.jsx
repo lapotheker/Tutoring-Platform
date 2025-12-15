@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import { tutorAPI } from "../../services/api";
+import defaultProfileImage from "../../assets/default-profile.jpg";
 
 export default function TutorProfile() {
   const { id } = useParams();
@@ -81,110 +82,74 @@ export default function TutorProfile() {
     }
   }, [id]);
 
-  const backHref = useMemo(() => ({ pathname: "/results", search }), [search]);
-
-  function goContact() {
-    const params = new URLSearchParams(search);
-    if (data?.display_name) {
-      params.set("to", data.display_name);
-    }
-    navigate({
-      pathname: `/tutor/request/${data.tutor_profile_id}`,
-      search: `?${params.toString()}`,
-    });
-  }
-
-  function handleReport() {
-    // Check if user is logged in
+  function handleContact() {
     if (!demoUser) {
-      // Redirect to login page with return URL
-      const currentPath = `/tutor/${id}${search}`;
-      const next = encodeURIComponent(currentPath);
+      const next = encodeURIComponent(`/tutor/request/${id}`);
       navigate(`/login?next=${next}`);
-      return;
+    } else {
+      navigate({ pathname: `/tutor/request/${id}`, search });
     }
-
-    alert("Thank you. Your report about this tutor profile has been submitted for review.");
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12">
-        <section className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 max-w-5xl mx-auto">
-          <div className="text-sm text-purple-600 font-medium flex items-center gap-2">
-            <div className="animate-spin h-5 w-5 border-2 border-purple-600 border-t-transparent rounded-full"></div>
-            Loading tutor profile...
-          </div>
-        </section>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 flex items-center justify-center">
+        <p className="text-purple-600 font-medium">Loading profile...</p>
       </div>
     );
   }
 
   if (error || !data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12">
-        <section className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 max-w-5xl mx-auto">
-          <div className="text-sm text-red-600 font-medium">{error || "Tutor not found."}</div>
-          <div className="mt-4">
-            <Link
-              to={backHref}
-              className="text-purple-600 font-semibold hover:text-purple-800 hover:underline"
-            >
-              Back to Results
-            </Link>
-          </div>
-        </section>
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 font-medium mb-4">{error || "Profile not found"}</p>
+          <Link
+            to={{ pathname: "/results", search }}
+            className="text-purple-600 hover:text-purple-800 font-semibold"
+          >
+            ← Back to Results
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12">
-      <section className="space-y-6 max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         <div className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50">
-          {/* Back to result list */}
           <Link
-            to={backHref}
-            className="inline-flex items-center gap-1 text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors mb-6"
+            to={{ pathname: "/results", search }}
+            className="inline-flex items-center gap-1 mb-6 text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors"
           >
             ← BACK TO RESULTS
           </Link>
 
-          {/* Header row: avatar + names */}
+          {/* Header row: avatar + info */}
           <div className="flex items-start gap-5 mb-8">
             <div
-              className={`h-24 w-24 md:h-28 md:w-28 rounded-2xl grid place-items-center text-4xl overflow-hidden shadow-lg ring-4 ring-amber-400 flex-shrink-0 ${
+              className={`h-24 w-24 md:h-28 md:w-28 rounded-2xl grid place-items-center overflow-hidden shadow-md border-2 flex-shrink-0 ${
                 data.profile_photo
-                  ? "bg-gradient-to-br from-purple-600 to-purple-800"
-                  : "bg-gray-100"
+                  ? "bg-purple-700 border-amber-500"
+                  : "bg-gray-200 border-gray-300"
               }`}
             >
-              {data.profile_photo ? (
-                <img
-                  src={data.profile_photo}
-                  alt={data.display_name}
-                  className="h-full w-full object-cover"
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                    e.currentTarget.parentElement.innerHTML = "👤";
-                    e.currentTarget.parentElement.classList.remove(
-                      "bg-gradient-to-br",
-                      "from-purple-600",
-                      "to-purple-800"
-                    );
-                    e.currentTarget.parentElement.classList.add("bg-gray-100");
-                  }}
-                />
-              ) : (
-                <span>👤</span>
-              )}
+              <img
+                src={data.profile_photo || defaultProfileImage}
+                alt={data.display_name}
+                className="h-full w-full object-cover"
+                onError={(e) => {
+                  e.currentTarget.src = defaultProfileImage;
+                }}
+              />
             </div>
 
             <div className="flex-1">
               <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
                 {data.display_name?.toUpperCase()}
               </h1>
-              <div className="text-lg text-slate-700 font-medium mt-1">{data.full_name}</div>
+              <div className="text-sm text-purple-600 font-medium mt-1">{data.sfsu_email}</div>
               <div className="mt-3 inline-flex items-center gap-2 text-2xl font-bold text-amber-600">
                 ${data.hourly_rate}
                 <span className="text-base font-medium text-slate-600">/hour</span>
@@ -197,49 +162,32 @@ export default function TutorProfile() {
             {/* Left column: core info */}
             <div className="space-y-5">
               <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
-                <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
-                  <span className="text-lg">&#128218;</span>
-                  Courses Covered
-                </div>
+                <div className="font-bold text-purple-900 mb-2">Courses Covered</div>
                 <div className="text-sm text-slate-700">{data.courses || "N/A"}</div>
               </div>
 
               <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
-                <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
-                  <span className="text-lg">&#127919;</span>
-                  Subject Tags
-                </div>
+                <div className="font-bold text-purple-900 mb-2">Subject Tags</div>
                 <div className="text-sm text-slate-700">{data.subject_tags || "N/A"}</div>
               </div>
 
               <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
-                <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
-                  <span className="text-lg">&#127760;</span>
-                  Languages Spoken
-                </div>
+                <div className="font-bold text-purple-900 mb-2">Languages Spoken</div>
                 <div className="text-sm text-slate-700">{data.languages || "N/A"}</div>
               </div>
 
-              {/* Text-based summary for backward compatibility */}
-              {data.availability_summary && (
-                <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
-                  <div className="font-bold text-purple-900 mb-2 flex items-center gap-2">
-                    <span className="text-lg">&#128197;</span>
-                    Availability Summary
-                  </div>
-                  <div className="text-sm text-slate-700 whitespace-pre-wrap">
-                    {data.availability_summary}
-                  </div>
+              {/* Tutoring Mode */}
+              <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-white p-5">
+                <div className="font-bold text-purple-900 mb-2">Tutoring Mode</div>
+                <div className="text-sm text-slate-700">
+                  {data.mode || "Online and In-person available"}
                 </div>
-              )}
+              </div>
             </div>
 
             {/* Right column: structured Weekly Availability */}
             <aside className="rounded-3xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-amber-50 p-6 shadow-lg h-fit sticky top-6">
-              <h2 className="text-lg font-bold text-purple-900 mb-4 flex items-center gap-2">
-                <span className="text-xl">&#128197;</span>
-                Weekly Availability
-              </h2>
+              <h2 className="text-lg font-bold text-purple-900 mb-4">Weekly Availability</h2>
 
               {Object.keys(availabilityByDay).length === 0 ? (
                 <p className="text-sm text-purple-600">
@@ -282,74 +230,28 @@ export default function TutorProfile() {
                         </div>
                       );
                     })}
-
-                  {/* Any non-standard day strings */}
-                  {Object.keys(availabilityByDay)
-                    .filter(
-                      (day) =>
-                        ![
-                          "Monday",
-                          "Tuesday",
-                          "Wednesday",
-                          "Thursday",
-                          "Friday",
-                          "Saturday",
-                          "Sunday",
-                        ].includes(day)
-                    )
-                    .map((day) => {
-                      const slots = availabilityByDay[day];
-                      return (
-                        <div
-                          key={day}
-                          className="bg-white rounded-xl p-3 border border-purple-200 shadow-sm"
-                        >
-                          <div className="font-bold text-purple-900 mb-2 text-sm">{day}</div>
-                          <div className="flex flex-wrap gap-2">
-                            {slots.map((slot) => {
-                              const start = slot.time_start;
-                              const end = slot.time_end;
-                              const hasRange = start && end;
-                              const label = slot.time_slot;
-
-                              return (
-                                <span
-                                  key={slot.availability_id}
-                                  className="inline-flex items-center rounded-full bg-purple-100 border border-purple-300 px-3 py-1 text-xs font-semibold text-purple-800"
-                                >
-                                  {hasRange
-                                    ? `${formatTime(start)} – ${formatTime(end)}`
-                                    : label || "Time not specified"}
-                                </span>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      );
-                    })}
                 </div>
               )}
             </aside>
           </div>
 
-          {/* Actions: contact + simple report */}
-          <div className="mt-8 flex flex-wrap gap-4">
+          {/* Contact and Report buttons */}
+          <div className="mt-8 flex justify-center gap-4">
             <button
-              onClick={goContact}
-              className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3 font-bold text-white shadow-lg shadow-purple-200 hover:from-purple-700 hover:to-purple-800 hover:shadow-xl transition-all"
+              onClick={handleContact}
+              className="rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 px-8 py-3 text-purple-900 font-bold shadow-lg shadow-amber-200 hover:from-amber-500 hover:to-amber-600 hover:shadow-xl transition-all"
             >
               CONTACT TUTOR
             </button>
-
             <button
-              onClick={handleReport}
-              className="inline-flex items-center justify-center rounded-xl border-2 border-red-300 bg-white px-6 py-3 font-bold text-red-600 hover:bg-red-50 hover:border-red-400 transition-all shadow-sm"
+              className="rounded-xl border-2 border-red-300 bg-white px-8 py-3 text-red-700 font-bold hover:bg-red-50 hover:border-red-400 transition-all shadow-sm cursor-not-allowed opacity-60"
+              title="Report feature not yet implemented"
             >
-              REPORT TUTOR
+              REPORT
             </button>
           </div>
         </div>
-      </section>
+      </div>
     </div>
   );
 }

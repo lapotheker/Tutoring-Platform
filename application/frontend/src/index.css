@@ -6,3 +6,14 @@
 :root {
   color-scheme: light;
 }
+
+/* SFSU Logo Color */
+img[src*="logo.svg"] {
+  filter: brightness(0) saturate(100%) invert(23%) sepia(93%) saturate(2755%) hue-rotate(256deg) brightness(91%) contrast(96%);
+  /* Purple logo */
+  border-radius: 50%;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(75, 46, 131, 0.3);
+  border: 3px solid #FDB515;
+  /* Gold border */
+}
