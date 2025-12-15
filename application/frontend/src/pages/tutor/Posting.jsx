@@ -157,15 +157,19 @@ export default function Posting() {
         }),
       });
 
-      const data = await response.json();
+       const data = await response.json();
 
-      if (data.success) {
-        // Navigate back to dashboard instead of showing message
+      if (response.ok && data?.success) {
         navigate("/tutor/dashboard");
       } else {
-        setMessage("Failed to submit profile: " + (data.error || "Unknown error"));
+        setMessage(
+          "Failed to submit profile: " +
+            (data?.error || data?.message || `HTTP ${response.status}`)
+        );
       }
     } catch (error) {
+
+
       console.error("Error submitting profile:", error);
       setMessage("Network error - please try again");
     }
