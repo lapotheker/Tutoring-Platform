@@ -149,7 +149,8 @@ export default function AdminDashboard() {
     return beforeAt.charAt(0).toUpperCase() + beforeAt.slice(1);
   }, [user]);
 
-  const card = "rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-xl shadow-purple-100";
+  const card =
+    "rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-xl shadow-purple-100";
 
   const StatusBadge = ({ value, type }) => {
     const color =
@@ -178,28 +179,28 @@ export default function AdminDashboard() {
             <div className="flex items-center gap-3">
               <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-lg ring-4 ring-amber-400 overflow-hidden">
                 <svg viewBox="0 0 24 24" fill="white" className="w-10 h-10">
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/>
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
                 </svg>
               </div>
               <div>
-                <div className="text-xl font-extrabold text-purple-900">Welcome, {displayName}!</div>
+                <div className="text-xl font-extrabold text-purple-900">
+                  Welcome, {displayName}!
+                </div>
                 <div className="text-sm text-purple-600 font-medium">Administrator</div>
               </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <Link to="/" title="Home" className="text-2xl hover:opacity-80 transition-opacity flex items-center justify-center w-8 h-8">
-                &#8962;
-              </Link>
             </div>
           </div>
 
           <div className="flex flex-col items-center mt-6">
             <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-2 ring-amber-400 mb-2">
-              <span className="text-xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+              <span
+                className="text-xl font-bold text-white leading-none tracking-tighter"
+                style={{ fontFamily: "Georgia, serif", fontStyle: "italic" }}
+              >
                 SG
               </span>
             </div>
-            
+
             <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
               ADMIN DASHBOARD
             </h1>
@@ -209,12 +210,14 @@ export default function AdminDashboard() {
         {/* ===== Tutor Profile Queue ===== */}
         <div className={card}>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl md:text-2xl font-extrabold text-purple-900">Tutor Profile Queue</h2>
+            <h2 className="text-xl md:text-2xl font-extrabold text-purple-900">
+              Tutor Profile Queue
+            </h2>
             <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
               {pendingTutors.length} pending
             </span>
           </div>
-          
+
           <div className="flex flex-wrap gap-2 mb-4">
             <button
               onClick={toggleAll}
@@ -228,8 +231,8 @@ export default function AdminDashboard() {
               onClick={() => updateTutorStatus("Approved")}
               disabled={noneSelected}
               className={`rounded-xl border-2 px-4 py-2 text-sm font-bold transition-all shadow-sm ${
-                noneSelected 
-                  ? "border-purple-200 bg-purple-50 text-purple-400 cursor-not-allowed" 
+                noneSelected
+                  ? "border-purple-200 bg-purple-50 text-purple-400 cursor-not-allowed"
                   : "border-emerald-300 bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:border-emerald-400"
               }`}
             >
@@ -239,8 +242,8 @@ export default function AdminDashboard() {
               onClick={() => updateTutorStatus("Rejected")}
               disabled={noneSelected}
               className={`rounded-xl border-2 px-4 py-2 text-sm font-bold transition-all shadow-sm ${
-                noneSelected 
-                  ? "border-purple-200 bg-purple-50 text-purple-400 cursor-not-allowed" 
+                noneSelected
+                  ? "border-purple-200 bg-purple-50 text-purple-400 cursor-not-allowed"
                   : "border-rose-300 bg-rose-50 text-rose-700 hover:bg-rose-100 hover:border-rose-400"
               }`}
             >
@@ -250,8 +253,8 @@ export default function AdminDashboard() {
               onClick={() => updateTutorStatus("Removed")}
               disabled={noneSelected}
               className={`rounded-xl border-2 px-4 py-2 text-sm font-bold transition-all shadow-sm ${
-                noneSelected 
-                  ? "border-purple-200 bg-purple-50 text-purple-400 cursor-not-allowed" 
+                noneSelected
+                  ? "border-purple-200 bg-purple-50 text-purple-400 cursor-not-allowed"
                   : "border-amber-300 bg-amber-50 text-amber-700 hover:bg-amber-100 hover:border-amber-400"
               }`}
             >
@@ -284,8 +287,12 @@ export default function AdminDashboard() {
                         />
                         <span className="font-bold text-purple-900">{tutor.full_name}</span>
                       </label>
-                      <span className="text-sm text-purple-700 font-semibold">{tutor.display_name}</span>
-                      <span className="text-sm text-amber-600 font-bold">${tutor.hourly_rate}/hr</span>
+                      <span className="text-sm text-purple-700 font-semibold">
+                        {tutor.display_name}
+                      </span>
+                      <span className="text-sm text-amber-600 font-bold">
+                        ${tutor.hourly_rate}/hr
+                      </span>
                       <StatusBadge value={tutor.approval_status} />
                       <span className="text-xs text-purple-600">
                         {new Date(tutor.created_at).toLocaleString()}
@@ -312,7 +319,7 @@ export default function AdminDashboard() {
               {reports.length} total
             </span>
           </div>
-          
+
           <div className="rounded-2xl border-2 border-purple-200 overflow-hidden">
             {loading ? (
               <p className="p-6 text-sm text-purple-600 font-medium">Loading reports...</p>
@@ -333,7 +340,10 @@ export default function AdminDashboard() {
                   </thead>
                   <tbody>
                     {reports.map((r) => (
-                      <tr key={r.report_id} className="border-t border-purple-200 hover:bg-purple-50">
+                      <tr
+                        key={r.report_id}
+                        className="border-t border-purple-200 hover:bg-purple-50"
+                      >
                         <td className="px-4 py-3 font-bold text-purple-900">{r.report_id}</td>
                         <td className="px-4 py-3 text-purple-700">{r.report_reason}</td>
                         <td className="px-4 py-3">
@@ -406,7 +416,7 @@ export default function AdminDashboard() {
               Last {actions.length} actions
             </span>
           </div>
-          
+
           <div className="rounded-2xl border-2 border-purple-200 overflow-hidden">
             {loading ? (
               <p className="p-6 text-sm text-purple-600 font-medium">Loading actions...</p>
@@ -426,8 +436,13 @@ export default function AdminDashboard() {
                   </thead>
                   <tbody>
                     {actions.map((a) => (
-                      <tr key={a.admin_action_id} className="border-t border-purple-200 hover:bg-purple-50">
-                        <td className="px-4 py-3 text-purple-700">{new Date(a.timestamp).toLocaleString()}</td>
+                      <tr
+                        key={a.admin_action_id}
+                        className="border-t border-purple-200 hover:bg-purple-50"
+                      >
+                        <td className="px-4 py-3 text-purple-700">
+                          {new Date(a.timestamp).toLocaleString()}
+                        </td>
                         <td className="px-4 py-3 font-semibold text-purple-900">{a.admin_email}</td>
                         <td className="px-4 py-3 font-bold text-amber-700">{a.action_type}</td>
                         <td className="px-4 py-3 text-purple-700">
@@ -459,7 +474,10 @@ export default function AdminDashboard() {
             <DetailRow label="Courses" value={profileDetail.courses || "—"} />
             <DetailRow label="Subjects" value={profileDetail.subjects || "—"} />
             <DetailRow label="Languages" value={profileDetail.languages || "—"} />
-            <DetailRow label="Created" value={new Date(profileDetail.created_at).toLocaleString()} />
+            <DetailRow
+              label="Created"
+              value={new Date(profileDetail.created_at).toLocaleString()}
+            />
             {profileDetail.updated_at && (
               <DetailRow
                 label="Updated"

@@ -8,44 +8,45 @@ const tutorModel = {
    */
   async searchTutors(filters = {}) {
     let query = `
-      SELECT DISTINCT
-        tp.tutor_profile_id,
-        tp.display_name,
-        tp.hourly_rate,
-        tp.approval_status,
-        tp.visibility,
-        u.full_name,
-        u.sfsu_email,
-        GROUP_CONCAT(DISTINCT cn.code SEPARATOR ', ') as courses,
-        GROUP_CONCAT(DISTINCT st.tag_name SEPARATOR ', ') as subject_tags,
-        GROUP_CONCAT(DISTINCT l.language_name SEPARATOR ', ') as languages,
-        MAX(tpp.file_path) as profile_photo,
-        -- Build availability summary from availability table for backward compatibility
-        GROUP_CONCAT(
-          DISTINCT CONCAT(
-            ta.day_of_week, 
-            CASE 
-              WHEN ta.time_slot IS NOT NULL THEN CONCAT(' ', ta.time_slot)
-              WHEN ta.time_start IS NOT NULL AND ta.time_end IS NOT NULL 
-                THEN CONCAT(' ', TIME_FORMAT(ta.time_start, '%h:%i %p'), '-', TIME_FORMAT(ta.time_end, '%h:%i %p'))
-              ELSE ''
-            END
-          )
-          SEPARATOR '; '
-        ) as availability_summary
-      FROM tutor_profile tp
-      INNER JOIN user u ON tp.tutor_user_id = u.user_id
-      LEFT JOIN tutor_profile_course tpc ON tp.tutor_profile_id = tpc.tutor_profile_id
-      LEFT JOIN course_number cn ON tpc.course_id = cn.course_id
-      LEFT JOIN tutor_profile_subject_tag tpst ON tp.tutor_profile_id = tpst.tutor_profile_id
-      LEFT JOIN subject_tag st ON tpst.tag_id = st.tag_id
-      LEFT JOIN tutor_profile_language tpl ON tp.tutor_profile_id = tpl.tutor_profile_id
-      LEFT JOIN language l ON tpl.language_id = l.language_id
-      LEFT JOIN tutor_profile_photo tpp ON tp.tutor_profile_id = tpp.tutor_profile_id AND tpp.policy_check = 'Approved'
-      LEFT JOIN tutor_availability ta ON tp.tutor_profile_id = ta.tutor_profile_id
-      WHERE tp.approval_status = 'Approved'
-        AND tp.visibility = 'Public'
-    `;
+    SELECT DISTINCT
+      tp.tutor_profile_id,
+      tp.tutor_user_id,
+      tp.display_name,
+      tp.hourly_rate,
+      tp.approval_status,
+      tp.visibility,
+      u.full_name,
+      u.sfsu_email,
+      GROUP_CONCAT(DISTINCT cn.code SEPARATOR ', ') as courses,
+      GROUP_CONCAT(DISTINCT st.tag_name SEPARATOR ', ') as subject_tags,
+      GROUP_CONCAT(DISTINCT l.language_name SEPARATOR ', ') as languages,
+      MAX(tpp.file_path) as profile_photo,
+      -- Build availability summary from availability table for backward compatibility
+      GROUP_CONCAT(
+        DISTINCT CONCAT(
+          ta.day_of_week, 
+          CASE 
+            WHEN ta.time_slot IS NOT NULL THEN CONCAT(' ', ta.time_slot)
+            WHEN ta.time_start IS NOT NULL AND ta.time_end IS NOT NULL 
+              THEN CONCAT(' ', TIME_FORMAT(ta.time_start, '%h:%i %p'), '-', TIME_FORMAT(ta.time_end, '%h:%i %p'))
+            ELSE ''
+          END
+        )
+        SEPARATOR '; '
+      ) as availability_summary
+    FROM tutor_profile tp
+    INNER JOIN user u ON tp.tutor_user_id = u.user_id
+    LEFT JOIN tutor_profile_course tpc ON tp.tutor_profile_id = tpc.tutor_profile_id
+    LEFT JOIN course_number cn ON tpc.course_id = cn.course_id
+    LEFT JOIN tutor_profile_subject_tag tpst ON tp.tutor_profile_id = tpst.tutor_profile_id
+    LEFT JOIN subject_tag st ON tpst.tag_id = st.tag_id
+    LEFT JOIN tutor_profile_language tpl ON tp.tutor_profile_id = tpl.tutor_profile_id
+    LEFT JOIN language l ON tpl.language_id = l.language_id
+    LEFT JOIN tutor_profile_photo tpp ON tp.tutor_profile_id = tpp.tutor_profile_id AND tpp.policy_check = 'Approved'
+    LEFT JOIN tutor_availability ta ON tp.tutor_profile_id = ta.tutor_profile_id
+    WHERE tp.approval_status = 'Approved'
+      AND tp.visibility = 'Public'
+  `;
 
     const params = [];
 
@@ -151,49 +152,50 @@ const tutorModel = {
    */
   async getTutorById(tutorId) {
     const query = `
-      SELECT 
-        tp.tutor_profile_id,
-        tp.display_name,
-        tp.hourly_rate,
-        tp.approval_status,
-        tp.visibility,
-        u.full_name,
-        u.sfsu_email,
-        GROUP_CONCAT(DISTINCT cn.code SEPARATOR ', ') as courses,
-        GROUP_CONCAT(DISTINCT st.tag_name SEPARATOR ', ') as subject_tags,
-        GROUP_CONCAT(DISTINCT l.language_name SEPARATOR ', ') as languages,
-        MAX(tpp.file_path) as profile_photo,
-        -- Build availability summary for backward compatibility
-        GROUP_CONCAT(
-          DISTINCT CONCAT(
-            ta.day_of_week,
-            CASE 
-              WHEN ta.time_slot IS NOT NULL THEN CONCAT(' ', ta.time_slot)
-              WHEN ta.time_start IS NOT NULL AND ta.time_end IS NOT NULL 
-                THEN CONCAT(' ', TIME_FORMAT(ta.time_start, '%h:%i %p'), '-', TIME_FORMAT(ta.time_end, '%h:%i %p'))
-              ELSE ''
-            END
-          )
-          SEPARATOR '; '
-        ) as availability_summary
-      FROM tutor_profile tp
-      INNER JOIN user u ON tp.tutor_user_id = u.user_id
-      LEFT JOIN tutor_profile_course tpc ON tp.tutor_profile_id = tpc.tutor_profile_id
-      LEFT JOIN course_number cn ON tpc.course_id = cn.course_id
-      LEFT JOIN tutor_profile_subject_tag tpst ON tp.tutor_profile_id = tpst.tutor_profile_id
-      LEFT JOIN subject_tag st ON tpst.tag_id = st.tag_id
-      LEFT JOIN tutor_profile_language tpl ON tp.tutor_profile_id = tpl.tutor_profile_id
-      LEFT JOIN language l ON tpl.language_id = l.language_id
-      LEFT JOIN tutor_profile_photo tpp ON tp.tutor_profile_id = tpp.tutor_profile_id AND tpp.policy_check = 'Approved'
-      LEFT JOIN tutor_availability ta ON tp.tutor_profile_id = ta.tutor_profile_id
-      WHERE tp.tutor_profile_id = ?
-        AND tp.approval_status = 'Approved'
-        AND tp.visibility = 'Public'
-      GROUP BY 
-        tp.tutor_profile_id, tp.display_name, tp.hourly_rate, 
-        tp.approval_status, tp.visibility, 
-        u.full_name, u.sfsu_email
-    `;
+    SELECT 
+      tp.tutor_profile_id,
+      tp.tutor_user_id,
+      tp.display_name,
+      tp.hourly_rate,
+      tp.approval_status,
+      tp.visibility,
+      u.full_name,
+      u.sfsu_email,
+      GROUP_CONCAT(DISTINCT cn.code SEPARATOR ', ') as courses,
+      GROUP_CONCAT(DISTINCT st.tag_name SEPARATOR ', ') as subject_tags,
+      GROUP_CONCAT(DISTINCT l.language_name SEPARATOR ', ') as languages,
+      MAX(tpp.file_path) as profile_photo,
+      -- Build availability summary for backward compatibility
+      GROUP_CONCAT(
+        DISTINCT CONCAT(
+          ta.day_of_week,
+          CASE 
+            WHEN ta.time_slot IS NOT NULL THEN CONCAT(' ', ta.time_slot)
+            WHEN ta.time_start IS NOT NULL AND ta.time_end IS NOT NULL 
+              THEN CONCAT(' ', TIME_FORMAT(ta.time_start, '%h:%i %p'), '-', TIME_FORMAT(ta.time_end, '%h:%i %p'))
+            ELSE ''
+          END
+        )
+        SEPARATOR '; '
+      ) as availability_summary
+    FROM tutor_profile tp
+    INNER JOIN user u ON tp.tutor_user_id = u.user_id
+    LEFT JOIN tutor_profile_course tpc ON tp.tutor_profile_id = tpc.tutor_profile_id
+    LEFT JOIN course_number cn ON tpc.course_id = cn.course_id
+    LEFT JOIN tutor_profile_subject_tag tpst ON tp.tutor_profile_id = tpst.tutor_profile_id
+    LEFT JOIN subject_tag st ON tpst.tag_id = st.tag_id
+    LEFT JOIN tutor_profile_language tpl ON tp.tutor_profile_id = tpl.tutor_profile_id
+    LEFT JOIN language l ON tpl.language_id = l.language_id
+    LEFT JOIN tutor_profile_photo tpp ON tp.tutor_profile_id = tpp.tutor_profile_id AND tpp.policy_check = 'Approved'
+    LEFT JOIN tutor_availability ta ON tp.tutor_profile_id = ta.tutor_profile_id
+    WHERE tp.tutor_profile_id = ?
+      AND tp.approval_status = 'Approved'
+      AND tp.visibility = 'Public'
+    GROUP BY 
+      tp.tutor_profile_id, tp.tutor_user_id, tp.display_name, tp.hourly_rate, 
+      tp.approval_status, tp.visibility, 
+      u.full_name, u.sfsu_email
+  `;
 
     const [rows] = await pool.execute(query, [tutorId]);
     const tutor = rows[0] || null;

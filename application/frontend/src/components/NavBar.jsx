@@ -48,8 +48,7 @@ export default function Navbar() {
     <nav className="border-b border-slate-200 bg-white shadow-sm">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex h-16 items-center justify-between">
-
-          {/* Navigation Links */}
+          {/* Left side - Home and About */}
           <div className="flex items-center gap-4">
             <Link
               to="/"
@@ -67,14 +66,17 @@ export default function Navbar() {
             >
               About
             </Link>
+          </div>
 
+          {/* Right side - Dashboards and Logout */}
+          <div className="flex items-center gap-4">
             {/* Student Dashboard (role 1 or 2) */}
             {showStudentDash && (
               <Link
                 to="/dashboard"
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive("/dashboard")
-                     ? "bg-purple-500 text-white shadow-sm"
+                    ? "bg-purple-500 text-white shadow-sm"
                     : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
                 }`}
               >

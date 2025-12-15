@@ -1,10 +1,10 @@
 // src/pages/RequestSession.jsx
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams, Link, useLocation } from "react-router-dom";
-import { API_BASE_URL } from "../../services/api";
+import { API_BASE_URL, tutorAPI } from "../../services/api";
 
 export default function RequestSession() {
-  const { id } = useParams(); // /tutor/request/:id
+  const { id } = useParams(); // /tutor/request/:id (this is tutor_profile_id)
   const navigate = useNavigate();
   const { search } = useLocation(); // keep prior filters when going back
 
@@ -13,6 +13,8 @@ export default function RequestSession() {
   const [message, setMessage] = useState("");
   const [err, setErr] = useState("");
   const [status, setStatus] = useState("idle"); // idle | sending | sent
+  const [tutorData, setTutorData] = useState(null);
+  const [loadingTutor, setLoadingTutor] = useState(true);
 
   // Read demo login (set by Login.jsx) and prefill FROM with @sfsu.edu email
   const demoUser = useMemo(() => {
@@ -24,6 +26,27 @@ export default function RequestSession() {
       return null;
     }
   }, []);
+
+  // Fetch tutor data to get tutor_user_id
+  useEffect(() => {
+    async function fetchTutor() {
+      try {
+        const response = await tutorAPI.getTutorById(id);
+        if (response.success) {
+          setTutorData(response.data);
+        }
+      } catch (err) {
+        console.error("Error fetching tutor:", err);
+        setErr("Failed to load tutor information");
+      } finally {
+        setLoadingTutor(false);
+      }
+    }
+
+    if (id) {
+      fetchTutor();
+    }
+  }, [id]);
 
   // If not logged in (demo), redirect to login then return here via ?next=
   useEffect(() => {
@@ -41,6 +64,7 @@ export default function RequestSession() {
       return "FROM must be a valid @sfsu.edu email.";
     }
     if (!message.trim()) return "MESSAGE is required.";
+    if (!tutorData?.tutor_user_id) return "Tutor information not loaded.";
     return "";
   }
 
@@ -58,19 +82,20 @@ export default function RequestSession() {
 
     try {
       // Store sent message in backend
-      const base = import.meta.env.VITE_API_BASE_URL || `${API_BASE_URL}`;
-
-      const res = await fetch(`${base}/api/messages`, {
+      const res = await fetch(`${API_BASE_URL}/messages`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           sender_user_id: parseInt(demoUser?.user_id || demoUser?.id, 10), // student's user ID
-          recipient_user_id: parseInt(id, 10), // tutor's user_id from URL
+          recipient_user_id: parseInt(tutorData.tutor_user_id, 10), // tutor's user_id (NOT profile_id!)
           message: message.trim(), // backend only accepts this field
         }),
       });
 
-      if (!res.ok) throw new Error("Failed to send message");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.error || "Failed to send message");
+      }
 
       // Demo: simulate a short network delay
       await new Promise((r) => setTimeout(r, 700));
@@ -85,8 +110,17 @@ export default function RequestSession() {
   }
 
   // Simple panel + form layout to mirror the wireframe
-  const input = "w-full max-w-xs rounded-xl border-2 border-purple-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all";
+  const input =
+    "w-full max-w-xs rounded-xl border-2 border-purple-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all";
   const label = "text-sm font-bold text-purple-900";
+
+  if (loadingTutor) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12 flex items-center justify-center">
+        <p className="text-purple-600 font-medium">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-12">
@@ -104,9 +138,16 @@ export default function RequestSession() {
             <div className="h-12 w-12 rounded-xl bg-gradient-to-br from-purple-600 to-purple-800 flex items-center justify-center shadow-lg ring-2 ring-amber-400">
               <span className="text-2xl">✉️</span>
             </div>
-            <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
-              Contact Form
-            </h1>
+            <div>
+              <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
+                Contact Form
+              </h1>
+              {tutorData && (
+                <p className="text-sm text-purple-600 font-medium">
+                  Messaging: {tutorData.display_name}
+                </p>
+              )}
+            </div>
           </div>
 
           {/* Form Block */}
@@ -123,7 +164,9 @@ export default function RequestSession() {
                 autoComplete="email"
                 required
               />
-              <p className="text-xs text-purple-600 mt-1.5 font-medium">(Must use @sfsu.edu email)</p>
+              <p className="text-xs text-purple-600 mt-1.5 font-medium">
+                (Must use @sfsu.edu email)
+              </p>
             </div>
 
             {/* MESSAGE */}
@@ -136,8 +179,8 @@ export default function RequestSession() {
                   <span className="text-amber-600 text-lg">💡</span>
                   <div>
                     <div className="font-semibold text-amber-900 mb-1">Example:</div>
-                    "Hi Sarah, I'm taking CSC 648 this semester and need help with the team
-                    project requirements. Are you available for tutoring sessions on Wednesdays?"
+                    "Hi Sarah, I'm taking CSC 648 this semester and need help with the team project
+                    requirements. Are you available for tutoring sessions on Wednesdays?"
                   </div>
                 </div>
               </div>
@@ -164,7 +207,7 @@ export default function RequestSession() {
             <div className="flex gap-3 pt-2">
               <button
                 type="submit"
-                disabled={status === "sending"}
+                disabled={status === "sending" || loadingTutor}
                 className="rounded-xl bg-gradient-to-r from-purple-600 to-purple-700 px-6 py-3 text-white font-bold shadow-lg shadow-purple-200 hover:from-purple-700 hover:to-purple-800 hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed transition-all"
               >
                 {status === "sending" ? "SENDING…" : "SEND MESSAGE"}
