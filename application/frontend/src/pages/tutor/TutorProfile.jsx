@@ -152,7 +152,13 @@ export default function TutorProfile() {
 
           {/* Header row: avatar + names */}
           <div className="flex items-start gap-5 mb-8">
-            <div className="h-24 w-24 md:h-28 md:w-28 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 grid place-items-center text-white text-4xl overflow-hidden shadow-lg ring-4 ring-amber-400 flex-shrink-0">
+            <div
+              className={`h-24 w-24 md:h-28 md:w-28 rounded-2xl grid place-items-center text-4xl overflow-hidden shadow-lg ring-4 ring-amber-400 flex-shrink-0 ${
+                data.profile_photo
+                  ? "bg-gradient-to-br from-purple-600 to-purple-800"
+                  : "bg-gray-100"
+              }`}
+            >
               {data.profile_photo ? (
                 <img
                   src={data.profile_photo}
@@ -160,10 +166,17 @@ export default function TutorProfile() {
                   className="h-full w-full object-cover"
                   onError={(e) => {
                     e.currentTarget.style.display = "none";
+                    e.currentTarget.parentElement.innerHTML = "👤";
+                    e.currentTarget.parentElement.classList.remove(
+                      "bg-gradient-to-br",
+                      "from-purple-600",
+                      "to-purple-800"
+                    );
+                    e.currentTarget.parentElement.classList.add("bg-gray-100");
                   }}
                 />
               ) : (
-                "&#128100;"
+                <span>👤</span>
               )}
             </div>
 

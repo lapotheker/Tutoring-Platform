@@ -263,25 +263,39 @@ const tutorModel = {
     try {
       await connection.beginTransaction();
 
-      const tutorUserId = 2; // In real app, from authentication
-      const adminUserId = 1; // Alice Admin's user_id
+      const tutorUserId = profileData.tutorUserId; // Use the passed user ID
 
       // Insert tutor profile WITHOUT availability_summary
       const [profileResult] = await connection.execute(
         `INSERT INTO tutor_profile 
-         (tutor_user_id, display_name, hourly_rate, 
-          approval_status, visibility, created_by, updated_by) 
-         VALUES (?, ?, ?, 'Pending', 'Public', ?, ?)`,
+       (tutor_user_id, display_name, hourly_rate, 
+        approval_status, visibility, created_by, updated_by) 
+       VALUES (?, ?, ?, 'Pending', 'Public', ?, ?)`,
         [
           tutorUserId,
           profileData.displayName,
           parseFloat(profileData.hourlyRate),
-          adminUserId,
-          adminUserId,
+          tutorUserId, // Use tutor's own ID as created_by
+          tutorUserId, // Use tutor's own ID as updated_by
         ]
       );
 
       const tutorProfileId = profileResult.insertId;
+
+      // If profile photo URL is provided, insert it
+      if (profileData.profilePhotoUrl) {
+        await connection.execute(
+          `INSERT INTO tutor_profile_photo 
+         (tutor_profile_id, file_path, caption, policy_check, uploaded_at) 
+         VALUES (?, ?, ?, 'Approved', NOW())`,
+          [
+            tutorProfileId,
+            profileData.profilePhotoUrl,
+            "Profile photo",
+            "Approved",
+          ]
+        );
+      }
 
       // Handle courses (same as before)
       if (profileData.courses && profileData.courses.length > 0) {
@@ -354,6 +368,232 @@ const tutorModel = {
 
       await connection.commit();
       return { success: true, tutorProfileId };
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  },
+
+  /**
+   * Update existing tutor profile
+   */
+  async updateTutorProfile(profileId, profileData) {
+    const connection = await pool.getConnection();
+
+    try {
+      await connection.beginTransaction();
+
+      const tutorUserId = profileData.tutorUserId;
+
+      // Update basic profile info
+      await connection.execute(
+        `UPDATE tutor_profile 
+       SET display_name = ?, 
+           hourly_rate = ?, 
+           updated_by = ?,
+           updated_at = NOW()
+       WHERE tutor_profile_id = ?`,
+        [
+          profileData.displayName || null,
+          parseFloat(profileData.hourlyRate),
+          tutorUserId,
+          profileId,
+        ]
+      );
+
+      // Update profile photo if provided
+      if (profileData.profilePhotoUrl) {
+        // Check if photo exists
+        const [existingPhoto] = await connection.execute(
+          "SELECT media_id FROM tutor_profile_photo WHERE tutor_profile_id = ? LIMIT 1",
+          [profileId]
+        );
+
+        if (existingPhoto.length > 0) {
+          // Update existing photo
+          await connection.execute(
+            "UPDATE tutor_profile_photo SET file_path = ?, uploaded_at = NOW() WHERE media_id = ?",
+            [profileData.profilePhotoUrl, existingPhoto[0].media_id]
+          );
+        } else {
+          // Insert new photo
+          await connection.execute(
+            `INSERT INTO tutor_profile_photo 
+           (tutor_profile_id, file_path, caption, policy_check, uploaded_at) 
+           VALUES (?, ?, ?, 'Approved', NOW())`,
+            [
+              profileId,
+              profileData.profilePhotoUrl,
+              "Profile photo",
+              "Approved",
+            ]
+          );
+        }
+      }
+
+      // Update courses - delete old ones and insert new ones
+      await connection.execute(
+        "DELETE FROM tutor_profile_course WHERE tutor_profile_id = ?",
+        [profileId]
+      );
+
+      if (profileData.courses && profileData.courses.length > 0) {
+        for (const courseName of profileData.courses) {
+          const cleanCourseName = courseName.trim();
+
+          let [courseRows] = await connection.execute(
+            "SELECT course_id FROM course_number WHERE code = ?",
+            [cleanCourseName]
+          );
+
+          if (courseRows.length === 0) {
+            [courseRows] = await connection.execute(
+              "SELECT course_id FROM course_number WHERE REPLACE(code, ' ', '') LIKE REPLACE(?, ' ', '')",
+              [`%${cleanCourseName}%`]
+            );
+          }
+
+          if (courseRows.length === 0) {
+            const match = cleanCourseName.match(/([A-Z]+)\s*(\d+)/i);
+            if (match) {
+              const [, dept, num] = match;
+              [courseRows] = await connection.execute(
+                "SELECT course_id FROM course_number WHERE code LIKE ? OR code LIKE ?",
+                [`${dept}${num}%`, `${dept} ${num}%`]
+              );
+            }
+          }
+
+          if (courseRows.length > 0) {
+            await connection.execute(
+              "INSERT INTO tutor_profile_course (tutor_profile_id, course_id) VALUES (?, ?)",
+              [profileId, courseRows[0].course_id]
+            );
+          }
+        }
+      }
+
+      // Update subject tags
+      await connection.execute(
+        "DELETE FROM tutor_profile_subject_tag WHERE tutor_profile_id = ?",
+        [profileId]
+      );
+
+      if (profileData.subjects && profileData.subjects.length > 0) {
+        for (const subjectName of profileData.subjects) {
+          const [subjectRows] = await connection.execute(
+            "SELECT tag_id FROM subject_tag WHERE tag_name LIKE ?",
+            [`%${subjectName.trim()}%`]
+          );
+
+          if (subjectRows.length > 0) {
+            await connection.execute(
+              "INSERT INTO tutor_profile_subject_tag (tutor_profile_id, tag_id) VALUES (?, ?)",
+              [profileId, subjectRows[0].tag_id]
+            );
+          }
+        }
+      }
+
+      // Update languages
+      await connection.execute(
+        "DELETE FROM tutor_profile_language WHERE tutor_profile_id = ?",
+        [profileId]
+      );
+
+      if (profileData.languages && profileData.languages.length > 0) {
+        for (const languageName of profileData.languages) {
+          const [langRows] = await connection.execute(
+            "SELECT language_id FROM language WHERE language_name LIKE ?",
+            [`%${languageName.trim()}%`]
+          );
+
+          if (langRows.length > 0) {
+            await connection.execute(
+              "INSERT INTO tutor_profile_language (tutor_profile_id, language_id) VALUES (?, ?)",
+              [profileId, langRows[0].language_id]
+            );
+          }
+        }
+      }
+
+      // Update availability
+      await connection.execute(
+        "DELETE FROM tutor_availability WHERE tutor_profile_id = ?",
+        [profileId]
+      );
+
+      if (profileData.availability && Array.isArray(profileData.availability)) {
+        for (const avail of profileData.availability) {
+          const dayMapping = {
+            Mon: "Monday",
+            Tue: "Tuesday",
+            Wed: "Wednesday",
+            Thu: "Thursday",
+            Fri: "Friday",
+            Sat: "Saturday",
+            Sun: "Sunday",
+          };
+
+          const timeSlotMapping = {
+            morning: {
+              slot: "Morning",
+              start: "09:00:00",
+              end: "12:00:00",
+            },
+            afternoon: {
+              slot: "Afternoon",
+              start: "13:00:00",
+              end: "17:00:00",
+            },
+            evening: {
+              slot: "Evening",
+              start: "18:00:00",
+              end: "22:00:00",
+            },
+            Morning: {
+              slot: "Morning",
+              start: "09:00:00",
+              end: "12:00:00",
+            },
+            Afternoon: {
+              slot: "Afternoon",
+              start: "13:00:00",
+              end: "17:00:00",
+            },
+            Evening: {
+              slot: "Evening",
+              start: "18:00:00",
+              end: "22:00:00",
+            },
+          };
+
+          const dayOfWeek = dayMapping[avail.day] || avail.day;
+          const timeInfo =
+            timeSlotMapping[avail.slot] ||
+            timeSlotMapping[avail.slot?.toLowerCase()];
+
+          if (timeInfo) {
+            await connection.execute(
+              `INSERT INTO tutor_availability 
+         (tutor_profile_id, day_of_week, time_slot, time_start, time_end) 
+         VALUES (?, ?, ?, ?, ?)`,
+              [
+                profileId,
+                dayOfWeek,
+                timeInfo.slot,
+                timeInfo.start,
+                timeInfo.end,
+              ]
+            );
+          }
+        }
+      }
+
+      await connection.commit();
+      return { tutorProfileId: profileId };
     } catch (error) {
       await connection.rollback();
       throw error;

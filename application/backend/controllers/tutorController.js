@@ -97,9 +97,11 @@ const tutorController = {
   async createTutorProfile(req, res) {
     try {
       const profileData = {
-        displayName: req.body.fullName, // Map from frontend's fullName to display_name
+        tutorUserId: req.body.tutorUserId,
+        displayName: req.body.fullName,
         hourlyRate: req.body.hourlyRate,
-        availabilitySummary: req.body.availability, // (kept for legacy)
+        availability: req.body.availability, // Now an array
+        profilePhotoUrl: req.body.profilePhotoUrl,
         courses: req.body.courses
           ? req.body.courses.split(",").map((c) => c.trim())
           : [],
@@ -115,13 +117,15 @@ const tutorController = {
 
       // Validate required fields
       if (
+        !profileData.tutorUserId ||
         !profileData.displayName ||
         !profileData.hourlyRate ||
-        !profileData.availabilitySummary
+        !profileData.availability
       ) {
         return res.status(400).json({
           success: false,
-          error: "Missing required fields: fullName, hourlyRate, availability",
+          error:
+            "Missing required fields: tutorUserId, fullName, hourlyRate, availability",
         });
       }
 
@@ -137,6 +141,57 @@ const tutorController = {
       res.status(500).json({
         success: false,
         error: "Failed to create tutor profile",
+      });
+    }
+  },
+
+  /**
+   * Update existing tutor profile
+   * PUT /api/tutors/profile/:profileId
+   */
+  async updateTutorProfile(req, res) {
+    try {
+      const { profileId } = req.params;
+      const profileData = {
+        tutorUserId: req.body.tutorUserId,
+        displayName: req.body.fullName,
+        hourlyRate: req.body.hourlyRate,
+        profilePhotoUrl: req.body.profilePhotoUrl,
+        courses: req.body.courses
+          ? req.body.courses.split(",").map((c) => c.trim())
+          : [],
+        subjects: req.body.subjects
+          ? req.body.subjects.split(",").map((s) => s.trim())
+          : [],
+        languages: req.body.languages
+          ? req.body.languages.split(",").map((l) => l.trim())
+          : [],
+        availability: req.body.availability, // Array of {day, slot} objects
+      };
+
+      // Validate required fields
+      if (!profileData.tutorUserId || !profileData.hourlyRate) {
+        return res.status(400).json({
+          success: false,
+          error: "Missing required fields: tutorUserId, hourlyRate",
+        });
+      }
+
+      const result = await tutorModel.updateTutorProfile(
+        profileId,
+        profileData
+      );
+
+      res.json({
+        success: true,
+        message: "Tutor profile updated successfully",
+        tutorProfileId: result.tutorProfileId,
+      });
+    } catch (error) {
+      console.error("Error in updateTutorProfile controller:", error);
+      res.status(500).json({
+        success: false,
+        error: "Failed to update tutor profile",
       });
     }
   },

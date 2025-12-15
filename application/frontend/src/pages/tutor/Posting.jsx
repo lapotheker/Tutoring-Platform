@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../services/api";
 
 export default function Posting() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     fullName: "",
+    profilePhotoUrl: "",
     bio: "",
     subjects: "",
     courses: "",
@@ -38,8 +40,42 @@ export default function Posting() {
       e.hourlyRate = "Enter a valid hourly rate";
     if (form.availabilityDays.length === 0) e.availabilityDays = "Select at least one day";
     if (form.availabilityTimes.length === 0) e.availabilityTimes = "Select at least one time slot";
+
+    // Validate profile photo URL if provided
+    if (form.profilePhotoUrl && !form.profilePhotoUrl.startsWith("http")) {
+      e.profilePhotoUrl = "Profile photo must be a valid URL starting with http:// or https://";
+    }
+
     setErrors(e);
     return Object.keys(e).length === 0;
+  }
+
+  // Build availability summary from days and times
+  function buildAvailabilitySummary() {
+    if (form.availabilityDays.length === 0 || form.availabilityTimes.length === 0) {
+      return "";
+    }
+
+    const dayMapping = {
+      Mon: "Monday",
+      Tue: "Tuesday",
+      Wed: "Wednesday",
+      Thu: "Thursday",
+      Fri: "Friday",
+      Sat: "Saturday",
+      Sun: "Sunday",
+    };
+
+    const timeMapping = {
+      morning: "Morning",
+      afternoon: "Afternoon",
+      evening: "Evening",
+    };
+
+    const days = form.availabilityDays.map((d) => dayMapping[d] || d).join(", ");
+    const times = form.availabilityTimes.map((t) => timeMapping[t] || t).join(", ");
+
+    return `${days} • ${times}`;
   }
 
   async function onSubmit(e) {
@@ -49,19 +85,73 @@ export default function Posting() {
     setMessage("Submitting profile...");
 
     try {
+      // Get the logged-in user's ID
+      const demoUser = JSON.parse(
+        localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser") || "{}"
+      );
+      const tutorUserId = demoUser?.user_id || demoUser?.id;
+
+      if (!tutorUserId) {
+        setMessage("Failed: You must be logged in to create a profile");
+        return;
+      }
+
+      // Build structured availability array
+      const availabilityArray = [];
+      const dayMapping = {
+        Mon: "Monday",
+        Tue: "Tuesday",
+        Wed: "Wednesday",
+        Thu: "Thursday",
+        Fri: "Friday",
+        Sat: "Saturday",
+        Sun: "Sunday",
+      };
+
+      const timeSlotMapping = {
+        morning: {
+          slot: "Morning",
+          start: "09:00:00",
+          end: "12:00:00",
+        },
+        afternoon: {
+          slot: "Afternoon",
+          start: "13:00:00",
+          end: "17:00:00",
+        },
+        evening: {
+          slot: "Evening",
+          start: "18:00:00",
+          end: "22:00:00",
+        },
+      };
+
+      form.availabilityDays.forEach((day) => {
+        form.availabilityTimes.forEach((time) => {
+          const timeInfo = timeSlotMapping[time];
+          availabilityArray.push({
+            day_of_week: dayMapping[day],
+            time_slot: timeInfo.slot,
+            time_start: timeInfo.start,
+            time_end: timeInfo.end,
+          });
+        });
+      });
+
       const response = await fetch(`${API_BASE_URL}/tutors/profile`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          tutorUserId: tutorUserId,
           fullName: form.fullName,
+          profilePhotoUrl: form.profilePhotoUrl || null,
           bio: form.bio,
           subjects: form.subjects,
           courses: form.courses,
           languages: form.languages,
           hourlyRate: form.hourlyRate,
           mode: form.mode,
-          availabilityDays: form.availabilityDays,
-          availabilityTimes: form.availabilityTimes,
+          availability: availabilityArray, // Send as structured array
           contactMethod: form.contactMethod,
         }),
       });
@@ -69,19 +159,8 @@ export default function Posting() {
       const data = await response.json();
 
       if (data.success) {
-        setMessage("Profile submitted successfully! Awaiting admin approval.");
-        setForm({
-          fullName: "",
-          bio: "",
-          subjects: "",
-          courses: "",
-          languages: "",
-          hourlyRate: "",
-          mode: "online",
-          availabilityDays: [],
-          availabilityTimes: [],
-          contactMethod: "platform",
-        });
+        // Navigate back to dashboard instead of showing message
+        navigate("/tutor/dashboard");
       } else {
         setMessage("Failed to submit profile: " + (data.error || "Unknown error"));
       }
@@ -104,12 +183,15 @@ export default function Posting() {
         <section className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 space-y-6">
           <div className="text-center">
             <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-4 ring-amber-400 mb-4">
-              <span className="text-2xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
+              <span
+                className="text-2xl font-bold text-white leading-none tracking-tighter"
+                style={{ fontFamily: "Georgia, serif", fontStyle: "italic" }}
+              >
                 SG
               </span>
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
-              BECOME A TUTOR 
+              BECOME A TUTOR
             </h1>
             <p className="text-sm text-purple-600 font-medium mt-2">
               Provide your teaching information so students can find you
@@ -127,6 +209,22 @@ export default function Posting() {
                 placeholder="e.g., John Doe"
               />
               {errors.fullName && <p className={errClass}>{errors.fullName}</p>}
+            </div>
+
+            <div>
+              <label className={labelClass}>Profile Photo URL (optional)</label>
+              <input
+                type="url"
+                className={inputClass}
+                value={form.profilePhotoUrl}
+                onChange={(e) => update("profilePhotoUrl", e.target.value)}
+                placeholder="e.g., https://i.pravatar.cc/400 or https://images.unsplash.com/photo-..."
+              />
+              <p className="mt-1.5 text-xs text-purple-600 font-medium">
+                Use a public image URL (Unsplash, Pravatar, etc.). Leave blank to use default
+                avatar.
+              </p>
+              {errors.profilePhotoUrl && <p className={errClass}>{errors.profilePhotoUrl}</p>}
             </div>
 
             <div>
@@ -273,6 +371,7 @@ export default function Posting() {
                 onClick={() =>
                   setForm({
                     fullName: "",
+                    profilePhotoUrl: "",
                     bio: "",
                     subjects: "",
                     courses: "",
@@ -297,8 +396,14 @@ export default function Posting() {
             </div>
 
             {message && (
-              <div className="rounded-xl border-2 border-green-300 bg-green-50 text-green-900 text-sm px-4 py-3 flex items-start gap-2">
-                <span className="text-lg">✓</span>
+              <div
+                className={`rounded-xl border-2 px-4 py-3 flex items-start gap-2 text-sm ${
+                  message.includes("successfully")
+                    ? "border-green-300 bg-green-50 text-green-900"
+                    : "border-red-300 bg-red-50 text-red-900"
+                }`}
+              >
+                <span className="text-lg">{message.includes("successfully") ? "✓" : "⚠️"}</span>
                 <span className="font-medium">{message}</span>
               </div>
             )}
