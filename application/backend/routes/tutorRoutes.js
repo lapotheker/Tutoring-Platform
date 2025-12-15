@@ -14,4 +14,7 @@ router.get("/:id", tutorController.getTutorById);
 // POST /api/tutors/profile - Create new tutor profile
 router.post("/profile", tutorController.createTutorProfile);
 
+// PUT /api/tutors/profile/:profileId - Update existing tutor profile
+router.put("/profile/:profileId", tutorController.updateTutorProfile);
+
 module.exports = router;

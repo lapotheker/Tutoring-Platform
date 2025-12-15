@@ -48,12 +48,7 @@ export default function Navbar() {
     <nav className="border-b border-slate-200 bg-white shadow-sm">
       <div className="mx-auto max-w-6xl px-4">
         <div className="flex h-16 items-center justify-between">
-          {/* Logo/Brand */}
-          <Link to="/" className="text-xl font-bold text-slate-900 hover:text-blue-600 transition">
-            SFSU Tutoring
-          </Link>
-
-          {/* Navigation Links */}
+          {/* Left side - Home and About */}
           <div className="flex items-center gap-4">
             <Link
               to="/"
@@ -71,18 +66,21 @@ export default function Navbar() {
             >
               About
             </Link>
+          </div>
 
+          {/* Right side - Dashboards and Logout */}
+          <div className="flex items-center gap-4">
             {/* Student Dashboard (role 1 or 2) */}
             {showStudentDash && (
               <Link
                 to="/dashboard"
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive("/dashboard")
-                    ? "bg-blue-600 text-white shadow-sm"
-                    : "bg-blue-50 text-blue-600 hover:bg-blue-100 border border-blue-200"
+                    ? "bg-purple-500 text-white shadow-sm"
+                    : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
                 }`}
               >
-                <MessageSquare className="w-4 h-4" />
+                <span className="font-bold text-lg"></span>
                 <span>Student Dashboard</span>
               </Link>
             )}
@@ -93,11 +91,11 @@ export default function Navbar() {
                 to="/tutor/dashboard"
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive("/tutor/dashboard")
-                    ? "bg-green-600 text-white shadow-sm"
-                    : "bg-green-50 text-green-700 hover:bg-green-100 border border-green-200"
+                    ? "bg-purple-500 text-white shadow-sm"
+                    : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
                 }`}
               >
-                <span className="font-bold text-lg">🎓</span>
+                <span className="font-bold text-lg"></span>
                 <span>Tutor Dashboard</span>
               </Link>
             )}
@@ -105,14 +103,14 @@ export default function Navbar() {
             {/* Admin Dashboard (role 3) */}
             {showAdminDash && (
               <Link
-                to="/admin/dashboard"
+                to="/admin"
                 className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
                   isActive("/admin/dashboard")
                     ? "bg-purple-500 text-white shadow-sm"
                     : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
                 }`}
               >
-                <span className="font-bold text-lg">🛠️</span>
+                <span className="font-bold text-lg"></span>
                 <span>Admin Dashboard</span>
               </Link>
             )}

@@ -1,6 +1,11 @@
 // src/components/FiltersSidebar.jsx
+import { useEffect, useState } from "react";
+import { dataAPI } from "../services/api";
+import SearchableDropdown from "./SearchableDropdown";
+
 export default function FiltersSidebar({ filters, onFiltersChange }) {
   const {
+    course = "",
     subject = "",
     language = "",
     minRate = "",
@@ -9,6 +14,56 @@ export default function FiltersSidebar({ filters, onFiltersChange }) {
     times = [],
   } = filters || {};
 
+  const [courses, setCourses] = useState([]);
+  const [subjects, setSubjects] = useState([]);
+  const [languages, setLanguages] = useState([]);
+  const [loadingCourses, setLoadingCourses] = useState(true);
+  const [loadingSubjects, setLoadingSubjects] = useState(true);
+  const [loadingLanguages, setLoadingLanguages] = useState(true);
+
+  // Fetch all filter data on mount
+  useEffect(() => {
+    async function fetchFilterData() {
+      try {
+        // Fetch courses
+        const coursesResponse = await dataAPI.getCourses();
+        if (coursesResponse.success && coursesResponse.data) {
+          setCourses(coursesResponse.data.map((c) => c.code));
+        }
+      } catch (error) {
+        console.error("Failed to fetch courses:", error);
+      } finally {
+        setLoadingCourses(false);
+      }
+
+      try {
+        // Fetch subjects
+        const subjectsResponse = await dataAPI.getSubjects();
+        if (subjectsResponse.success && subjectsResponse.data) {
+          setSubjects(subjectsResponse.data.map((s) => s.tag_name));
+        }
+      } catch (error) {
+        console.error("Failed to fetch subjects:", error);
+      } finally {
+        setLoadingSubjects(false);
+      }
+
+      try {
+        // Fetch languages
+        const languagesResponse = await dataAPI.getLanguages();
+        if (languagesResponse.success && languagesResponse.data) {
+          setLanguages(languagesResponse.data.map((l) => l.language_name));
+        }
+      } catch (error) {
+        console.error("Failed to fetch languages:", error);
+      } finally {
+        setLoadingLanguages(false);
+      }
+    }
+
+    fetchFilterData();
+  }, []);
+
   function update(patch) {
     onFiltersChange({
       ...filters,
@@ -16,13 +71,15 @@ export default function FiltersSidebar({ filters, onFiltersChange }) {
     });
   }
 
-  function handleSubjectChange(e) {
-    const value = e.target.value;
+  function handleCourseChange(value) {
+    update({ course: value || "" });
+  }
+
+  function handleSubjectChange(value) {
     update({ subject: value || "" });
   }
 
-  function handleLanguageChange(e) {
-    const value = e.target.value;
+  function handleLanguageChange(value) {
     update({ language: value || "" });
   }
 
@@ -61,52 +118,63 @@ export default function FiltersSidebar({ filters, onFiltersChange }) {
     { key: "evening", label: "Evening (5pm–10pm)" },
   ];
 
-  const card = "rounded-2xl border border-slate-200 bg-white p-4 shadow-sm";
-  const label = "text-xs font-semibold text-slate-700 tracking-wide";
-  const select =
-    "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900";
+  const card =
+    "rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-xl shadow-purple-100";
+  const label = "text-xs font-bold text-purple-900 tracking-wide uppercase";
   const input =
-    "mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-slate-900";
-  const dayBtnBase = "px-3 py-1 rounded-full border text-xs font-medium transition-colors";
-  const dayBtnActive = "bg-slate-900 text-white border-slate-900";
-  const dayBtnInactive = "bg-white text-slate-700 border-slate-300 hover:bg-slate-100";
+    "w-full rounded-xl border-2 border-purple-200 px-4 py-2.5 text-sm focus:outline-none focus:ring-4 focus:ring-purple-200 focus:border-purple-500 transition-all bg-white";
+  const dayBtnBase = "px-4 py-2 rounded-full border-2 text-xs font-bold transition-all shadow-sm";
+  const dayBtnActive =
+    "bg-gradient-to-r from-purple-600 to-purple-700 text-white border-purple-700 shadow-md";
+  const dayBtnInactive =
+    "bg-white text-purple-700 border-purple-300 hover:bg-purple-50 hover:border-purple-400";
 
   return (
     <aside className={card}>
-      <h3 className="text-sm font-semibold text-slate-900">Filters</h3>
-      <p className="mt-1 text-xs text-slate-500">
-        Narrow down tutors by subject, language, rate, and availability.
-      </p>
+      <div className="flex items-center gap-2 mb-2">
+        <h3 className="text-lg font-extrabold text-purple-900">Filters</h3>
+      </div>
+
+      {/* COURSE */}
+      <div className="mt-6 space-y-1">
+        <div className={label}>Course</div>
+        <SearchableDropdown
+          value={course}
+          onChange={handleCourseChange}
+          options={courses}
+          placeholder="Type to search courses (e.g., CSC 340)"
+          loading={loadingCourses}
+        />
+      </div>
 
       {/* SUBJECT */}
-      <div className="mt-4 space-y-1">
-        <div className={label}>SUBJECT</div>
-        <select value={subject} onChange={handleSubjectChange} className={select}>
-          <option value="">Any subject</option>
-          <option value="cs">Computer Science</option>
-          <option value="math">Math</option>
-          <option value="writing">Writing</option>
-          <option value="statistics">Statistics</option>
-        </select>
+      <div className="mt-5 space-y-1">
+        <div className={label}>Subject</div>
+        <SearchableDropdown
+          value={subject}
+          onChange={handleSubjectChange}
+          options={subjects}
+          placeholder="Type to search subjects"
+          loading={loadingSubjects}
+        />
       </div>
 
       {/* LANGUAGE */}
-      <div className="mt-4 space-y-1">
-        <div className={label}>LANGUAGE</div>
-        <select value={language} onChange={handleLanguageChange} className={select}>
-          <option value="">Any language</option>
-          <option value="English">English</option>
-          <option value="Chinese">Chinese</option>
-          <option value="Spanish">Spanish</option>
-          <option value="Hindi">Hindi</option>
-          <option value="Italian">Italian</option>
-        </select>
+      <div className="mt-5 space-y-1">
+        <div className={label}>Language</div>
+        <SearchableDropdown
+          value={language}
+          onChange={handleLanguageChange}
+          options={languages}
+          placeholder="Type to search languages"
+          loading={loadingLanguages}
+        />
       </div>
 
       {/* HOURLY RATE */}
-      <div className="mt-4 space-y-1">
-        <div className={label}>HOURLY RATE ($)</div>
-        <div className="mt-1 flex gap-2">
+      <div className="mt-5 space-y-1">
+        <div className={label}>Hourly Rate ($)</div>
+        <div className="mt-2 flex gap-2">
           <input
             type="number"
             inputMode="decimal"
@@ -127,9 +195,9 @@ export default function FiltersSidebar({ filters, onFiltersChange }) {
       </div>
 
       {/* DAYS */}
-      <div className="mt-4 space-y-1">
-        <div className={label}>DAYS</div>
-        <div className="mt-1 flex flex-wrap gap-2">
+      <div className="mt-5 space-y-1">
+        <div className={label}>Days Available</div>
+        <div className="mt-2 flex flex-wrap gap-2">
           {dayOptions.map((d) => {
             const active = (days || []).includes(d);
             return (
@@ -147,21 +215,45 @@ export default function FiltersSidebar({ filters, onFiltersChange }) {
       </div>
 
       {/* TIMES */}
-      <div className="mt-4 space-y-1">
-        <div className={label}>TIMES</div>
-        <div className="mt-1 space-y-1 text-xs text-slate-700">
+      <div className="mt-5 space-y-1">
+        <div className={label}>Time Slots</div>
+        <div className="mt-2 space-y-2 bg-gradient-to-br from-purple-50 to-amber-50 rounded-xl p-4 border-2 border-purple-200">
           {timeOptions.map((t) => (
-            <label key={t.key} className="flex items-center gap-2">
+            <label
+              key={t.key}
+              className="flex items-center gap-3 cursor-pointer hover:bg-white/50 p-2 rounded-lg transition-colors"
+            >
               <input
                 type="checkbox"
-                className="h-3 w-3"
+                className="h-4 w-4 rounded border-purple-300 text-purple-600 focus:ring-2 focus:ring-purple-500"
                 checked={(times || []).includes(t.key)}
                 onChange={() => toggleTime(t.key)}
               />
-              <span>{t.label}</span>
+              <span className="text-sm font-semibold text-purple-900">{t.label}</span>
             </label>
           ))}
         </div>
+      </div>
+
+      {/* Clear Filters Button */}
+      <div className="mt-6">
+        <button
+          type="button"
+          onClick={() =>
+            onFiltersChange({
+              course: "",
+              subject: "",
+              language: "",
+              minRate: "",
+              maxRate: "",
+              days: [],
+              times: [],
+            })
+          }
+          className="w-full rounded-xl border-2 border-purple-300 bg-white px-4 py-2.5 text-sm font-bold text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-all shadow-sm"
+        >
+          Clear All Filters
+        </button>
       </div>
     </aside>
   );

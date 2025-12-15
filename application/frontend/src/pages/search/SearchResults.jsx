@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { tutorAPI } from "../../services/api";
 import FiltersSidebar from "../../components/FiltersSidebar";
 import defaultProfileImage from "../../assets/default-profile.jpg";
+import logo from "../../assets/logo.svg";
 
 export default function SearchResults() {
   const { search } = useLocation();
@@ -25,7 +26,7 @@ export default function SearchResults() {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [failedImages, setFailedImages] = useState(new Set()); // Track failed image loads
+  const [failedImages, setFailedImages] = useState(new Set());
 
   // State for top input bar
   const [q, setQ] = useState(searchText || course);
@@ -35,6 +36,7 @@ export default function SearchResults() {
 
   // Filters object for sidebar
   const filters = {
+    course,
     subject,
     language,
     minRate,
@@ -47,57 +49,40 @@ export default function SearchResults() {
   function updateFilters(next) {
     const p = new URLSearchParams(search);
 
-    // Subject
+    next.course ? p.set("course", next.course) : p.delete("course");
     next.subject ? p.set("subject", next.subject) : p.delete("subject");
-
-    // Language
     next.language ? p.set("language", next.language) : p.delete("language");
-
-    // Rate
     next.minRate ? p.set("minRate", next.minRate) : p.delete("minRate");
     next.maxRate ? p.set("maxRate", next.maxRate) : p.delete("maxRate");
-
-    // Days
     next.days?.length ? p.set("days", next.days.join(",")) : p.delete("days");
-
-    // Times
     next.times?.length ? p.set("times", next.times.join(",")) : p.delete("times");
 
     navigate(`/results?${p.toString()}`);
   }
 
-  // Handle image loading errors
   const handleImageError = (tutorProfileId) => {
     setFailedImages((prev) => new Set(prev).add(tutorProfileId));
   };
 
-  // Get proper photo URL - handles backend paths and default images
   const getProfilePhotoUrl = (tutor) => {
-    // If image failed to load previously, use default
     if (failedImages.has(tutor.tutor_profile_id)) {
       return getDefaultProfilePhoto();
     }
 
-    // If no profile photo, use default
     if (!tutor.profile_photo) {
       return getDefaultProfilePhoto();
     }
 
-    // If it's already a full URL, use it directly
     if (tutor.profile_photo.startsWith("http")) {
       return tutor.profile_photo;
     }
 
-    // If it's a relative path from backend, construct full URL
-    // Adjust this base URL according to your backend setup
     const baseUrl = import.meta.env.VITE_API_URL || "";
     return `${baseUrl}${tutor.profile_photo.startsWith("/") ? "" : "/"}${tutor.profile_photo}`;
   };
 
-  // Get default profile photo
   const getDefaultProfilePhoto = () => {
-    // You can use a local image or an external default avatar
-    return defaultProfileImage; // Make sure this file exists in your public folder
+    return defaultProfileImage;
   };
 
   // Fetch tutors whenever search parameters change
@@ -105,7 +90,7 @@ export default function SearchResults() {
     async function fetchTutors() {
       setLoading(true);
       setError(null);
-      setFailedImages(new Set()); // Reset failed images on new search
+      setFailedImages(new Set());
 
       try {
         const response = await tutorAPI.searchTutors({
@@ -148,148 +133,177 @@ export default function SearchResults() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6">
-      {/* TOP HEADER */}
-      <div className="rounded-2xl border border-slate-300 bg-white p-6 shadow-sm text-center relative">
-        <Link
-          to="/"
-          className="absolute left-6 top-6 text-slate-600 text-sm font-medium hover:text-blue-600"
-        >
-          ← Back to Home
-        </Link>
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-8">
+      <div className="mx-auto max-w-7xl">
+        {/* TOP HEADER */}
+        <div className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-2xl shadow-purple-200/50 text-center relative mb-8">
+          <Link
+            to="/"
+            className="absolute left-6 top-6 text-purple-600 text-sm font-semibold hover:text-purple-800 transition-colors inline-flex items-center gap-1"
+          >
+            ← Back to Home
+          </Link>
 
-        <h1 className="text-xl md:text-2xl font-extrabold tracking-wide">SFSU TUTORING PLATFORM</h1>
+          <div className="inline-flex h-20 w-20 items-center justify-center mb-3">
+            <img src={logo} alt="ScholarlyGator Logo" className="h-full w-full object-contain" />
+          </div>
 
-        <div className="mt-4 flex justify-center">
-          <div className="flex items-center gap-2 rounded-full border border-slate-300 pl-4 pr-2 py-2 w-full max-w-lg bg-white">
-            <input
-              type="text"
-              value={q}
-              maxLength={40}
-              onChange={(e) => setQ(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && submitHeaderSearch()}
-              placeholder="Search by keyword or course"
-              className="flex-1 outline-none text-sm"
-            />
-           
+          <h1 className="text-xl md:text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
+            ScholarlyGator
+          </h1>
 
-            <button
-              type="button"
-              onClick={submitHeaderSearch}
-              className="grid place-items-center h-9 w-9 rounded-full bg-slate-900 text-white"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                className="h-4 w-4"
+          <div className="mt-6 flex justify-center">
+            <div className="flex items-center gap-3 rounded-full border-2 border-purple-300 bg-white px-5 py-2.5 w-full max-w-lg shadow-lg hover:shadow-xl focus-within:shadow-xl focus-within:border-purple-500 focus-within:ring-4 focus-within:ring-purple-200 transition-all">
+              <input
+                type="text"
+                value={q}
+                onChange={(e) => setQ(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && submitHeaderSearch()}
+                placeholder="Search by keyword or course"
+                className="flex-1 outline-none text-sm bg-transparent"
+              />
+              <button
+                type="button"
+                onClick={submitHeaderSearch}
+                className="grid place-items-center h-9 w-9 rounded-full bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 transition-all shadow-md"
               >
-                <circle cx="11" cy="11" r="7" />
-                <line x1="21" y1="21" x2="16.65" y2="16.65" />
-              </svg>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* MAIN CONTENT: RESULTS LEFT + SIDEBAR RIGHT */}
-      <div className="mt-6 flex flex-col gap-6 lg:flex-row">
-        {/* LEFT COLUMN – Tutor Results */}
-        <div className="flex-1 max-w-4xl">
-          <div className="flex items-baseline justify-between">
-            <h2 className="text-lg md:text-xl font-extrabold">Search Results – "{searchTitle}"</h2>
-            <div className="text-sm text-slate-600">{showingLabel}</div>
-          </div>
-
-          {loading && <div className="mt-8 text-center text-slate-600">Loading tutors...</div>}
-
-          {error && <div className="mt-8 text-center text-red-600">{error}</div>}
-
-          {!loading && !error && (
-            <div className="mt-4 space-y-5">
-              {tutors.map((t) => {
-                const photoUrl = getProfilePhotoUrl(t);
-                const isDefaultAvatar = photoUrl.includes("default-avatar.png");
-
-                return (
-                  <article
-                    key={t.tutor_profile_id}
-                    className="rounded border border-slate-300 bg-white p-4"
-                  >
-                    <div className="flex gap-4">
-                      <div className="h-12 w-12 rounded-full bg-slate-200 grid place-items-center text-slate-600 text-xl overflow-hidden flex-shrink-0">
-                        {!isDefaultAvatar ? (
-                          <img
-                            src={photoUrl}
-                            alt={`${t.display_name}'s profile`}
-                            className="w-full h-full object-cover"
-                            onError={() => handleImageError(t.tutor_profile_id)}
-                            loading="lazy"
-                          />
-                        ) : (
-                          <img
-                            src={photoUrl}
-                            alt="Default avatar"
-                            className="w-full h-full object-cover"
-                          />
-                        )}
-                      </div>
-
-                      <div className="flex-1">
-                        <div className="flex items-start justify-between">
-                          <h3 className="font-extrabold tracking-wide">
-                            {t.display_name.toUpperCase()}
-                          </h3>
-                          <div className="font-semibold">${t.hourly_rate}/hour</div>
-                        </div>
-
-                        <div className="text-sm">
-                          <div>{t.full_name}</div>
-                          <div>Courses: {t.courses || "N/A"}</div>
-                          <div>Subject Tags: {t.subject_tags || "N/A"}</div>
-                          <div>Languages: {t.languages || "N/A"}</div>
-                          <div>Availability: {t.availability_summary}</div>
-                        </div>
-
-                        <div className="mt-3 flex gap-2">
-                          <Link
-                            to={`/tutors/${t.tutor_profile_id}${search}`}
-                            className="inline-block rounded border px-4 py-1 text-sm font-medium hover:bg-slate-50"
-                          >
-                            VIEW PROFILE
-                          </Link>
-
-                          <Link
-                            to={{
-                              pathname: `/tutor/request/${t.tutor_profile_id}`,
-                              search: `?to=${encodeURIComponent(t.display_name)}${
-                                search ? `&${search.slice(1)}` : ""
-                              }`,
-                            }}
-                            className="inline-block rounded bg-slate-900 text-white px-4 py-1 text-sm font-medium hover:bg-black"
-                          >
-                            CONTACT
-                          </Link>
-                        </div>
-                      </div>
-                    </div>
-                  </article>
-                );
-              })}
-
-              {tutors.length === 0 && (
-                <div className="text-slate-600 text-center">
-                  No results found. Try adjusting your filters.
-                </div>
-              )}
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="h-4 w-4"
+                >
+                  <circle cx="11" cy="11" r="7" />
+                  <line x1="21" y1="21" x2="16.65" y2="16.65" />
+                </svg>
+              </button>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* RIGHT COLUMN – Filters Sidebar */}
-        <div className="w-full lg:w-80 shrink-0">
-          <FiltersSidebar filters={filters} onFiltersChange={updateFilters} />
+        {/* MAIN CONTENT: RESULTS LEFT + SIDEBAR RIGHT */}
+        <div className="flex flex-col gap-6 lg:flex-row">
+          {/* LEFT COLUMN – Tutor Results */}
+          <div className="flex-1 max-w-4xl">
+            <div className="flex items-baseline justify-between mb-6">
+              <h2 className="text-xl md:text-2xl font-extrabold text-purple-900">
+                Search Results – "<span className="text-amber-600">{searchTitle}</span>"
+              </h2>
+              <div className="text-sm text-purple-600 font-semibold">{showingLabel}</div>
+            </div>
+
+            {loading && (
+              <div className="mt-8 text-center text-purple-600 font-medium">Loading tutors...</div>
+            )}
+
+            {error && <div className="mt-8 text-center text-red-600 font-medium">{error}</div>}
+
+            {!loading && !error && (
+              <div className="space-y-5">
+                {tutors.map((t) => {
+                  const photoUrl = getProfilePhotoUrl(t);
+                  const isDefaultAvatar = photoUrl.includes("default-avatar.png");
+
+                  return (
+                    <article
+                      key={t.tutor_profile_id}
+                      className="rounded-2xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-5 shadow-lg shadow-purple-100 hover:shadow-2xl hover:shadow-purple-200/50 hover:border-purple-300 transition-all"
+                    >
+                      <div className="flex gap-5">
+                        <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 grid place-items-center text-white text-2xl overflow-hidden flex-shrink-0 shadow-md ring-2 ring-amber-400">
+                          {!isDefaultAvatar ? (
+                            <img
+                              src={photoUrl}
+                              alt={`${t.display_name}'s profile`}
+                              className="w-full h-full object-cover"
+                              onError={() => handleImageError(t.tutor_profile_id)}
+                              loading="lazy"
+                            />
+                          ) : (
+                            <img
+                              src={photoUrl}
+                              alt="Default avatar"
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                        </div>
+
+                        <div className="flex-1">
+                          <div className="flex items-start justify-between">
+                            <h3 className="font-extrabold tracking-wide text-purple-900 text-lg">
+                              {t.display_name.toUpperCase()}
+                            </h3>
+                            <div className="font-bold text-amber-600 text-lg">
+                              ${t.hourly_rate}/hr
+                            </div>
+                          </div>
+
+                          <div className="text-sm mt-2 space-y-1 text-slate-700">
+                            <div>
+                              <span className="font-semibold text-purple-700">Name:</span>{" "}
+                              {t.full_name}
+                            </div>
+                            <div>
+                              <span className="font-semibold text-purple-700">Courses:</span>{" "}
+                              {t.courses || "N/A"}
+                            </div>
+                            <div>
+                              <span className="font-semibold text-purple-700">Subjects:</span>{" "}
+                              {t.subject_tags || "N/A"}
+                            </div>
+                            <div>
+                              <span className="font-semibold text-purple-700">Languages:</span>{" "}
+                              {t.languages || "N/A"}
+                            </div>
+                            <div>
+                              <span className="font-semibold text-purple-700">Availability:</span>{" "}
+                              {t.availability_summary}
+                            </div>
+                          </div>
+
+                          <div className="mt-4 flex gap-3">
+                            <Link
+                              to={`/tutors/${t.tutor_profile_id}${search}`}
+                              className="inline-flex items-center justify-center rounded-xl border-2 border-purple-300 bg-white px-5 py-2 text-sm font-bold text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-all shadow-sm"
+                            >
+                              VIEW PROFILE
+                            </Link>
+
+                            <Link
+                              to={{
+                                pathname: `/tutor/request/${t.tutor_profile_id}`,
+                                search: `?to=${encodeURIComponent(t.display_name)}${
+                                  search ? `&${search.slice(1)}` : ""
+                                }`,
+                              }}
+                              className="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-amber-400 to-amber-500 text-purple-900 px-5 py-2 text-sm font-bold hover:from-amber-500 hover:to-amber-600 transition-all shadow-md hover:shadow-lg"
+                            >
+                              CONTACT
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </article>
+                  );
+                })}
+
+                {tutors.length === 0 && (
+                  <div className="rounded-2xl border-2 border-purple-200 bg-purple-50 p-8 text-center">
+                    <div className="text-4xl mb-3">🔍</div>
+                    <div className="text-purple-700 font-semibold">
+                      No results found. Try adjusting your filters.
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT COLUMN – Filters Sidebar */}
+          <div className="w-full lg:w-80 shrink-0">
+            <FiltersSidebar filters={filters} onFiltersChange={updateFilters} />
+          </div>
         </div>
       </div>
     </div>

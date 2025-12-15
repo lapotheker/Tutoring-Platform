@@ -31,6 +31,12 @@ app.use("/api/admin", adminRoutes);
 // 404 handler
 app.use((_req, res) => res.status(404).json({ error: "Not found" }));
 
-app.listen(PORT, () => {
-  console.log(`API listening on ${PORT}`);
-});
+// Export app for testing
+module.exports = app;
+
+// Only start server if not in test environment
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`API listening on ${PORT}`);
+  });
+}
