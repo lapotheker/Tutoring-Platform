@@ -2,6 +2,7 @@
 
 ## 1. Server URL or IP
 - **Public DNS:** ec2-50-18-23-168.us-west-1.compute.amazonaws.com
+- **Public URL**: https://team04.duckdns.org
 ## 2. SSH username
 - **SSH user:** ubuntu
 ## 3. SSH key (file inside this folder)
@@ -30,6 +31,7 @@
   - **Username:** class_cto 
   - **Password:** see section 6
   - **Default Schema:** teamapp_db
+
 
 
 
