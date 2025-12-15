@@ -440,21 +440,17 @@ export default function TutorDashboard() {
                   <p className="text-purple-700 font-medium">No messages from students yet.</p>
                 </div>
               ) : (
-                receivedMessages.slice(0, 5).map((msg) => {
-                  const timeStr = new Date(msg.created_at).toLocaleString();
-                  return (
-                    <div
-                      key={msg.message_id}
-                      className="rounded-2xl border-2 border-purple-200 bg-white p-4 hover:border-purple-300 hover:shadow-md transition-all"
-                    >
-                      <div className="flex items-center justify-between mb-2">
-                        <span className="font-bold text-purple-900">From: {msg.sender_name}</span>
-                        <span className="text-xs text-purple-600">{timeStr}</span>
-                      </div>
-                      <p className="text-sm text-slate-700 line-clamp-2">{msg.message}</p>
-                    </div>
-                  );
-                })
+                receivedMessages.slice(0, 5).map((msg) => (
+                  <MessageReplyCard
+                    key={msg.message_id}
+                    message={msg}
+                    currentUserId={currentUserId}
+                    onReplySent={() => {
+                      fetchMessages(currentUserId);
+                      fetchSessions(currentUserId);
+                    }}
+                  />
+                ))
               )}
             </div>
           </div>
@@ -498,4 +494,186 @@ export default function TutorDashboard() {
       </section>
     </div>
   );
+
+  function MessageReplyCard({ message, currentUserId, onReplySent }) {
+    const [showReply, setShowReply] = useState(false);
+    const [replyText, setReplyText] = useState("");
+    const [courseInfo, setCourseInfo] = useState("");
+    const [sessionDate, setSessionDate] = useState("");
+    const [sessionTime, setSessionTime] = useState("");
+    const [locationMode, setLocationMode] = useState("Online (Zoom)");
+    const [sending, setSending] = useState(false);
+    const [error, setError] = useState("");
+
+    const timeStr = new Date(message.created_at).toLocaleString();
+
+    const handleReply = async (confirmSession) => {
+      if (!replyText.trim()) {
+        setError("Please enter a message");
+        return;
+      }
+
+      if (confirmSession && (!courseInfo.trim() || !sessionDate || !sessionTime)) {
+        setError("Please fill in all session details to confirm");
+        return;
+      }
+
+      setSending(true);
+      setError("");
+
+      try {
+        // Combine date and time into ISO datetime string
+        const sessionDateTime = confirmSession ? `${sessionDate}T${sessionTime}` : null;
+
+        const response = await fetch("http://localhost:3000/api/messages/reply", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tutor_user_id: currentUserId,
+            student_user_id: message.sender_user_id,
+            message: replyText.trim(),
+            confirm_session: confirmSession,
+            course_info: confirmSession ? courseInfo.trim() : null,
+            session_datetime: sessionDateTime,
+            location_mode: confirmSession ? locationMode : null,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setReplyText("");
+          setCourseInfo("");
+          setSessionDate("");
+          setSessionTime("");
+          setLocationMode("Online (Zoom)");
+          setShowReply(false);
+          onReplySent();
+        } else {
+          setError(data.error || "Failed to send reply");
+        }
+      } catch (err) {
+        console.error("Error sending reply:", err);
+        setError("Failed to send reply");
+      } finally {
+        setSending(false);
+      }
+    };
+
+    return (
+      <div className="rounded-2xl border-2 border-purple-200 bg-white p-4 hover:border-purple-300 hover:shadow-md transition-all">
+        <div className="flex items-center justify-between mb-2">
+          <span className="font-bold text-purple-900">From: {message.sender_name}</span>
+          <span className="text-xs text-purple-600">{timeStr}</span>
+        </div>
+        <p className="text-sm text-slate-700 mb-3">{message.message}</p>
+
+        {!showReply ? (
+          <button
+            onClick={() => setShowReply(true)}
+            className="text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors"
+          >
+            Reply to Student →
+          </button>
+        ) : (
+          <div className="mt-4 p-4 rounded-xl bg-purple-50 border-2 border-purple-200">
+            <h4 className="text-sm font-bold text-purple-900 mb-3">
+              Reply to {message.sender_name}
+            </h4>
+
+            <textarea
+              className="w-full rounded-lg border-2 border-purple-200 p-3 text-sm focus:border-purple-400 focus:outline-none resize-none mb-3"
+              rows={3}
+              placeholder="Type your message here..."
+              value={replyText}
+              onChange={(e) => setReplyText(e.target.value)}
+              disabled={sending}
+            />
+
+            {/* Session Details (shown when confirming) */}
+            <div className="space-y-3 mb-3 p-3 rounded-lg bg-white border border-purple-100">
+              <p className="text-xs font-semibold text-purple-700 mb-2">
+                Session Details (required for confirmation):
+              </p>
+
+              <input
+                type="text"
+                className="w-full rounded-lg border-2 border-purple-200 p-2 text-sm focus:border-purple-400 focus:outline-none"
+                placeholder="Course info (e.g., 'CSC 340 - Data Structures')"
+                value={courseInfo}
+                onChange={(e) => setCourseInfo(e.target.value)}
+                disabled={sending}
+              />
+
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-purple-700 mb-1">Date</label>
+                  <input
+                    type="date"
+                    className="w-full rounded-lg border-2 border-purple-200 p-2 text-sm focus:border-purple-400 focus:outline-none"
+                    value={sessionDate}
+                    onChange={(e) => setSessionDate(e.target.value)}
+                    disabled={sending}
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-purple-700 mb-1">Time</label>
+                  <input
+                    type="time"
+                    className="w-full rounded-lg border-2 border-purple-200 p-2 text-sm focus:border-purple-400 focus:outline-none"
+                    value={sessionTime}
+                    onChange={(e) => setSessionTime(e.target.value)}
+                    disabled={sending}
+                  />
+                </div>
+              </div>
+
+              <select
+                className="w-full rounded-lg border-2 border-purple-200 p-2 text-sm focus:border-purple-400 focus:outline-none"
+                value={locationMode}
+                onChange={(e) => setLocationMode(e.target.value)}
+                disabled={sending}
+              >
+                <option value="Online (Zoom)">Online (Zoom)</option>
+                <option value="Online (Google Meet)">Online (Google Meet)</option>
+                <option value="In-person · Library">In-person · Library</option>
+                <option value="In-person · Student Center">In-person · Student Center</option>
+                <option value="In-person · Other">In-person · Other</option>
+              </select>
+            </div>
+
+            {error && <p className="mt-2 text-xs text-red-600 mb-3">{error}</p>}
+
+            <div className="flex gap-2">
+              <button
+                onClick={() => handleReply(true)}
+                disabled={sending}
+                className="flex-1 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-semibold hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                {sending ? "Confirming..." : "✓ Confirm Session"}
+              </button>
+              <button
+                onClick={() => handleReply(false)}
+                disabled={sending}
+                className="flex-1 px-4 py-2 rounded-lg bg-red-600 text-white text-sm font-semibold hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed transition"
+              >
+                {sending ? "Declining..." : "✗ Decline Session"}
+              </button>
+              <button
+                onClick={() => {
+                  setShowReply(false);
+                  setReplyText("");
+                  setError("");
+                }}
+                disabled={sending}
+                className="px-4 py-2 rounded-lg border-2 border-slate-300 text-slate-700 text-sm font-semibold hover:bg-slate-50 transition disabled:opacity-50"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
 }

@@ -342,7 +342,7 @@ export default function StudentDashboard() {
                       {s.status}
                     </span>
                   </div>
-                  <div className="mt-2 text-sm text-slate-700">{s.course_info}</div>
+                  <div className="mt-2 text-sm text-slate-700">{s.tutor_name || "TBA"}</div>
                   <div className="mt-1 text-sm text-slate-600">
                     {fmtDateTime(s.session_datetime)} · {s.location_mode}
                   </div>
@@ -381,7 +381,7 @@ export default function StudentDashboard() {
                       {s.status}
                     </span>
                   </div>
-                  <div className="mt-2 text-sm text-slate-700">{s.course_info}</div>
+                  <div className="mt-2 text-sm text-slate-700">{s.tutor_name || "TBA"}</div>
                   <div className="mt-1 text-sm text-slate-600">
                     {fmtDateTime(s.session_datetime)} · {s.location_mode}
                   </div>

@@ -5,6 +5,9 @@ const messageController = require("../controllers/messageController");
 // POST /api/messages
 router.post("/", messageController.sendMessage);
 
+// POST /api/messages/reply - ADD THIS
+router.post("/reply", messageController.replyToMessage);
+
 // GET /api/messages/user/:userId
 router.get("/user/:userId", messageController.getMessagesForUser);
 
