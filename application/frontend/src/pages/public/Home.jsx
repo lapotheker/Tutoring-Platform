@@ -71,7 +71,7 @@ export default function Home() {
     }
 
     if (!target) return navigate("/results");
-    navigate(`/results?q=${encodeURIComponent(target)}`);
+    navigate(`/results?search=${encodeURIComponent(target)}`);
   }
 
   return (
