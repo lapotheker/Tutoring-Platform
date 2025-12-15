@@ -8,6 +8,21 @@ router.post("/", messageController.sendMessage);
 // GET /api/messages/user/:userId
 router.get("/user/:userId", messageController.getMessagesForUser);
 
+// GET /api/messages/sent/:userId
+router.get("/sent/:userId", messageController.getSentMessages);
+
+// GET /api/messages/received/:userId
+router.get("/received/:userId", messageController.getReceivedMessages);
+
+// GET /api/messages/tutor/sent/:userId
+router.get("/tutor/sent/:userId", messageController.getTutorSentMessages);
+
+// GET /api/messages/tutor/received/:userId
+router.get(
+  "/tutor/received/:userId",
+  messageController.getTutorReceivedMessages
+);
+
 // POST /api/messages/:messageId/report
 router.post("/:messageId/report", messageController.reportMessage);
 

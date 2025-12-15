@@ -160,7 +160,24 @@ CREATE TABLE sample_material (
     FOREIGN KEY (tutor_profile_id) REFERENCES tutor_profile(tutor_profile_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-<<<<<<< HEAD
+-- Tutoring Sessions table (for actual booked sessions)
+CREATE TABLE tutoring_sessions (
+    session_id INT AUTO_INCREMENT PRIMARY KEY,
+    student_user_id INT NOT NULL,
+    tutor_user_id INT NOT NULL,
+    course_info VARCHAR(255) NOT NULL COMMENT 'e.g., "CSC 340 - Data Structures"',
+    session_datetime DATETIME NOT NULL,
+    location_mode VARCHAR(255) NOT NULL COMMENT 'e.g., "Online (Zoom)" or "In-person · Library Room 210"',
+    status ENUM('upcoming', 'completed') NOT NULL DEFAULT 'upcoming',
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (student_user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (tutor_user_id) REFERENCES user(user_id) ON DELETE CASCADE,
+    INDEX idx_student (student_user_id),
+    INDEX idx_tutor (tutor_user_id),
+    INDEX idx_status (status),
+    INDEX idx_datetime (session_datetime)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 -- In-Site Message table
 CREATE TABLE in_site_message (
     message_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -173,38 +190,6 @@ CREATE TABLE in_site_message (
     FOREIGN KEY (sender_user_id) REFERENCES user(user_id) ON DELETE CASCADE,
     FOREIGN KEY (recipient_user_id) REFERENCES user(user_id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-=======
--- -- Tutoring Sessions table (for actual booked sessions)
--- CREATE TABLE tutoring_sessions (
---     session_id INT AUTO_INCREMENT PRIMARY KEY,
---     student_user_id INT NOT NULL,
---     tutor_user_id INT NOT NULL,
---     course_info VARCHAR(255) NOT NULL COMMENT 'e.g., "CSC 340 - Data Structures"',
---     session_datetime DATETIME NOT NULL,
---     location_mode VARCHAR(255) NOT NULL COMMENT 'e.g., "Online (Zoom)" or "In-person · Library Room 210"',
---     status ENUM('upcoming', 'completed') NOT NULL DEFAULT 'upcoming',
---     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     FOREIGN KEY (student_user_id) REFERENCES user(user_id) ON DELETE CASCADE,
---     FOREIGN KEY (tutor_user_id) REFERENCES user(user_id) ON DELETE CASCADE,
---     INDEX idx_student (student_user_id),
---     INDEX idx_tutor (tutor_user_id),
---     INDEX idx_status (status),
---     INDEX idx_datetime (session_datetime)
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- -- In-Site Message table
--- CREATE TABLE in_site_message (
---     message_id INT AUTO_INCREMENT PRIMARY KEY,
---     sender_user_id INT NOT NULL,
---     recipient_user_id INT NOT NULL,
---     message TEXT NOT NULL,
---     created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
---     message_status ENUM('Sent', 'Reported', 'Removed') NOT NULL DEFAULT 'Sent',
---     linked_report_id INT NULL,
---     FOREIGN KEY (sender_user_id) REFERENCES user(user_id) ON DELETE CASCADE,
---     FOREIGN KEY (recipient_user_id) REFERENCES user(user_id) ON DELETE CASCADE
--- ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
->>>>>>> a9b7758288d90c99073eddc2e7501aba95aea194
 
 -- Reported Item table
 CREATE TABLE reported_item (

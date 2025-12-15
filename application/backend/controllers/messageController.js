@@ -72,6 +72,46 @@ const messageController = {
     }
   },
 
+  async getSentMessages(req, res) {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: "userId is required",
+      });
+    }
+    try {
+      const messages = await messageModel.getSentMessages(userId);
+      return res.status(200).json({ success: true, data: messages });
+    } catch (error) {
+      console.error("Error fetching sent messages:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to fetch sent messages",
+      });
+    }
+  },
+
+  async getReceivedMessages(req, res) {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: "userId is required",
+      });
+    }
+    try {
+      const messages = await messageModel.getReceivedMessages(userId);
+      return res.status(200).json({ success: true, data: messages });
+    } catch (error) {
+      console.error("Error fetching received messages:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to fetch received messages",
+      });
+    }
+  },
+
   async reportMessage(req, res) {
     const { messageId } = req.params;
     const { reporter_user_id, reason, details } = req.body;
@@ -116,6 +156,46 @@ const messageController = {
       return res.status(500).json({
         success: false,
         error: "Failed to report message",
+      });
+    }
+  },
+
+  async getTutorSentMessages(req, res) {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: "userId is required",
+      });
+    }
+    try {
+      const messages = await messageModel.getTutorSentMessages(userId);
+      return res.status(200).json({ success: true, data: messages });
+    } catch (error) {
+      console.error("Error fetching tutor sent messages:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to fetch sent messages",
+      });
+    }
+  },
+
+  async getTutorReceivedMessages(req, res) {
+    const { userId } = req.params;
+    if (!userId) {
+      return res.status(400).json({
+        success: false,
+        error: "userId is required",
+      });
+    }
+    try {
+      const messages = await messageModel.getTutorReceivedMessages(userId);
+      return res.status(200).json({ success: true, data: messages });
+    } catch (error) {
+      console.error("Error fetching tutor received messages:", error);
+      return res.status(500).json({
+        success: false,
+        error: "Failed to fetch received messages",
       });
     }
   },

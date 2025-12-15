@@ -100,7 +100,7 @@ const tutorController = {
         tutorUserId: req.body.tutorUserId,
         displayName: req.body.fullName,
         hourlyRate: req.body.hourlyRate,
-        availability: req.body.availability, // Now an array
+        availability: req.body.availability,
         profilePhotoUrl: req.body.profilePhotoUrl,
         courses: req.body.courses
           ? req.body.courses.split(",").map((c) => c.trim())

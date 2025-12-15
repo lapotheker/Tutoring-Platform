@@ -12,8 +12,10 @@ export default function StudentDashboard() {
   const location = useLocation();
 
   const [user, setUser] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [query, setQuery] = useState("");
-  const [messages, setMessages] = useState([]);
+  const [sentMessages, setSentMessages] = useState([]);
+  const [receivedMessages, setReceivedMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sessions, setSessions] = useState([]);
   const [loadingSessions, setLoadingSessions] = useState(false);
@@ -24,41 +26,62 @@ export default function StudentDashboard() {
 
   const tab = new URLSearchParams(location.search).get("tab");
 
+  // Fetch messages when user is set
   useEffect(() => {
-    const raw = localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser");
-    if (raw) {
+    const getUserFromStorage = () => {
       try {
-        const userData = JSON.parse(raw);
-        setUser(userData);
-        // Fetch messages when user is set
-        if (userData?.user_id) {
-          fetchMessages(userData.user_id);
-          fetchSessions(userData.user_id);
-        }
+        return (
+          JSON.parse(localStorage.getItem("demoUser")) ||
+          JSON.parse(sessionStorage.getItem("demoUser"))
+        );
       } catch {
-        setUser(null);
+        return null;
       }
+    };
+
+    const userData = getUserFromStorage();
+    if (userData?.user_id) {
+      setUser(userData);
+      setCurrentUserId(userData.user_id);
+      // Fetch messages when user is set
+      if (userData.user_id) {
+        fetchMessages(userData.user_id);
+        fetchSessions(userData.user_id);
+      }
+    } else {
+      navigate("/login");
     }
-    if (location.state?.composeTo) {
-      setComposeTo(location.state.composeTo);
-    }
-  }, [location.state]);
+  }, [navigate]);
 
   const fetchMessages = async (userId) => {
     setLoadingMessages(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/messages/user/${userId}`);
-      const data = await response.json();
+      // Fetch both sent and received messages
+      const [sentRes, receivedRes] = await Promise.all([
+        fetch(`http://localhost:3000/api/messages/sent/${userId}`),
+        fetch(`http://localhost:3000/api/messages/received/${userId}`),
+      ]);
 
-      if (data.success) {
-        setMessages(data.data || []);
+      const sentData = await sentRes.json();
+      const receivedData = await receivedRes.json();
+
+      if (sentData.success) {
+        setSentMessages(sentData.data || []);
       } else {
-        console.error("Failed to fetch messages:", data.error);
-        setMessages([]);
+        console.error("Failed to fetch sent messages:", sentData.error);
+        setSentMessages([]);
+      }
+
+      if (receivedData.success) {
+        setReceivedMessages(receivedData.data || []);
+      } else {
+        console.error("Failed to fetch received messages:", receivedData.error);
+        setReceivedMessages([]);
       }
     } catch (error) {
       console.error("Error fetching messages:", error);
-      setMessages([]);
+      setSentMessages([]);
+      setReceivedMessages([]);
     } finally {
       setLoadingMessages(false);
     }
@@ -91,7 +114,6 @@ export default function StudentDashboard() {
     return left.charAt(0).toUpperCase() + left.slice(1);
   }, [user]);
 
-  const currentUserId = user?.user_id ?? user?.id;
   const isAlreadyTutor = user?.role === 2;
 
   const handleBecomeTutor = async () => {
@@ -131,8 +153,10 @@ export default function StudentDashboard() {
       <div className="min-h-screen bg-gradient-to-br from-purple-50 via-white to-amber-50 px-4 py-8">
         <section className="max-w-5xl mx-auto space-y-6">
           <div className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-6 shadow-2xl shadow-purple-200/50">
-            <div className="flex items-center justify-between mb-4">
-              <h1 className="text-xl font-extrabold tracking-wide text-purple-900">Inbox</h1>
+            <div className="flex items-center justify-between mb-6">
+              <h1 className="text-xl font-extrabold tracking-wide text-purple-900">
+                Student Messages
+              </h1>
               <Link
                 to="/dashboard"
                 className="text-sm font-semibold text-purple-600 hover:text-purple-800 transition-colors"
@@ -141,25 +165,51 @@ export default function StudentDashboard() {
               </Link>
             </div>
 
-            {composeTo && (
-              <ComposeBar
-                composeTo={composeTo}
-                onSent={() => {
-                  setComposeTo(null);
-                  if (currentUserId) {
-                    fetchMessages(currentUserId);
-                  }
-                }}
-                currentUserId={currentUserId}
-                existingMessages={messages}
-              />
-            )}
+            {/* Messages Sent to Tutors */}
+            <div className="mb-8">
+              <h2 className="text-lg font-bold text-purple-900 mb-4">
+                Messages Sent to Tutors ({sentMessages.length})
+              </h2>
+              {composeTo && (
+                <ComposeBar
+                  composeTo={composeTo}
+                  onSent={() => {
+                    setComposeTo(null);
+                    if (currentUserId) {
+                      fetchMessages(currentUserId);
+                    }
+                  }}
+                  currentUserId={currentUserId}
+                  existingMessages={[...sentMessages, ...receivedMessages]}
+                />
+              )}
 
-            {loadingMessages ? (
-              <p className="text-sm text-purple-600">Loading messages...</p>
-            ) : (
-              <MessagesList messages={messages} currentUserId={currentUserId} />
-            )}
+              {loadingMessages ? (
+                <p className="text-sm text-purple-600">Loading sent messages...</p>
+              ) : sentMessages.length === 0 ? (
+                <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-amber-50 p-6 text-center">
+                  <p className="text-purple-700 font-medium">No messages sent yet.</p>
+                </div>
+              ) : (
+                <MessagesList messages={sentMessages} currentUserId={currentUserId} />
+              )}
+            </div>
+
+            {/* Messages Received from Tutors */}
+            <div>
+              <h2 className="text-lg font-bold text-purple-900 mb-4">
+                Messages Received from Tutors ({receivedMessages.length})
+              </h2>
+              {loadingMessages ? (
+                <p className="text-sm text-purple-600">Loading received messages...</p>
+              ) : receivedMessages.length === 0 ? (
+                <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-amber-50 p-6 text-center">
+                  <p className="text-purple-700 font-medium">No messages received yet.</p>
+                </div>
+              ) : (
+                <MessagesList messages={receivedMessages} currentUserId={currentUserId} />
+              )}
+            </div>
           </div>
         </section>
       </div>
@@ -356,7 +406,10 @@ export default function StudentDashboard() {
             {loadingMessages ? (
               <p className="text-sm text-purple-600">Loading messages...</p>
             ) : (
-              <MessagesPreview messages={messages} currentUserId={currentUserId} />
+              <MessagesPreview
+                messages={[...sentMessages, ...receivedMessages]}
+                currentUserId={currentUserId}
+              />
             )}
           </div>
         </div>

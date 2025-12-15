@@ -5,33 +5,74 @@ import logo from "../../assets/logo.svg";
 export default function TutorDashboard() {
   const navigate = useNavigate();
   const [user, setUser] = useState(null);
+  const [currentUserId, setCurrentUserId] = useState(null);
   const [sessions, setSessions] = useState([]);
   const [loadingSessions, setLoadingSessions] = useState(false);
-  const [messages, setMessages] = useState([]);
+  const [sentMessages, setSentMessages] = useState([]);
+  const [receivedMessages, setReceivedMessages] = useState([]);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [tutorProfile, setTutorProfile] = useState(null);
   const [loadingProfile, setLoadingProfile] = useState(true);
 
   useEffect(() => {
-    const raw = localStorage.getItem("demoUser") || sessionStorage.getItem("demoUser");
-    if (!raw) {
-      const next = encodeURIComponent("/tutor/dashboard");
-      navigate(`/login?next=${next}`, { replace: true });
-      return;
-    }
-
-    try {
-      const userData = JSON.parse(raw);
-      setUser(userData);
-      if (userData?.user_id) {
-        fetchSessions(userData.user_id);
-        fetchMessages(userData.user_id);
-        fetchTutorProfile(userData.user_id);
+    const getUserFromStorage = () => {
+      try {
+        return (
+          JSON.parse(localStorage.getItem("demoUser")) ||
+          JSON.parse(sessionStorage.getItem("demoUser"))
+        );
+      } catch {
+        return null;
       }
-    } catch {
-      navigate(`/login?next=${encodeURIComponent("/tutor/dashboard")}`, { replace: true });
+    };
+
+    const userData = getUserFromStorage();
+    if (userData?.user_id) {
+      setUser(userData);
+      setCurrentUserId(userData.user_id);
+      if (userData.user_id) {
+        fetchTutorProfile(userData.user_id);
+        fetchMessages(userData.user_id);
+        fetchSessions(userData.user_id);
+      }
+    } else {
+      navigate("/login");
     }
   }, [navigate]);
+
+  const fetchMessages = async (userId) => {
+    setLoadingMessages(true);
+    try {
+      // Fetch both sent and received messages FOR TUTORS
+      const [sentRes, receivedRes] = await Promise.all([
+        fetch(`http://localhost:3000/api/messages/tutor/sent/${userId}`),
+        fetch(`http://localhost:3000/api/messages/tutor/received/${userId}`),
+      ]);
+
+      const sentData = await sentRes.json();
+      const receivedData = await receivedRes.json();
+
+      if (sentData.success) {
+        setSentMessages(sentData.data || []);
+      } else {
+        console.error("Failed to fetch sent messages:", sentData.error);
+        setSentMessages([]);
+      }
+
+      if (receivedData.success) {
+        setReceivedMessages(receivedData.data || []);
+      } else {
+        console.error("Failed to fetch received messages:", receivedData.error);
+        setReceivedMessages([]);
+      }
+    } catch (error) {
+      console.error("Error fetching messages:", error);
+      setSentMessages([]);
+      setReceivedMessages([]);
+    } finally {
+      setLoadingMessages(false);
+    }
+  };
 
   const fetchSessions = async (userId) => {
     setLoadingSessions(true);
@@ -50,26 +91,6 @@ export default function TutorDashboard() {
       setSessions([]);
     } finally {
       setLoadingSessions(false);
-    }
-  };
-
-  const fetchMessages = async (userId) => {
-    setLoadingMessages(true);
-    try {
-      const response = await fetch(`http://localhost:3000/api/messages/user/${userId}`);
-      const data = await response.json();
-
-      if (data.success) {
-        setMessages(data.data || []);
-      } else {
-        console.error("Failed to fetch messages:", data.error);
-        setMessages([]);
-      }
-    } catch (error) {
-      console.error("Error fetching messages:", error);
-      setMessages([]);
-    } finally {
-      setLoadingMessages(false);
     }
   };
 
@@ -118,8 +139,6 @@ export default function TutorDashboard() {
     new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(
       typeof d === "string" ? new Date(d) : d
     );
-
-  const currentUserId = user?.user_id ?? user?.id;
 
   // Determine profile status
   const getProfileStatusSection = () => {
@@ -397,42 +416,83 @@ export default function TutorDashboard() {
 
         {/* ===== Messages Section ===== */}
         <div className={card}>
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg md:text-xl font-extrabold text-purple-900">MESSAGES</h2>
-            <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
-              {messages.filter((m) => m.recipient_user_id === currentUserId).length} received
-            </span>
+          <div className="mb-6">
+            <h2 className="text-lg md:text-xl font-extrabold text-purple-900 mb-1">
+              TUTOR MESSAGES
+            </h2>
+            <p className="text-sm text-purple-600">Messages related to your tutoring services</p>
           </div>
 
-          <div className="space-y-3">
-            {loadingMessages ? (
-              <p className="text-sm text-purple-600">Loading messages...</p>
-            ) : messages.length === 0 ? (
-              <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-amber-50 p-6 text-center">
-                <p className="text-purple-700 font-medium">No messages yet.</p>
-              </div>
-            ) : (
-              messages.slice(0, 5).map((msg) => {
-                const isSender = msg.sender_user_id === currentUserId;
-                const displayName = isSender ? msg.recipient_name : msg.sender_name;
-                const timeStr = new Date(msg.created_at).toLocaleString();
+          {/* Messages Received from Students */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-md font-bold text-purple-900">Messages from Students</h3>
+              <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
+                {receivedMessages.length} received
+              </span>
+            </div>
 
-                return (
-                  <div
-                    key={msg.message_id}
-                    className="rounded-2xl border-2 border-purple-200 bg-white p-4 hover:border-purple-300 hover:shadow-md transition-all"
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="font-bold text-purple-900">
-                        {isSender ? `To: ${displayName}` : `From: ${displayName}`}
-                      </span>
-                      <span className="text-xs text-purple-600">{timeStr}</span>
+            <div className="space-y-3">
+              {loadingMessages ? (
+                <p className="text-sm text-purple-600">Loading messages...</p>
+              ) : receivedMessages.length === 0 ? (
+                <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-amber-50 p-6 text-center">
+                  <p className="text-purple-700 font-medium">No messages from students yet.</p>
+                </div>
+              ) : (
+                receivedMessages.slice(0, 5).map((msg) => {
+                  const timeStr = new Date(msg.created_at).toLocaleString();
+                  return (
+                    <div
+                      key={msg.message_id}
+                      className="rounded-2xl border-2 border-purple-200 bg-white p-4 hover:border-purple-300 hover:shadow-md transition-all"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-purple-900">From: {msg.sender_name}</span>
+                        <span className="text-xs text-purple-600">{timeStr}</span>
+                      </div>
+                      <p className="text-sm text-slate-700 line-clamp-2">{msg.message}</p>
                     </div>
-                    <p className="text-sm text-slate-700 line-clamp-2">{msg.message}</p>
-                  </div>
-                );
-              })
-            )}
+                  );
+                })
+              )}
+            </div>
+          </div>
+
+          {/* Messages Sent to Students */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-md font-bold text-purple-900">Messages Sent to Students</h3>
+              <span className="text-xs font-semibold text-purple-600 bg-purple-100 px-3 py-1 rounded-full">
+                {sentMessages.length} sent
+              </span>
+            </div>
+
+            <div className="space-y-3">
+              {loadingMessages ? (
+                <p className="text-sm text-purple-600">Loading messages...</p>
+              ) : sentMessages.length === 0 ? (
+                <div className="rounded-2xl border-2 border-purple-200 bg-gradient-to-br from-purple-50 to-amber-50 p-6 text-center">
+                  <p className="text-purple-700 font-medium">No messages sent yet.</p>
+                </div>
+              ) : (
+                sentMessages.slice(0, 5).map((msg) => {
+                  const timeStr = new Date(msg.created_at).toLocaleString();
+                  return (
+                    <div
+                      key={msg.message_id}
+                      className="rounded-2xl border-2 border-purple-200 bg-white p-4 hover:border-purple-300 hover:shadow-md transition-all"
+                    >
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="font-bold text-purple-900">To: {msg.recipient_name}</span>
+                        <span className="text-xs text-purple-600">{timeStr}</span>
+                      </div>
+                      <p className="text-sm text-slate-700 line-clamp-2">{msg.message}</p>
+                    </div>
+                  );
+                })
+              )}
+            </div>
           </div>
         </div>
       </section>

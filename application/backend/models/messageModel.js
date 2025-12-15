@@ -89,6 +89,60 @@ const messageModel = {
   },
 
   /**
+   * Get messages sent by a user TO TUTORS ONLY, with names.
+   * Excludes Removed.
+   */
+  async getSentMessages(userId) {
+    const [rows] = await pool.query(
+      `SELECT 
+       m.message_id,
+       m.sender_user_id,
+       m.recipient_user_id,
+       m.message,
+       m.message_status,
+       m.created_at,
+       s.full_name AS sender_name,
+       r.full_name AS recipient_name
+     FROM in_site_message m
+     JOIN user s ON m.sender_user_id = s.user_id
+     JOIN user r ON m.recipient_user_id = r.user_id
+     WHERE m.sender_user_id = ?
+       AND r.role = 2
+       AND m.message_status != 'Removed'
+     ORDER BY m.created_at DESC`,
+      [userId]
+    );
+    return rows;
+  },
+
+  /**
+   * Get messages received by a user FROM TUTORS ONLY, with names.
+   * Excludes Removed.
+   */
+  async getReceivedMessages(userId) {
+    const [rows] = await pool.query(
+      `SELECT 
+       m.message_id,
+       m.sender_user_id,
+       m.recipient_user_id,
+       m.message,
+       m.message_status,
+       m.created_at,
+       s.full_name AS sender_name,
+       r.full_name AS recipient_name
+     FROM in_site_message m
+     JOIN user s ON m.sender_user_id = s.user_id
+     JOIN user r ON m.recipient_user_id = r.user_id
+     WHERE m.recipient_user_id = ?
+       AND s.role = 2
+       AND m.message_status != 'Removed'
+     ORDER BY m.created_at DESC`,
+      [userId]
+    );
+    return rows;
+  },
+
+  /**
    * Report a message; inserts into reported_item and marks message as Reported.
    */
   async reportMessage({ messageId, reporterUserId, reason, details }) {
@@ -158,6 +212,60 @@ const messageModel = {
     } finally {
       conn.release();
     }
+  },
+
+  /**
+   * Get messages sent by a TUTOR to STUDENTS, with names.
+   * Excludes Removed.
+   */
+  async getTutorSentMessages(userId) {
+    const [rows] = await pool.query(
+      `SELECT 
+       m.message_id,
+       m.sender_user_id,
+       m.recipient_user_id,
+       m.message,
+       m.message_status,
+       m.created_at,
+       s.full_name AS sender_name,
+       r.full_name AS recipient_name
+     FROM in_site_message m
+     JOIN user s ON m.sender_user_id = s.user_id
+     JOIN user r ON m.recipient_user_id = r.user_id
+     WHERE m.sender_user_id = ?
+       AND r.role = 1
+       AND m.message_status != 'Removed'
+     ORDER BY m.created_at DESC`,
+      [userId]
+    );
+    return rows;
+  },
+
+  /**
+   * Get messages received by a TUTOR from STUDENTS, with names.
+   * Excludes Removed.
+   */
+  async getTutorReceivedMessages(userId) {
+    const [rows] = await pool.query(
+      `SELECT 
+       m.message_id,
+       m.sender_user_id,
+       m.recipient_user_id,
+       m.message,
+       m.message_status,
+       m.created_at,
+       s.full_name AS sender_name,
+       r.full_name AS recipient_name
+     FROM in_site_message m
+     JOIN user s ON m.sender_user_id = s.user_id
+     JOIN user r ON m.recipient_user_id = r.user_id
+     WHERE m.recipient_user_id = ?
+       AND s.role = 1
+       AND m.message_status != 'Removed'
+     ORDER BY m.created_at DESC`,
+      [userId]
+    );
+    return rows;
   },
 };
 
