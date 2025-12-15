@@ -3,23 +3,6 @@
 -- Complete schema with numeric roles and tutor_availability table
 -- ============================================================
 
-<<<<<<< HEAD
--- Step 1: Drop all existing tables (in reverse dependency order)
-DROP TABLE IF EXISTS tutor_availability;
-DROP TABLE IF EXISTS admin_action;
-DROP TABLE IF EXISTS reported_item;
-DROP TABLE IF EXISTS in_site_message;
-DROP TABLE IF EXISTS sample_material;
-DROP TABLE IF EXISTS tutor_profile_photo;
-DROP TABLE IF EXISTS tutor_profile_language;
-DROP TABLE IF EXISTS tutor_profile_subject_tag;
-DROP TABLE IF EXISTS tutor_profile_course;
-DROP TABLE IF EXISTS tutor_profile;
-DROP TABLE IF EXISTS language;
-DROP TABLE IF EXISTS subject_tag;
-DROP TABLE IF EXISTS course_number;
-DROP TABLE IF EXISTS user;
-=======
 -- -- Step 1: Drop all existing tables (in reverse dependency order)
 -- DROP TABLE IF EXISTS tutor_availability;
 -- DROP TABLE IF EXISTS tutoring_sessions;
@@ -36,7 +19,6 @@ DROP TABLE IF EXISTS user;
 -- DROP TABLE IF EXISTS subject_tag;
 -- DROP TABLE IF EXISTS course_number;
 -- DROP TABLE IF EXISTS user;
->>>>>>> a9b7758288d90c99073eddc2e7501aba95aea194
 
 -- Step 2: Create all tables
 

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import logo from "../../assets/logo.svg";
+import { API_BASE_URL } from "../../services/api";
 
 const fmtDateTime = (d) =>
   new Intl.DateTimeFormat(undefined, { dateStyle: "medium", timeStyle: "short" }).format(
@@ -58,8 +59,8 @@ export default function StudentDashboard() {
     try {
       // Fetch both sent and received messages
       const [sentRes, receivedRes] = await Promise.all([
-        fetch(`http://localhost:3000/api/messages/sent/${userId}`),
-        fetch(`http://localhost:3000/api/messages/received/${userId}`),
+        fetch(`${API_BASE_URL}/messages/sent/${userId}`),
+        fetch(`${API_BASE_URL}/messages/received/${userId}`),
       ]);
 
       const sentData = await sentRes.json();
@@ -90,7 +91,7 @@ export default function StudentDashboard() {
   const fetchSessions = async (userId) => {
     setLoadingSessions(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/sessions/student/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/sessions/student/${userId}`);
       const data = await response.json();
 
       if (data.success) {
@@ -120,7 +121,7 @@ export default function StudentDashboard() {
     setAcceptingTerms(true);
     try {
       // Update user role to tutor (role 2)
-      const response = await fetch(`http://localhost:3000/api/auth/upgrade-to-tutor`, {
+      const response = await fetch(`${API_BASE_URL}/auth/upgrade-to-tutor`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user_id: currentUserId }),
@@ -497,7 +498,7 @@ function ComposeBar({ composeTo, onSent, currentUserId, existingMessages }) {
     setError("");
 
     try {
-      const response = await fetch("http://localhost:3000/api/messages/send", {
+      const response = await fetch(`${API_BASE_URL}/messages/send`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

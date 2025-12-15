@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../../assets/logo.svg";
+import { API_BASE_URL } from "../../services/api";
 
 export default function TutorDashboard() {
   const navigate = useNavigate();
@@ -45,8 +46,8 @@ export default function TutorDashboard() {
     try {
       // Fetch both sent and received messages FOR TUTORS
       const [sentRes, receivedRes] = await Promise.all([
-        fetch(`http://localhost:3000/api/messages/tutor/sent/${userId}`),
-        fetch(`http://localhost:3000/api/messages/tutor/received/${userId}`),
+        fetch(`${API_BASE_URL}/messages/tutor/sent/${userId}`),
+        fetch(`${API_BASE_URL}/messages/tutor/received/${userId}`),
       ]);
 
       const sentData = await sentRes.json();
@@ -77,7 +78,7 @@ export default function TutorDashboard() {
   const fetchSessions = async (userId) => {
     setLoadingSessions(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/sessions/tutor/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/sessions/tutor/${userId}`);
       const data = await response.json();
 
       if (data.success) {
@@ -97,7 +98,7 @@ export default function TutorDashboard() {
   const fetchTutorProfile = async (userId) => {
     setLoadingProfile(true);
     try {
-      const response = await fetch(`http://localhost:3000/api/tutors/profile/by-user/${userId}`);
+      const response = await fetch(`${API_BASE_URL}/tutors/profile/by-user/${userId}`);
       const data = await response.json();
 
       if (data.success) {
@@ -525,7 +526,7 @@ export default function TutorDashboard() {
         // Combine date and time into ISO datetime string
         const sessionDateTime = confirmSession ? `${sessionDate}T${sessionTime}` : null;
 
-        const response = await fetch("http://localhost:3000/api/messages/reply", {
+        const response = await fetch(`${API_BASE_URL}/messages/reply`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
