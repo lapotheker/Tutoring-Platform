@@ -1,4 +1,3 @@
-// src/components/NavBar.jsx
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { MessageSquare } from "lucide-react";
 import { useEffect, useState } from "react";
@@ -46,13 +45,13 @@ export default function Navbar() {
 
   return (
     <nav className="border-b border-slate-200 bg-white shadow-sm">
-      <div className="mx-auto max-w-6xl px-4">
+      <div className="mx-auto max-w-6xl px-2 sm:px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Left side - Home and About */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <Link
               to="/"
-              className={`text-sm font-medium transition ${
+              className={`text-xs sm:text-sm font-medium transition ${
                 isActive("/") ? "text-blue-600" : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -60,7 +59,7 @@ export default function Navbar() {
             </Link>
             <Link
               to="/about"
-              className={`text-sm font-medium transition ${
+              className={`text-xs sm:text-sm font-medium transition ${
                 isActive("/about") ? "text-blue-600" : "text-slate-600 hover:text-slate-900"
               }`}
             >
@@ -69,19 +68,20 @@ export default function Navbar() {
           </div>
 
           {/* Right side - Dashboards and Logout */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-4">
             {/* Student Dashboard (role 1 or 2) */}
             {showStudentDash && (
               <Link
                 to="/dashboard"
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`inline-flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 md:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                   isActive("/dashboard")
                     ? "bg-purple-500 text-white shadow-sm"
                     : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
                 }`}
               >
                 <span className="font-bold text-lg"></span>
-                <span>Student Dashboard</span>
+                <span>Student</span>
+                <span className="hidden md:inline">Dashboard</span>
               </Link>
             )}
 
@@ -89,14 +89,15 @@ export default function Navbar() {
             {showTutorDash && (
               <Link
                 to="/tutor/dashboard"
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`inline-flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 md:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                   isActive("/tutor/dashboard")
                     ? "bg-purple-500 text-white shadow-sm"
                     : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
                 }`}
               >
                 <span className="font-bold text-lg"></span>
-                <span>Tutor Dashboard</span>
+                <span>Tutor</span>
+                <span className="hidden md:inline">Dashboard</span>
               </Link>
             )}
 
@@ -104,14 +105,15 @@ export default function Navbar() {
             {showAdminDash && (
               <Link
                 to="/admin"
-                className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all ${
+                className={`inline-flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 md:px-4 rounded-lg text-xs sm:text-sm font-medium transition-all ${
                   isActive("/admin/dashboard")
                     ? "bg-purple-500 text-white shadow-sm"
                     : "bg-purple-50 text-purple-700 hover:bg-purple-100 border border-purple-100"
                 }`}
               >
                 <span className="font-bold text-lg"></span>
-                <span>Admin Dashboard</span>
+                <span>Admin</span>
+                <span className="hidden md:inline">Dashboard</span>
               </Link>
             )}
 
@@ -119,7 +121,7 @@ export default function Navbar() {
             {isLoggedIn && (
               <button
                 onClick={handleLogout}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-black transition"
+                className="inline-flex items-center gap-1 px-2 py-1.5 sm:px-3 sm:py-2 rounded-lg text-xs sm:text-sm font-medium bg-slate-900 text-white hover:bg-black transition"
               >
                 Logout
               </button>
