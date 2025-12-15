@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Link, useNavigate } from "react-router-dom";
+import logo from "../../assets/logo.svg";
 
 function getCurrentUser() {
   try {
@@ -78,7 +79,7 @@ export default function Home() {
             className="flex h-20 w-20 items-center justify-center"
           >
             <img
-              src="/src/assets/logo.svg"
+              src={logo}
               alt="ScholarlyGator Logo"
               className="h-full w-full object-contain drop-shadow-2xl"
             />
