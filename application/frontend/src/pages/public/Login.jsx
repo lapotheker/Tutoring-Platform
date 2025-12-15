@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
 import { API_BASE_URL } from "../../services/api";
+import logo from "../../assets/logo.svg";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -89,10 +90,8 @@ export default function Login() {
 
         <section className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 space-y-6">
           <div className="text-center">
-            <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-4 ring-amber-400 mb-4">
-              <span className="text-2xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
-                SG
-              </span>
+            <div className="inline-flex h-20 w-20 items-center justify-center mb-4">
+              <img src={logo} alt="ScholarlyGator Logo" className="h-full w-full object-contain" />
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
               SCHOLARLYGATOR
@@ -139,7 +138,10 @@ export default function Login() {
                 <span>Remember me</span>
               </label>
 
-              <Link to="/forgot" className="text-sm font-semibold text-purple-600 hover:text-purple-800 hover:underline">
+              <Link
+                to="/forgot"
+                className="text-sm font-semibold text-purple-600 hover:text-purple-800 hover:underline"
+              >
                 Forgot Password?
               </Link>
             </div>
@@ -161,7 +163,10 @@ export default function Login() {
 
             <p className="text-sm text-slate-700 text-center">
               Don&apos;t have an account?{" "}
-              <Link to="/register" className="font-bold text-purple-600 hover:text-purple-800 hover:underline">
+              <Link
+                to="/register"
+                className="font-bold text-purple-600 hover:text-purple-800 hover:underline"
+              >
                 Sign up here
               </Link>
             </p>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { API_BASE_URL } from "../../services/api";
+import logo from "../../assets/logo.svg";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -86,10 +87,8 @@ export default function Register() {
 
         <section className="rounded-3xl border-2 border-purple-200 bg-white/95 backdrop-blur-sm p-8 shadow-2xl shadow-purple-200/50 space-y-6">
           <div className="text-center">
-            <div className="inline-flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-purple-600 to-purple-800 shadow-lg ring-4 ring-amber-400 mb-4">
-              <span className="text-2xl font-bold text-white leading-none tracking-tighter" style={{ fontFamily: 'Georgia, serif', fontStyle: 'italic' }}>
-                SG
-              </span>
+            <div className="inline-flex h-20 w-20 items-center justify-center mb-4">
+              <img src={logo} alt="ScholarlyGator Logo" className="h-full w-full object-contain" />
             </div>
             <h1 className="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-purple-700 to-purple-900 bg-clip-text text-transparent">
               SCHOLARLYGATOR
@@ -122,7 +121,9 @@ export default function Register() {
                   className={inputStyle}
                   required
                 />
-                {errors.firstName && <p className="text-xs text-red-600 mt-1.5">{errors.firstName}</p>}
+                {errors.firstName && (
+                  <p className="text-xs text-red-600 mt-1.5">{errors.firstName}</p>
+                )}
               </label>
 
               <label className="block">
@@ -135,7 +136,9 @@ export default function Register() {
                   className={inputStyle}
                   required
                 />
-                {errors.lastName && <p className="text-xs text-red-600 mt-1.5">{errors.lastName}</p>}
+                {errors.lastName && (
+                  <p className="text-xs text-red-600 mt-1.5">{errors.lastName}</p>
+                )}
               </label>
             </div>
 
@@ -176,11 +179,17 @@ export default function Register() {
               />
               <span>
                 I agree to the{" "}
-                <Link to="/terms" className="font-semibold text-purple-600 hover:text-purple-800 hover:underline">
+                <Link
+                  to="/terms"
+                  className="font-semibold text-purple-600 hover:text-purple-800 hover:underline"
+                >
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link to="/privacy" className="font-semibold text-purple-600 hover:text-purple-800 hover:underline">
+                <Link
+                  to="/privacy"
+                  className="font-semibold text-purple-600 hover:text-purple-800 hover:underline"
+                >
                   Privacy Policy
                 </Link>
               </span>
@@ -210,7 +219,10 @@ export default function Register() {
 
             <p className="text-sm text-slate-700 text-center">
               Already have an account?{" "}
-              <Link to="/login" className="font-bold text-purple-600 hover:text-purple-800 hover:underline">
+              <Link
+                to="/login"
+                className="font-bold text-purple-600 hover:text-purple-800 hover:underline"
+              >
                 Login here
               </Link>
             </p>
