@@ -61,6 +61,15 @@ export default function Home() {
   function onSearch(e) {
     e.preventDefault();
     const target = query.trim();
+
+    // Track search event
+    if (window.gtag) {
+      window.gtag("event", "search", {
+        search_term: target || "",
+        source: "home",
+      });
+    }
+
     if (!target) return navigate("/results");
     navigate(`/results?q=${encodeURIComponent(target)}`);
   }

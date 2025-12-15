@@ -265,6 +265,16 @@ export default function SearchResults() {
                           <div className="mt-4 flex gap-3">
                             <Link
                               to={`/tutors/${t.tutor_profile_id}${search}`}
+                              onClick={() => {
+                                // Track tutor profile view
+                                if (window.gtag) {
+                                  window.gtag("event", "view_item", {
+                                    item_id: String(t.tutor_profile_id),
+                                    item_name: t.display_name,
+                                    item_category: "tutor_profile",
+                                  });
+                                }
+                              }}
                               className="inline-flex items-center justify-center rounded-xl border-2 border-purple-300 bg-white px-5 py-2 text-sm font-bold text-purple-700 hover:bg-purple-50 hover:border-purple-400 transition-all shadow-sm"
                             >
                               VIEW PROFILE

@@ -57,6 +57,14 @@ export default function Login() {
         const storage = remember ? localStorage : sessionStorage;
         storage.setItem("demoUser", JSON.stringify(userData));
 
+        // Track login event
+        if (window.gtag) {
+          window.gtag("event", "login", {
+            method: "email",
+            role: data.user.role,
+          });
+        }
+
         if (data.user.role === 3) {
           navigate("/admin", { replace: true });
         } else if (data.user.role === 2) {
