@@ -43,40 +43,16 @@ export default function Posting() {
     if (form.availabilityTimes.length === 0) e.availabilityTimes = "Select at least one time slot";
 
     // Validate profile photo URL if provided
-    if (form.profilePhotoUrl && !form.profilePhotoUrl.startsWith("http")) {
+    if (
+      form.profilePhotoUrl &&
+      !form.profilePhotoUrl.startsWith("http://") &&
+      !form.profilePhotoUrl.startsWith("https://")
+    ) {
       e.profilePhotoUrl = "Profile photo must be a valid URL starting with http:// or https://";
     }
 
     setErrors(e);
     return Object.keys(e).length === 0;
-  }
-
-  // Build availability summary from days and times
-  function buildAvailabilitySummary() {
-    if (form.availabilityDays.length === 0 || form.availabilityTimes.length === 0) {
-      return "";
-    }
-
-    const dayMapping = {
-      Mon: "Monday",
-      Tue: "Tuesday",
-      Wed: "Wednesday",
-      Thu: "Thursday",
-      Fri: "Friday",
-      Sat: "Saturday",
-      Sun: "Sunday",
-    };
-
-    const timeMapping = {
-      morning: "Morning",
-      afternoon: "Afternoon",
-      evening: "Evening",
-    };
-
-    const days = form.availabilityDays.map((d) => dayMapping[d] || d).join(", ");
-    const times = form.availabilityTimes.map((t) => timeMapping[t] || t).join(", ");
-
-    return `${days} • ${times}`;
   }
 
   async function onSubmit(e) {
@@ -157,19 +133,16 @@ export default function Posting() {
         }),
       });
 
-       const data = await response.json();
+      const data = await response.json();
 
       if (response.ok && data?.success) {
         navigate("/tutor/dashboard");
       } else {
         setMessage(
-          "Failed to submit profile: " +
-            (data?.error || data?.message || `HTTP ${response.status}`)
+          "Failed to submit profile: " + (data?.error || data?.message || `HTTP ${response.status}`)
         );
       }
     } catch (error) {
-
-
       console.error("Error submitting profile:", error);
       setMessage("Network error - please try again");
     }
