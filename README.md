@@ -1,25 +1,33 @@
-# csc648 Repository
+# ScholarlyGator - Tutoring Platform
+## A full-stack tutoring platform connecting students with tutors at San Francisco State University with role-based dashboards, real-time messaging, session booking, and administrative moderation.
+## team04.duckdns.org
 
-## Please when ready add your teams application URL or IP to the repository description. This will help with grading. Teams are expected to keep this value up to date.
+### Features
+#### For Students
+* **Tutor Search** : Search and filter tutors by course, subject, and availability
+* **Direct Messaging** : Contact tutors with session requests
+* **Session Booking** : Schedule and manage tutoring appointments
+* **Dashboard** : View upcoming sessions and message history
 
-## Please do the following steps before completing Milestone 0.
-1. Change the name of the repository. All that needs to change is the NN to your respective team number. Team numbers whose value is less than 10, please pad with a 0. Ex team 1 is Team01 team 11 is Team11. Please make sure to also remove the username from the repository as well. Teams with incorrectly name repository will have points deducted from their milestone 0 grades.
-      - Please follow the naming convention assigned by your instructor.
+#### For Tutors
+* **Profile Management** : Create and edit comprehensive tutor profiles
+* **Session Management** : Confirm or decline session requests
+* **Pricing Control** : Set hourly rates and availability
+* **Student Communications** : Respond to student inquiries
+* **Activity Tracking** : Monitor completed and upcoming sessions
+* **Multi-Subject Support** : List multiple courses and subjects
 
-1. PLEASE REMOVE THE USERNAME FROM THE REPOSITORY NAME!!!
-
-2. Add ALL members of your team to this repository. For it to count, they must ACCEPT the invite.
-
-3. Fill out the table below
-
-
-| Student Name | School Email | GitHub Username |
-|    :---:     |     :---:     |     :---:       |
-| Iliana Gallegos | igallegos@sfsu.edu | Ili-Gallegos |
-| Darien Sngoeun | dsngoeun@sfsu.edu | DarienSngoeun |
-| Leigh Apotheker | lapothker@sfsu.edu | lapotheker |
-| Jonathan Tsang | jtsang1@sfsu.edu | jjotsang |
-| Yuhang Wei | ywei@sfsu.edu | JustinWei110 |
-| Megha Rai | mrai@sfsu.edu | Megharai-Prog| 
-| Roxana Del Toro | rxdt@sfsu.edu | rxdt |
-## NO code needs to be stored in the root of your repository. You may rename the application folder if you like to your team's application name. But all source code related to your team's application should be stored inside the application folder.
+#### For Administrators
+* **Profile Approval** : Review and approve tutor applications
+* **Content Moderation** : Handle user reports and violations
+* **Batch Operations** : Approve/reject multiple profiles simultaneously
+* **Action Logging** : Comprehensive audit trail of admin actions
+* **Report Management** : Track and resolve platform issues
+  
+### License
+This project was developed as part of CSC 648 coursework at San Francisco State University.
+### Acknowledgments
+* San Francisco State University Computer Science Department
+* CSC 648 - Software Engineering Course
+* Project mentor and my fellow developers
+* React, Node.js, and open-source communities
