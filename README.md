@@ -24,10 +24,4 @@
 * **Action Logging** : Comprehensive audit trail of admin actions
 * **Report Management** : Track and resolve platform issues
   
-### License
-This project was developed as part of CSC 648 coursework at San Francisco State University.
-### Acknowledgments
-* San Francisco State University Computer Science Department
-* CSC 648 - Software Engineering Course
-* Project mentor and my fellow developers
-* React, Node.js, and open-source communities
+
